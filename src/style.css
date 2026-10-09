@@ -626,3 +626,48 @@ a { color:inherit; }
  .atlas-map-room{width:100%;min-height:0;}
 }
 @media(prefers-reduced-motion:reduce){.atlas-map-dialog{animation:none;}}
+
+
+/* v1.0 Grand Opening: Discovery Compass + Explorer's Journey */
+.discovery-compass{max-width:1410px;margin:0 auto 13px;position:relative;z-index:4;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:7px 13px;padding:9px 15px;background:linear-gradient(105deg,rgba(44,28,25,.9),rgba(34,29,40,.93));color:#f4daba;border:1px solid rgba(229,186,132,.33);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.22);}
+.discovery-compass-title{display:flex;align-items:center;gap:8px;min-width:0;}
+.discovery-compass-title>span{color:#f4d59b;font-size:27px;line-height:1;}
+.discovery-compass-title>div{display:flex;flex-direction:column;gap:3px;}
+.discovery-compass-title strong{font-size:10px;letter-spacing:.14em;font-weight:700;color:#ffe5bc;white-space:nowrap;}
+.discovery-compass-title small{font-size:10px;line-height:1.3;color:#d7c0a4;}
+.discovery-compass-controls{display:flex;align-items:center;justify-content:flex-end;gap:9px;min-width:0;}
+.discovery-compass-controls label{font-size:11px;color:#ead0a9;font-weight:600;}
+.discovery-compass-controls select{background:#302822;border:1px solid rgba(234,195,138,.55);border-radius:7px;color:#ffe9c3;max-width:160px;padding:8px 9px;font:600 11px 'DM Sans',sans-serif;min-height:35px;}
+.discovery-compass-count{font:600 10px 'DM Sans',sans-serif;color:#dec398;white-space:nowrap;}
+.discovery-surprise{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid #ebc791;background:linear-gradient(130deg,#986f44,#6c4538);color:#fff0d4;border-radius:8px;padding:8px 12px;min-height:35px;white-space:nowrap;font:700 11px 'DM Sans',sans-serif;box-shadow:inset 0 1px rgba(255,222,164,.3);transition:filter .2s,transform .2s;}
+.discovery-surprise:hover:not(:disabled){filter:brightness(1.18);transform:translateY(-1px);}
+.discovery-surprise:disabled{opacity:.45;cursor:not-allowed;}
+.discovery-compass button:focus-visible,.discovery-compass select:focus-visible{outline:3px solid #fff1c5;outline-offset:3px;}
+.discovery-compass-notice{flex:0 0 100%;font-size:11px;line-height:1.4;margin:0;color:#d7efcd;padding:4px 0 0;border-top:1px solid rgba(223,189,143,.18);}
+.reader-focus-mode .discovery-compass{max-width:1540px;background:rgba(30,26,35,.93);border-color:rgba(213,181,211,.35);}
+.atlas-explorer-trails{margin:14px 0 1px;padding:14px 12px 10px;color:#e6ccb0;border:1px solid rgba(230,189,129,.27);border-radius:13px;background:linear-gradient(140deg,rgba(56,41,36,.96),rgba(29,25,34,.96));}
+.atlas-trails-heading{margin:0 0 12px;padding:4px 5px 0;}
+.atlas-trails-heading h3{font:600 clamp(25px,3vw,34px)/1.05 'Cormorant Garamond',Georgia,serif;color:#f6dfb8;margin:4px 0 7px;}
+.atlas-trails-heading p{color:#d9c2a7;margin:0;font-size:11px;line-height:1.45;}
+.atlas-trails-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;}
+.atlas-trail-card{display:flex;flex-direction:column;gap:11px;padding:13px;background:radial-gradient(ellipse at 10% 0%,color-mix(in srgb,var(--trail-accent) 18%,transparent),transparent 70%),rgba(16,15,21,.6);border:1px solid color-mix(in srgb,var(--trail-accent) 49%,transparent);border-radius:11px;min-width:0;}
+.atlas-trail-card-head{display:flex;align-items:center;gap:11px;min-height:34px;}
+.atlas-trail-card-head>span{font:32px Georgia,serif;color:var(--trail-accent);}
+.atlas-trail-card-head h4{font:600 23px/1 'Cormorant Garamond',Georgia,serif;color:#ffdfb0;margin:0 0 4px;}
+.atlas-trail-card-head small{font-size:10px;color:#d5c0a9;}
+.atlas-trail-route{display:flex;gap:8px;overflow-x:auto;padding:3px 1px 10px;scrollbar-width:thin;scrollbar-color:#b79573 transparent;}
+.atlas-trail-stop{position:relative;flex:1 0 92px;max-width:155px;min-height:74px;display:flex;align-items:flex-start;gap:6px;text-align:left;padding:9px 7px;border:1px solid rgba(224,184,138,.42);border-radius:9px;color:#f8ddbd;background:rgba(87,61,54,.65);}
+.atlas-trail-stop:not(:last-child)::after{content:'›';position:absolute;right:-8px;top:27px;z-index:1;font:bold 18px Georgia,serif;color:#f1d19c;pointer-events:none;}
+.atlas-trail-stop:hover{background:#735044;border-color:#f8d49c;}
+.atlas-trail-stop.trail-stop-visited{border-color:rgba(161,205,151,.62);}
+.atlas-trail-step{flex:0 0 21px;width:21px;height:21px;border:1px solid rgba(241,198,137,.7);border-radius:50%;display:grid;place-items:center;font-size:11px;color:#f7dda8;}
+.trail-stop-visited .atlas-trail-step{color:#d7efc8;border-color:#aacc91;}
+.atlas-trail-stop-label{min-width:0;font-size:10px;line-height:1.2;overflow-wrap:anywhere;}
+.atlas-trail-stop-label small{display:block;margin-top:4px;color:#ceb99e;font-size:9px;}
+.atlas-trail-start{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;padding:9px 11px;margin-top:auto;border:1px solid rgba(237,199,145,.56);border-radius:8px;color:#ffdfb8;background:rgba(112,77,47,.8);font-size:10px;font-weight:700;}
+.atlas-trail-start:hover{background:#9b6c3e;}
+.atlas-trail-card button:focus-visible{outline:3px solid #ffe7b3;outline-offset:2px;}
+@media(max-width:1050px){.discovery-compass-title small{display:none;}.discovery-compass-count{display:none;}}
+@media(max-width:760px){.discovery-compass{padding:9px 10px;}.discovery-compass-title strong{font-size:9px;}.discovery-compass-controls{gap:6px;}.discovery-compass-controls label{display:none;}.discovery-compass-controls select{max-width:125px;padding:8px 4px;}.discovery-surprise{padding:8px;gap:5px;}.atlas-trails-grid{grid-template-columns:1fr;}}
+@media(max-width:460px){.discovery-compass{align-items:stretch;}.discovery-compass-title>span{font-size:21px;}.discovery-compass-controls{justify-content:space-between;width:100%;}.discovery-compass-controls select{flex:1;max-width:190px;}.discovery-surprise{flex:1;max-width:170px;}.atlas-explorer-trails{padding:10px 8px;}.atlas-trail-stop{flex-basis:102px;}}
+@media(prefers-reduced-motion:reduce){.discovery-surprise{transition:none;}.discovery-surprise:hover:not(:disabled){transform:none;}}

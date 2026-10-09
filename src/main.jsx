@@ -6,7 +6,7 @@ import {
   Search, Settings2, Sparkles, Sun, WandSparkles, X, RefreshCw,
   Globe2, Link2, Info, RotateCcw, Menu, Star, Keyboard,
 } from 'lucide-react';
-import { seedPages, categories, wings, wingForCategory, safeUrl, uniqueMerge, newArrivals, shouldAutoDiscover, discoverGithubPages } from './catalog';
+import { seedPages, categories, wings, wingForCategory, safeUrl, uniqueMerge, newArrivals, shouldAutoDiscover, discoverGithubPages, isVerifiedPublishedPage } from './catalog';
 import { curateProject, applyLocalEdits, categoryPalette } from './curation';
 import { isInfiniteAtlas, MAX_MIRROR_DEPTH, MIN_MIRROR_DEPTH, mirrorLayers, nextMirrorDepth } from './fieldception';
 import './style.css';
@@ -159,9 +159,7 @@ function App() {
       if (manifest.schema_version !== 1 || manifest.owner !== 'MichaelWave369' || !Array.isArray(manifest.pages)) {
         throw new Error('Unexpected public catalog format');
       }
-      const valid = manifest.pages.filter(item => item && item.verified === true
-        && /^gh-\d+$/.test(item.id) && /^[\w.-]+$/.test(item.repo || '')
-        && safeUrl(item.url)?.startsWith('https://')).map(item => ({
+      const valid = manifest.pages.filter(isVerifiedPublishedPage).map(item => ({
           ...item, title: String(item.title || item.repo).slice(0, 80),
           desc: String(item.desc || '').slice(0, 300),
           kicker: 'LIVE FROM THE FIELD',

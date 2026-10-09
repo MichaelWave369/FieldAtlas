@@ -164,6 +164,7 @@ function App() {
   useEffect(() => { localStorage.setItem(EDITS_KEY, JSON.stringify(localEdits)); }, [localEdits]);
   useEffect(() => { localStorage.setItem(PASSPORT_KEY, JSON.stringify(visitedChapters)); }, [visitedChapters]);
   useEffect(() => { if (active?.id) setVisitedChapters(old => old.includes(active.id) ? old : [...old, active.id].slice(-1000)); }, [active?.id]);
+  useEffect(() => { setShareNotice(''); }, [active?.id]);
   useEffect(() => { localStorage.setItem(DISCOVERY_KEY, JSON.stringify(discovery)); }, [discovery]);
   useEffect(() => {
     let cancelled = false;
@@ -363,7 +364,7 @@ function App() {
   }
   function resetCatalog() {
     if (!window.confirm('Restore the original nine curated chapters? Custom chapters and edits will be removed from this browser.')) return;
-    setPages(seedPages); setDiscovery(prev => ({...prev, hiddenIds: []})); setLocalEdits({}); setCategory('All'); setWing('all'); setSearch(''); setCurrent(0);
+    setPages(seedPages); setDiscovery(prev => ({...prev, hiddenIds: []})); setLocalEdits({}); setActiveTour(null); setCategory('All'); setWing('all'); setSearch(''); setCurrent(0);
   }
 
   const fav = active && favoriteIds.includes(active.id);
@@ -399,7 +400,7 @@ function App() {
       <div className="wings-rail">
         {wings.map(w => {
           const count = catalog.filter(p => w.id === 'all' || wingForCategory(p.category) === w.id).length;
-          return <button type="button" key={w.id} className={`wing-card ${wing===w.id?'wing-active':''}`} onClick={() => {setWing(w.id);setEnteredWing(w.id === 'all');setCategory('All');setSearch('');}} aria-pressed={wing === w.id}>
+          return <button type="button" key={w.id} className={`wing-card ${wing===w.id?'wing-active':''}`} onClick={() => {setActiveTour(null);setWing(w.id);setEnteredWing(w.id === 'all');setCategory('All');setSearch('');}} aria-pressed={wing === w.id}>
             <span className="wing-glyph" aria-hidden="true">{w.glyph}</span><span className="wing-title">{w.name}</span>
             <small>{w.description}</small><span className="wing-count">{count} {count===1?'chapter':'chapters'}</span>
           </button>;

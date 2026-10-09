@@ -2,13 +2,35 @@
 
 **A cozy, interactive living library of public GitHub Pages projects.**
 
+## v0.3: Enter the wings, open the world
+
+**The immersive study stays lightweight.** Enter the Research, Creative, Engineering, Games, or Curious Annex rooms for an animated arched doorway, atmospheric themed light, a small interactive bookshelf with book-spine shortcuts, and the existing full living reader. Everything still works without a 3D graphics card. This is a *cinematic 2.5D transition*, not yet a walkable Three.js room.
+
+**All verified, public GitHub Pages sites get shared chapters automatically.** On every deploy and once daily through GitHub Actions, `npm run catalog:sync`:
+
+1. Lists **public owner repositories only** via the GitHub REST API.
+2. Selects only repos with GitHub Pages enabled, excluding private, archived, and third-party repos.
+3. Makes a bounded HTTPS HTTP request to their Pages URLs and checks that the result is an available HTML page. Valid HTTPS custom-domain redirects are allowed.
+4. Writes `public/pages-discovered.json` with verification counts and published URL.
+5. Builds and deploys that catalog so *all visitors* see confirmed public sites automatically when opening the Atlas.
+
+The original nine curated chapters remain as a fallback. New additions are de-duplicated by repository and URL. Local user additions and hidden chapters stay private to each browser. The manual new-arrivals inbox remains available for Pages-enabled projects that cannot be confirmed automatically.
+
+**Limits:** A valid HTML response does not guarantee iframe permission, full app functionality, or that the site is appropriate for every audience. Some domains and network edges may fail a temporary verification and can be reviewed manually. Re-checks occur during deployment, not continuously. GitHub Pages embedding restrictions still require the `Open this world` link.
+
+```bash
+npm run catalog:sync  # optional local public-only discovery
+npm test              # includes safe filtering/probing tests
+npm run build
+```
+
 ## v0.2: The Living Library
 
 A new row of themed rooms organizes existing chapters: **Research Wing**, **Creative Wing**, **Engineering Wing**, **Game Room**, and **Curious Annex**, plus the complete library. The book itself stays central, and page-turning still works inside any room.
 
-**New-arrivals inbox:** When an existing browser opens FieldAtlas, the app can check public GitHub repository metadata once every 24 hours. It lists newly discovered Pages-enabled repositories in the Curate dialog for the visitor to inspect, **not** in the actual book. Each arrival has a direct preview link, suggested category, explicit *Add chapter* approval, and a *Dismiss* control. Manual refresh is available, and automatic checks can be disabled. The app requests no GitHub credentials and never mutates repositories.
+**New-arrivals inbox (v0.2 manual path):** When an existing browser opens FieldAtlas, the app can check public GitHub repository metadata once every 24 hours. It lists newly discovered Pages-enabled repositories in the Curate dialog for the visitor to inspect, **not** in the actual book. Each arrival has a direct preview link, suggested category, explicit *Add chapter* approval, and a *Dismiss* control. Manual refresh is available, and automatic checks can be disabled. The app requests no GitHub credentials and never mutates repositories.
 
-**What approval means:** browser-specific chapter approvals and dismissals are stored in localStorage. They do not add a site to the canonical public starter book for all visitors. To curate a public chapter for everyone, edit `src/catalog.js` and submit a regular GitHub pull request. This distinction is deliberate: public websites should not be globally featured from unreviewed metadata.
+**What approval means:** browser-specific chapter approvals and dismissals are stored in localStorage. They do not add an unverified site to the shared public book for all visitors. Verified Pages in the generated manifest are shared automatically. To curate a public chapter for everyone, edit `src/catalog.js` and submit a regular GitHub pull request. This distinction is deliberate: public websites should not be globally featured from unreviewed metadata.
 
 **Discovery limitations:** GitHub's `has_pages` flag is not proof a site is reachable, published correctly, or iframe-embeddable. Custom-domain homepages that do not use the owner's github.io host may require manual URL correction. GitHub API rate limits apply.
 
@@ -92,7 +114,7 @@ public/          Optimized room artwork
 
 ## Next phases
 
-- Optional review-only GitHub Action proposing new canonical public chapters in a pull request (requires repository-authorized governance).
+- Operator-controlled pinning, naming, and manually-reviewed exclusions for the auto-generated verified catalog.
 - Optional screenshots when a target refuses iframe embedding.
 - Richer 3D camera transitions (Three.js), optional spatial audio, and a walkable VR study.
 - Accessible page thumbnails/reading mode for low-bandwidth devices.

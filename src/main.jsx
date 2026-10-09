@@ -10,6 +10,7 @@ import { seedPages, categories, wings, wingForCategory, safeUrl, uniqueMerge, ne
 import { curateProject, applyLocalEdits, categoryPalette } from './curation';
 import LibraryMap from './LibraryMap';
 import { getMapChapterWing } from './library-map';
+import { compassFilters, pickSurpriseChapter, remainingSurpriseCount, availableSurprises } from './discovery-compass';
 import { isInfiniteAtlas, MAX_MIRROR_DEPTH, MIN_MIRROR_DEPTH, mirrorLayers, nextMirrorDepth } from './fieldception';
 import { visitorJourneys, findJourney, availableJourneyStops, readAtlasLink, buildAtlasLink, locateSharedChapter } from './journeys';
 import { wrapChapterIndex, canTurnChapters, wrapDestinationLabel } from './navigation';
@@ -121,6 +122,8 @@ function App() {
   const [portalOpen, setPortalOpen] = useState(false);
   const [focusMode, setFocusMode] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
+  const [compassWing, setCompassWing] = useState('all');
+  const [compassNotice, setCompassNotice] = useState('');
   const [mirrorDepth, setMirrorDepth] = useState(MIN_MIRROR_DEPTH);
   const [activeTour, setActiveTour] = useState(null);
   const [visitedChapters, setVisitedChapters] = useState(() => {
@@ -158,6 +161,8 @@ function App() {
   const journeyStops = useMemo(() => availableJourneyStops(journey, catalog), [journey, catalog]);
   const tourStep = Math.min(activeTour?.step ?? 0, Math.max(0, journeyStops.length - 1));
   const fieldception = isInfiniteAtlas(active);
+  const compassChoices = useMemo(() => availableSurprises(catalog, compassWing), [catalog, compassWing]);
+  const undiscoveredCount = useMemo(() => remainingSurpriseCount(catalog, compassWing, visitedChapters), [catalog, compassWing, visitedChapters]);
   useEffect(() => { setMirrorDepth(MIN_MIRROR_DEPTH); }, [active?.id]);
   const directoryResults = useMemo(() => catalog.filter(p => {
     const q = directorySearch.trim().toLowerCase();
@@ -304,6 +309,24 @@ function App() {
     } catch {
       setShareNotice(link);
     }
+  }
+  function surpriseMe() {
+    const discovered = pickSurpriseChapter(catalog, {
+      wing: compassWing,
+      visitedIds: visitedChapters,
+      currentId: active?.id,
+    });
+    if (!discovered) {
+      setCompassNotice('No available chapters in this wing yet. Choose another room.');
+      return;
+    }
+    setActiveTour(null);
+    setWing(compassWing);
+    setEnteredWing(true);
+    setCategory('All');
+    setSearch('');
+    setPendingChapterId(discovered.id);
+    setCompassNotice('The compass found ' + discovered.title + '. Open its living page!');
   }
   function enterRoomFromMap(id) {
     setMapOpen(false);
@@ -472,6 +495,22 @@ function App() {
       </div>
     </div>
 
+    <section className="discovery-compass" aria-label="Discover another library chapter">
+      <div className="discovery-compass-title"><span aria-hidden="true">✧</span><div><strong>THE DISCOVERY COMPASS</strong>
+        <small>Explore something unexpected from the public library</small></div></div>
+      <div className="discovery-compass-controls">
+        <label htmlFor="compass-room">Explore</label>
+        <select id="compass-room" value={compassWing} onChange={event => {setCompassWing(event.target.value);setCompassNotice('');}}>
+          {compassFilters.map(choice => <option key={choice.id} value={choice.id}>{choice.title}</option>)}
+        </select>
+        <span className="discovery-compass-count">{undiscoveredCount} not yet visited</span>
+        <button className="discovery-surprise" type="button" disabled={!compassChoices.length} onClick={surpriseMe}>
+          <Sparkles size={16}/> Surprise Me <ArrowRight size={15}/>
+        </button>
+      </div>
+      {compassNotice && <p className="discovery-compass-notice" role="status">{compassNotice}</p>}
+    </section>
+
     {journey && journeyStops.length > 0 && <section className="tour-compass" aria-label="Guided visit controls">
       <div className="tour-compass-label"><span>✦ GUIDED WALK</span><strong>{journey.name}</strong>
         <small>Stop {tourStep+1} / {journeyStops.length} · {journeyStops.filter(p=>visitedChapters.includes(p.id)).length} passport stamps</small></div>
@@ -635,7 +674,8 @@ function App() {
     </div>}
 
     {mapOpen && <LibraryMap wings={wings} catalog={catalog} currentWing={wing} visitedIds={visitedChapters}
-      onClose={() => setMapOpen(false)} onEnterWing={enterRoomFromMap} onOpenChapter={openChapterFromMap}/>}
+      onClose={() => setMapOpen(false)} onEnterWing={enterRoomFromMap} onOpenChapter={openChapterFromMap}
+      journeys={visitorJourneys} activeTour={activeTour} onStartTour={(id, repo) => {setMapOpen(false);selectJourney(id, repo);}}/>}
 
     {directoryOpen && <div className="directory-overlay" role="presentation" onMouseDown={() => setDirectoryOpen(false)}>
       <section className="directory-panel" role="dialog" aria-modal="true" aria-labelledby="directory-title" onMouseDown={e=>e.stopPropagation()}>

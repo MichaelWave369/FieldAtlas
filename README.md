@@ -2,6 +2,15 @@
 
 **A cozy, interactive living library of public GitHub Pages projects.**
 
+## v0.7: Endless Pages and Book-First Layout
+
+- **Circular book navigation:** When on chapter 1, the left arrow (and `←` key) wraps to the final chapter. At the final chapter, right arrow (`→`) wraps to chapter 1. This works within the current wing, search results, and category filters, with no invalid navigation for a one-chapter or empty result.
+- **The book is the main event:** A compact room-selection rail sits immediately below the title, then the living book, its search/progress bar and chapter index. The full room cards, Visitor's Desk, and expanded room entry are still present lower on the page.
+- **A little larger, a lot higher:** The desktop book has more horizontal space and a taller maximum height. Shorter desktop viewports constrain height so the living page remains usable. Phones retain their stacked two-page reader with compact, horizontally scrollable room choices.
+- **Accessible feedback:** Circular edge arrows have meaningful aria labels, and users can still navigate by pointer or keyboard. Empty or one-page lists disable turning rather than incorrectly looping.
+
+The existing FieldCeption mirror, live site iframes, guided tours, bookmarks and public Pages discovery are preserved.
+
 ## v0.6: The Visitor's Desk
 
 The Field Atlas now has **four guided discovery walks** for people who have never seen the ecosystem:

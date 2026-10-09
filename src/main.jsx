@@ -32,6 +32,19 @@ function Artwork({ accent = '#c8ab79', category = 'Other' }) {
   </div>;
 }
 
+function BookCover({ page, onOpen, compact = false }) {
+  const palette = categoryPalette[page.category] || categoryPalette.Other;
+  return <button type="button" className={`atlas-cover ${compact ? 'atlas-cover-compact' : ''}`}
+    style={{ '--cover-accent': page.accent || palette.color }}
+    onClick={onOpen} title={'Open ' + page.title} aria-label={'Open chapter: ' + page.title}>
+    <span className="cover-inner-frame" aria-hidden="true" />
+    <span className="cover-crest" aria-hidden="true">{page.coverGlyph || palette.glyph}</span>
+    <span className="cover-title">{page.title}</span>
+    <span className="cover-divider" aria-hidden="true">✧</span>
+    <span className="cover-imprint">{page.category.toUpperCase()} · FIELD ATLAS</span>
+  </button>;
+}
+
 function App() {
   const [pages, setPages] = useState(() => {
     const loaded = readLocal(STORE_KEY, seedPages);
@@ -163,6 +176,7 @@ function App() {
     setShelfOpen(false);
   }
   function beginEdit(page) {
+    setDirectoryOpen(false);
     setEditorPage(page);
     setEditForm({ title: page.title || '', desc: page.desc || '', category: page.category || 'Other' });
   }
@@ -287,13 +301,19 @@ function App() {
           </button>;
         })}
       </div>
+      <div className="directory-shortcut"><span>{catalog.length} living chapters across the Field</span><button type="button" onClick={() => {setDirectoryWing('all');setDirectorySearch('');setDirectoryOpen(true);}}><Search size={16}/> Browse the complete directory <ArrowRight size={15}/></button></div>
     </section>
 
-    <section className="room-portal" key={wing} aria-label={'Now visiting ' + activeWing.name}>
-      <div className="room-portal-arch" aria-hidden="true"><span>✧</span></div>
-      <div className="room-portal-text"><span className="room-portal-kicker">WELCOME TO THIS WING</span>
+    <section className={`room-portal ${enteredWing ? 'room-entered' : 'room-at-door'}`} key={wing} aria-label={'Now visiting ' + activeWing.name}>
+      <button type="button" className={`room-portal-arch ${enteredWing ? 'door-open' : ''}`}
+        onClick={() => setEnteredWing(true)} aria-label={'Enter ' + activeWing.name} disabled={enteredWing}>
+        <span className="door-light" aria-hidden="true">✧</span>
+        <span className="door-leaf door-left" aria-hidden="true" /><span className="door-leaf door-right" aria-hidden="true" />
+      </button>
+      <div className="room-portal-text"><span className="room-portal-kicker">{enteredWing ? 'WELCOME TO THIS WING' : 'A NEW ROOM AWAITS'}</span>
         <h2>{activeWing.name}</h2><p>{activeWing.description}</p>
-        <small>{manifestStatus || 'The shelves are always growing.'}</small></div>
+        {!enteredWing && <button className="room-enter-button" type="button" onClick={() => setEnteredWing(true)}>Enter this room <ArrowRight size={15}/></button>}
+        {enteredWing && <small>{manifestStatus || 'The shelves are always growing.'}</small>}</div>
       <div className="room-bookshelf" aria-label="Choose a book from this room">
         {filtered.slice(0, 24).map((p,i) => <button type="button" key={p.id}
           className={`room-book ${index === i ? 'room-book-selected' : ''}`}
@@ -301,8 +321,17 @@ function App() {
           onClick={() => goTo(i)} aria-label={'Open ' + p.title} title={p.title}>
           <span className="room-book-mark">✧</span><span className="room-book-name">{p.title}</span>
         </button>)}
-        {filtered.length > 24 && <span className="room-more-books">+{filtered.length - 24} more inside the Atlas</span>}
+        {filtered.length > 24 && <button className="room-more-books" type="button" onClick={() => {setDirectoryWing(wing);setDirectoryOpen(true);}}>+{filtered.length - 24} more · Browse all</button>}
       </div>
+      {enteredWing && <div className="room-gallery">
+        <div className="room-gallery-heading"><strong>Books in this room</strong><button type="button" onClick={() => {setDirectoryWing(wing);setDirectoryOpen(true);}}><Search size={13}/> View entire directory <ArrowRight size={13}/></button></div>
+        <div className="room-cover-gallery">{filtered.slice(0, 8).map(p =>
+          <BookCover page={p} key={p.id} compact onOpen={() => {
+            setPendingChapterId(p.id);
+            setDirectoryOpen(false);
+          }} />
+        )}</div>
+      </div>}
     </section>
 
     <section className="reading-stage" aria-label="Interactive book of GitHub Pages websites">
@@ -375,6 +404,48 @@ function App() {
       <div className="portal-modal-header"><span><BookOpen size={19}/> {active.title} <small>LIVE SITE</small></span><div><a href={active.url} target="_blank" rel="noopener noreferrer"><ExternalLink size={16}/> Open outside atlas</a><button aria-label="Close fullscreen reader" onClick={()=>setPortalOpen(false)}><X size={20}/></button></div></div>
       <iframe key={'full-'+active.id} title={`Fullscreen website ${active.title}`} src={active.url} allow="fullscreen; clipboard-read; clipboard-write" />
       <p className="modal-embed-hint">If a page is blank, its host may prevent iframe embedding. Use “Open outside atlas.”</p>
+    </div>}
+
+    {directoryOpen && <div className="directory-overlay" role="presentation" onMouseDown={() => setDirectoryOpen(false)}>
+      <section className="directory-panel" role="dialog" aria-modal="true" aria-labelledby="directory-title" onMouseDown={e=>e.stopPropagation()}>
+        <header className="directory-head">
+          <div><span className="eyebrow">THE GREAT CATALOG · VOLUME ONE</span><h2 id="directory-title">The Atlas Directory</h2><p>{catalog.length} unique chapters collected in one searchable place.</p></div>
+          <button type="button" className="directory-close" aria-label="Close directory" onClick={()=>setDirectoryOpen(false)}><X size={21}/></button>
+        </header>
+        <div className="directory-tools">
+          <label className="directory-search"><Search size={16}/><input value={directorySearch} onChange={e => setDirectorySearch(e.target.value)} placeholder="Search every world, tool, and experiment..." aria-label="Search the Atlas directory" autoFocus /></label>
+          <select aria-label="Filter directory by wing" value={directoryWing} onChange={e=>setDirectoryWing(e.target.value)}>
+            {wings.map(w=><option key={w.id} value={w.id}>{w.name}</option>)}
+          </select>
+          <span>{directoryResults.length} results</span>
+        </div>
+        <div className="directory-results">
+          {directoryResults.map(p => <article key={p.id} className="directory-entry">
+            <BookCover page={p} onOpen={() => openChapterFromDirectory(p)} compact />
+            <div className="directory-entry-copy"><h3>{p.title}</h3><span>{p.category} · {p.repo || 'Personal chapter'}</span><p>{p.desc || 'An open door to another project.'}</p>
+              <div className="directory-entry-actions"><button type="button" onClick={() => openChapterFromDirectory(p)}><BookOpen size={14}/> Read chapter</button>
+              <button type="button" onClick={() => beginEdit(p)}><Settings2 size={14}/> Edit label</button>
+              <a href={p.url} target="_blank" rel="noopener noreferrer"><ExternalLink size={14}/> Visit site</a></div>
+            </div>
+          </article>)}
+          {!directoryResults.length && <div className="directory-empty">No chapters match your search. Try a different phrase or room.</div>}
+        </div>
+        <p className="directory-note">Editorial category and title changes are saved only in this browser. The shared published catalog is updated through reviewed repository changes.</p>
+      </section>
+    </div>}
+
+    {editorPage && <div className="directory-overlay" role="presentation" onMouseDown={() => setEditorPage(null)}>
+      <section className="entry-edit-panel" role="dialog" aria-modal="true" aria-labelledby="edit-entry-title" onMouseDown={e=>e.stopPropagation()}>
+        <button className="directory-close edit-close" onClick={() => setEditorPage(null)} aria-label="Close editor"><X size={20}/></button>
+        <span className="eyebrow">LOCAL CURATOR DESK</span><h2 id="edit-entry-title">Edit this book's label</h2>
+        <p>Personalizing this label does not change GitHub or anyone else's Atlas.</p>
+        <form onSubmit={saveEditedChapter} className="directory-edit-form">
+          <label>Project title<input required maxLength={80} value={editForm.title} onChange={e => setEditForm(v=>({...v,title:e.target.value}))}/></label>
+          <label>Library section<select value={editForm.category} onChange={e => setEditForm(v=>({...v,category:e.target.value}))}>{categories.filter(c=>c!=='All').map(c=><option key={c}>{c}</option>)}</select></label>
+          <label>Description<textarea rows={3} maxLength={300} value={editForm.desc} onChange={e => setEditForm(v=>({...v,desc:e.target.value}))}/></label>
+          <button className="gold-btn" type="submit"><Check size={16}/> Save my label</button>
+        </form>
+      </section>
     </div>}
 
     {showHelp && <div className="modal-cover" onMouseDown={()=>setShowHelp(false)}><section className="small-modal" role="dialog" aria-modal="true" aria-labelledby="help-title" onMouseDown={e=>e.stopPropagation()}><button className="modal-x" aria-label="Close" onClick={()=>setShowHelp(false)}><X/></button><span className="eyebrow">A NOTE FROM THE LIBRARY</span><h2 id="help-title">A book made of doorways.</h2><p>The Field Atlas is a real React app, wrapped in a warm study. Each chapter previews a GitHub Pages website in an iframe and offers a direct link. Some browsers and projects refuse embedded frames, so the direct link is always available.</p><p>Turn chapters with the arrows or keyboard, choose a library wing, bookmark favorites, or add sites by URL. A daily public-site manifest automatically adds verified live GitHub Pages to the shared book. Unverified suggestions remain in the private-to-this-browser approval inbox. Personal bookmarks and changes stay in this browser.</p><div className="modal-notice"><Star size={18}/> The book is a guide, never a permission grant. Embedded sites keep their own functionality and safety rules.</div></section></div>}

@@ -38,7 +38,7 @@ export const projectOverrides = Object.freeze({
   'brainsweatstudios': { title:'BrainSweat Studios', category:'Creative' },
   'WaveForgeStudio': { title:'WaveForge Studio', category:'Creative' },
   'lumen_sword_369': { title:'Lumen Sword', category:'Creative' },
-  'FieldAtlas': { title:'The Field Atlas', category:'Tools' },
+  'FieldAtlas': { title:'The Infinite Atlas · Φ∞', category:'Other', desc:'The book that contains itself: a bounded mirror chamber where the Field reflects the Field.' },
   'LabelFit': { title:'LabelFit', category:'Tools' },
   'MoreBounceLabs': { title:'More Bounce Labs', category:'Creative' },
   'MemeForge': { title:'MemeForge', category:'Creative' },

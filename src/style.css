@@ -367,3 +367,50 @@ a { color:inherit; }
 @keyframes mirror-shimmer{from{opacity:.48;transform:scale(.92) rotateX(9deg)}to{opacity:1;transform:scale(1) rotateX(1.4deg)}}
 @media(max-width:680px){.mirror-chamber-header{font-size:7px;padding:6px 8px;}.mirror-vista{padding:5px;}.mirror-mini-room{padding:4px;}.mirror-mini-book{width:93%;}.mirror-console{gap:6px;padding:7px;flex-wrap:wrap;}.mirror-console p{font-size:10px;}.mirror-controls button{font-size:9px;padding:6px 8px;min-height:25px;}}
 @media(prefers-reduced-motion:reduce){.mirror-mini-room{animation:none;}}
+
+
+/* v0.6 The Visitor's Desk: a restrained, storybook invitation to explore */
+.visitor-desk{position:relative;z-index:3;max-width:1240px;margin:0 auto 15px;border:1px solid rgba(232,185,127,.33);border-radius:13px;background:linear-gradient(115deg,rgba(37,24,22,.93),rgba(23,20,29,.89));box-shadow:0 11px 31px rgba(0,0,0,.21);overflow:hidden;color:#e7cdab;}
+.visitor-desk>summary{display:flex;align-items:center;gap:12px;min-height:49px;padding:9px 17px;cursor:pointer;list-style:none;}
+.visitor-desk>summary::-webkit-details-marker{display:none;}
+.visitor-desk-emblem{font:26px/1 Georgia,serif;color:#f0c58a;text-shadow:0 0 16px rgba(239,186,119,.38);}
+.visitor-desk summary strong{font:700 11px 'DM Sans',sans-serif;letter-spacing:.16em;color:#f7dbb5;white-space:nowrap;}
+.visitor-desk summary>span:nth-child(3){font-size:12px;color:#dac2a5;}
+.passport-summary{margin-left:auto;display:inline-flex;align-items:center;gap:7px;font-size:10px;color:#f5d09e;white-space:nowrap;}
+.visitor-desk-chevron{color:#d6b78a;transition:transform .2s;}
+.visitor-desk[open] .visitor-desk-chevron{transform:rotate(90deg);}
+.visitor-desk summary:hover{background:rgba(114,73,46,.2);}
+.journey-options{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;padding:10px 16px 14px;border-top:1px solid rgba(238,190,131,.18);}
+.journey-card{display:flex;flex-direction:column;align-items:flex-start;gap:7px;min-height:170px;text-align:left;position:relative;overflow:hidden;padding:13px 15px;color:#f5dcbf;border:1px solid rgba(229,184,128,.29);border-radius:11px;background:radial-gradient(circle at 85% 9%,color-mix(in srgb,var(--journey-accent) 28%,transparent),transparent 65%),linear-gradient(130deg,rgba(83,49,38,.75),rgba(22,22,29,.91));transition:border-color .2s,transform .2s,box-shadow .2s;}
+.journey-card:hover:not(:disabled){border-color:var(--journey-accent);transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.24);}
+.journey-card:disabled{opacity:.4;cursor:not-allowed;}
+.journey-glyph{font:27px Georgia,serif;color:var(--journey-accent);}
+.journey-kicker{font-size:9px;color:#d9b789;letter-spacing:.16em;font-weight:700;}
+.journey-card strong{font:600 26px/1 'Cormorant Garamond',Georgia,serif;color:#fff0d6;}
+.journey-card small{font-size:11px;color:#e3ccb0;line-height:1.4;flex:1;}
+.journey-foot{display:flex;align-items:center;gap:7px;color:#f9d9a4;font-weight:700;font-size:10px;white-space:nowrap;}
+.journey-foot svg{margin-left:auto;}
+.visitor-desk-footnote{margin:0;padding:0 16px 13px;color:#cdb69b;font-size:10px;line-height:1.5;}
+.tour-compass{display:grid;grid-template-columns:minmax(190px,1fr) minmax(280px,2.5fr) auto;align-items:center;gap:15px;max-width:1235px;margin:0 auto 15px;padding:14px 16px;border-radius:14px;border:1px solid rgba(236,187,129,.42);background:linear-gradient(110deg,rgba(41,31,34,.93),rgba(28,24,35,.95));box-shadow:0 10px 29px rgba(0,0,0,.25);color:#f3dabc;position:relative;z-index:2;}
+.tour-compass-label{display:flex;align-items:flex-start;flex-direction:column;gap:5px;}
+.tour-compass-label>span{font-size:9px;font-weight:700;letter-spacing:.16em;color:#e1bd8e;}
+.tour-compass-label strong{font:600 23px/1 'Cormorant Garamond',Georgia,serif;color:#ffe2b7;}
+.tour-compass-label small{font-size:10px;color:#d9bca0;}
+.tour-compass-stops{display:flex;overflow-x:auto;gap:7px;scrollbar-width:thin;}
+.tour-stop{display:flex;flex:1 0 65px;align-items:center;min-width:0;gap:6px;padding:9px 6px;border:1px solid rgba(209,179,133,.25);border-radius:7px;background:rgba(28,22,26,.63);color:#ecd4b1;text-align:left;}
+.tour-stop span{display:grid;place-items:center;flex:0 0 20px;height:20px;border-radius:50%;border:1px solid #a78661;font-size:10px;color:#f0d3a1;}
+.tour-stop small{white-space:nowrap;text-overflow:ellipsis;overflow:hidden;font-size:10px;max-width:110px;}
+.tour-stop-active,.tour-stop:hover{background:rgba(118,76,43,.5);border-color:#eac596;}
+.tour-compass-controls{display:flex;align-items:center;gap:6px;}
+.tour-compass-controls button{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-width:33px;min-height:35px;padding:7px;border:1px solid rgba(231,191,143,.5);border-radius:8px;background:rgba(82,57,42,.75);color:#ffe0b4;font-weight:700;font-size:11px;white-space:nowrap;}
+.tour-compass-controls button:disabled{opacity:.35;cursor:default;}
+.tour-compass-controls button:hover:not(:disabled){background:rgba(127,84,46,.9);}
+.tour-compass-controls .tour-next-button{padding:7px 11px;background:#80603b;}
+.share-status{display:flex;align-items:center;gap:6px;position:relative;z-index:3;padding:7px 8px;background:rgba(47,64,47,.16);border:1px solid rgba(116,147,103,.3);border-radius:7px;margin-bottom:8px;color:#786543;font-size:10px;line-height:1.3;}
+.share-status span{white-space:nowrap;}
+.share-status input{width:100%;min-width:0;border:1px solid #b89b6e;border-radius:4px;background:#f8ebd1;color:#5d4830;padding:4px;font-size:10px;}
+.portal-actions .share-chapter{background:rgba(150,118,69,.12);}
+@media(max-width:940px){.journey-options{grid-template-columns:repeat(2,minmax(0,1fr));}.tour-compass{grid-template-columns:1fr auto;}.tour-compass-stops{grid-column:1 / -1;grid-row:2;}}
+@media(max-width:630px){.visitor-desk>summary{flex-wrap:wrap;gap:6px;padding:10px 11px;}.visitor-desk summary>span:nth-child(3){font-size:10px;flex:1;}.passport-summary{margin-left:0;}.journey-options{padding:10px;gap:7px;}.journey-card{padding:11px;min-height:185px;}.journey-card strong{font-size:23px;}.journey-card small{font-size:10px;}.tour-compass{gap:8px;padding:9px;grid-template-columns:1fr auto;}.tour-compass-label strong{font-size:20px;}.tour-compass-controls .tour-next-button{font-size:10px;}.share-status{flex-wrap:wrap;}}
+@media(max-width:400px){.journey-options{grid-template-columns:1fr;}.journey-card{min-height:125px;}.visitor-desk summary strong{font-size:10px;}.passport-summary{font-size:9px;}}
+@media(prefers-reduced-motion:reduce){.journey-card,.visitor-desk-chevron{transition:none;}.journey-card:hover{transform:none;}}

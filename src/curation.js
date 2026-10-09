@@ -46,7 +46,6 @@ export const projectOverrides = Object.freeze({
   'parallax-369-public-primer': { title:'Parallax Primer', category:'Research' },
   'phi369-element-spiral-atlas': { title:'Element Spiral Atlas', category:'Research' },
   'parallax-gran-prix': { title:'Parallax Grand Prix', category:'Games' },
-  'NestedBubbleGear': { title:'Nested Bubble Gear', category:'Research' },
   'Infinite-Porch': { title:'Infinite Porch', category:'Systems' },
   'JukeBot': { title:'JukeBot', category:'Creative' },
   'paracut': { title:'Paracut', category:'Creative' },

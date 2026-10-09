@@ -2,6 +2,16 @@
 
 **A cozy, interactive living library of public GitHub Pages projects.**
 
+## v1.0 Grand Opening Candidate: Discovery Compass + Explorer's Journey
+
+The public Atlas now has a lightweight, accessible **Discovery Compass** beneath its reading toolbar. Choose All rooms, Research, Creative, Engineering, Games, or the Curious Annex and press **Surprise Me**. The compass chooses from the currently accessible HTTPS catalog, favors unvisited chapters in the visitor's browser-local passport, avoids the current page whenever alternatives exist, and returns to the **same living book**. Empty rooms never produce broken links. There are no added requests, model calls, or repository permissions.
+
+The **Living Library Map** now hosts the **Explorer's Journey**: all four existing guided routes displayed as ordered stops, with chapter titles, room labels, visited passport stars, and a **Begin/Continue trail** control. Selecting a route or stop opens that project in the reader with the existing tour compass; it doesn't run code inside linked applications.
+
+**Polish and release discipline:** Responsive controls, keyboard-accessible native buttons, visible focus, screen-reader status for surprise results, no new dependencies, no duplicate live iframes, and explicit reduced-motion styling. Automated tests cover URL/wing filtering, unvisited-first selection, safe empty states, map trail data and integration. A separate **[Grand Opening acceptance checklist](docs/V1_GRAND_OPENING_CHECKLIST.md)** specifies the browser/mobile/keyboard checks required before intentionally tagging v1.0.0.
+
+This is a **v1.0 candidate PR**, not a claim that a manual cross-device acceptance pass has already happened. The existing book-first layout, Reader's Sanctuary, circular pages, live inventory, and FieldCeption are preserved.
+
 ## v0.9: The Cartographer's Room
 
 The live Atlas now includes an **interactive floor plan**. Select **Library Map** from the compact room selector above the living book to enter the map overlay. The same six established rooms are shown around a central **Great Atrium** with decorative pathways on parchment.

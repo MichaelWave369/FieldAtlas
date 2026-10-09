@@ -1,13 +1,16 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { ArrowRight, BookOpen, Compass, DoorOpen, X } from 'lucide-react';
-import { canEnterMapRoom, getAtlasMapRooms } from './library-map.js';
+import { canEnterMapRoom, getAtlasMapRooms, getMapChapterWing } from './library-map.js';
+import { availableJourneyStops } from './journeys.js';
 
 /**
  * A purely presentational floor plan: real buttons sit ABOVE decorative SVG
  * lines. No WebGL, tracking, iframe, external assets, or layout side effects.
  */
-export default function LibraryMap({ wings, catalog, currentWing, visitedIds, onClose, onEnterWing, onOpenChapter }) {
+export default function LibraryMap({ wings, catalog, currentWing, visitedIds, onClose, onEnterWing, onOpenChapter, journeys = [], activeTour = null, onStartTour = () => {} }) {
   const rooms = useMemo(() => getAtlasMapRooms(wings, catalog, visitedIds), [wings, catalog, visitedIds]);
+  const trails = useMemo(() => journeys.map(route => ({...route, stops: availableJourneyStops(route, catalog)})).filter(route => route.stops.length > 0), [journeys, catalog]);
+  const visited = useMemo(() => new Set(visitedIds), [visitedIds]);
   const dialogRef = useRef(null);
   const closeRef = useRef(null);
 
@@ -91,6 +94,41 @@ export default function LibraryMap({ wings, catalog, currentWing, visitedIds, on
           </div>
           <p className="atlas-map-watermark" aria-hidden="true">EVERY DOORWAY LEADS BACK TO THE FIELD · ✧ · MMXXVI</p>
         </div>
+        <section className="atlas-explorer-trails" aria-label="Explorer's guided journeys">
+          <div className="atlas-trails-heading">
+            <span className="atlas-map-eyebrow">THE EXPLORER'S JOURNEY</span>
+            <h3>Follow a trail across the rooms</h3>
+            <p>Choose a path and follow its books in order. Passport stars mark chapters already opened on this device.</p>
+          </div>
+          <div className="atlas-trails-grid">
+            {trails.map(route => {
+              const complete = route.stops.filter(p => visited.has(p.id)).length;
+              const next = route.stops.find(p => !visited.has(p.id)) || route.stops[0];
+              return <article className="atlas-trail-card" key={route.id} style={{'--trail-accent': route.accent}}>
+                <div className="atlas-trail-card-head">
+                  <span aria-hidden="true">{route.glyph}</span>
+                  <div><h4>{route.name}</h4><small>{complete} of {route.stops.length} chapters explored</small></div>
+                </div>
+                <div className="atlas-trail-route">
+                  {route.stops.map((page,i) => {
+                    const room = rooms.find(r => r.id === getMapChapterWing(page));
+                    return <button type="button" key={page.id}
+                      className={`atlas-trail-stop ${visited.has(page.id) ? 'trail-stop-visited' : ''}`}
+                      title={'Read ' + page.title}
+                      onClick={() => onStartTour(route.id, page.repo)}
+                      aria-label={`Open stop ${i+1}, ${page.title}, ${room?.shortName || 'Annex'}`}>
+                      <span className="atlas-trail-step">{visited.has(page.id) ? '✦' : i+1}</span>
+                      <span className="atlas-trail-stop-label">{page.title}<small>{room?.shortName || 'Other'}</small></span>
+                    </button>;
+                  })}
+                </div>
+                <button type="button" className="atlas-trail-start" onClick={() => onStartTour(route.id, next.repo)}>
+                  <BookOpen size={14}/> {activeTour?.id === route.id ? 'Continue the trail' : complete === route.stops.length ? 'Walk this trail again' : 'Begin this trail'} <ArrowRight size={14}/>
+                </button>
+              </article>;
+            })}
+          </div>
+        </section>
       </div>
       <footer className="atlas-map-footer">
         <span><Compass size={15}/> {catalog.length} accessible chapters · Your visit stamps stay in this browser</span>

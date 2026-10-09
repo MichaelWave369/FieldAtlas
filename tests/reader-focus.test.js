@@ -17,7 +17,7 @@ test('focus toolbar can enter and return from the reading sanctuary', () => {
 
 test('Escape leaves reader focus only when other dialogs are not active', () => {
   assert.match(app,/else if \(focusMode\) exitFocusMode\(\)/);
-  assert.match(app,/if \(portalOpen \|\| shelfOpen \|\| showHelp \|\| directoryOpen \|\| editorPage\)/);
+  assert.match(app,/if \(portalOpen \|\| shelfOpen \|\| showHelp \|\| directoryOpen \|\| editorPage \|\| mapOpen\)/);
 });
 
 test('shelf selection and deferred directory/tour choices return to the actual book', () => {

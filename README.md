@@ -2,6 +2,20 @@
 
 **A cozy, interactive living library of public GitHub Pages projects.**
 
+## v0.9: The Cartographer's Room
+
+The live Atlas now includes an **interactive floor plan**. Select **Library Map** from the compact room selector above the living book to enter the map overlay. The same six established rooms are shown around a central **Great Atrium** with decorative pathways on parchment.
+
+Each room reports actual **accessible chapter count** and local passport progress, plus up to three clickable project-name shortcuts. From the map:
+
+- **Enter wing** changes the room filter and returns focus to the **existing living book**, starting with the first chapter of that wing.
+- **Click a book title** jumps to that specific project in its themed wing, resets incompatible filters, and brings the reader into view.
+- **Return to the Book** or **Escape** closes the map without changing chapters.
+- A visually marked **YOU ARE HERE** tile shows the current wing.
+- The map is keyboard reachable with native buttons, keyboard focus handling, and reduced-motion support. On phones it becomes a compact, scrollable room grid.
+
+The cartography screen reads the same `catalog` and browser-local visited IDs already used by the live reader. It does **not** embed websites, call external APIs, publish private projects, introduce 3D/WebGL overhead, or change permissions. All normal room doors, Focus Mode, tours, books, and FieldCeption remain available.
+
 ## v0.8: The Reader's Sanctuary
 
 Focus Mode turns the *existing* living book into the centerpiece of the study without loading a duplicate live website. A compact gold **Focus Mode** button sits just above the reader. Entering sanctuary:

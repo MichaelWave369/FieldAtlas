@@ -205,3 +205,43 @@ a { color:inherit; }
 @media(max-width:1080px) {.wings-rail{grid-template-columns:repeat(3,minmax(0,1fr));}.wing-card{min-height:114px;}}
 @media(max-width:680px) {.study-wings{margin-bottom:26px;}.wings-rail{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding:3px 3px 10px;gap:9px;}.wing-card{min-width:166px;max-width:166px;scroll-snap-align:start;min-height:125px;}.wings-heading{align-items:flex-start;flex-direction:column;gap:4px;}.discovery-controls{align-items:stretch;flex-direction:column;}.arrival-entry{align-items:stretch;flex-direction:column;}.arrival-actions{justify-content:flex-start;}.arrival-alert{padding:9px 10px;font-size:10px;}}
 @media(prefers-reduced-motion:reduce){.wing-card{transition:none;}.wing-card:hover{transform:none;}}
+
+
+/* v0.3: cinematic room-door transitions without requiring WebGL or a GPU */
+.study-app { --wing-glow:rgba(240,187,104,.22); }
+.wing-scene-research{--wing-glow:rgba(106,161,237,.22);}
+.wing-scene-creative{--wing-glow:rgba(225,132,190,.2);}
+.wing-scene-engineering{--wing-glow:rgba(85,196,177,.2);}
+.wing-scene-games{--wing-glow:rgba(226,153,89,.26);}
+.wing-scene-annex{--wing-glow:rgba(186,147,239,.22);}
+.study-app .room-tint{transition:background .75s ease;}
+.study-app .room-art{transition:filter .85s ease;}
+.wing-scene-research .room-tint {background:linear-gradient(to bottom,rgba(6,12,22,.74),rgba(23,20,28,.25) 35%,rgba(9,17,33,.93)),radial-gradient(ellipse at 49% 48%,var(--wing-glow),transparent 67%);}
+.wing-scene-creative .room-tint {background:linear-gradient(to bottom,rgba(26,10,28,.7),rgba(38,17,28,.22) 35%,rgba(29,9,25,.93)),radial-gradient(ellipse at 50% 45%,var(--wing-glow),transparent 67%);}
+.wing-scene-engineering .room-tint {background:linear-gradient(to bottom,rgba(6,25,23,.75),rgba(14,24,20,.2) 35%,rgba(6,22,21,.94)),radial-gradient(ellipse at 50% 45%,var(--wing-glow),transparent 67%);}
+.wing-scene-games .room-tint {background:linear-gradient(to bottom,rgba(30,12,10,.72),rgba(31,18,12,.2) 35%,rgba(28,10,9,.95)),radial-gradient(ellipse at 50% 45%,var(--wing-glow),transparent 67%);}
+.wing-scene-annex .room-tint {background:linear-gradient(to bottom,rgba(22,12,31,.76),rgba(29,21,32,.22) 35%,rgba(19,11,29,.95)),radial-gradient(ellipse at 50% 45%,var(--wing-glow),transparent 67%);}
+.room-portal{max-width:1240px;margin:0 auto 27px;min-height:168px;border:1px solid rgba(244,206,151,.3);border-radius:24px;display:grid;grid-template-columns:104px minmax(0,1fr);gap:3px 17px;align-items:center;position:relative;z-index:2;overflow:hidden;background:radial-gradient(ellipse at 24% 35%,var(--wing-glow),transparent 66%),linear-gradient(130deg,rgba(23,15,14,.92),rgba(47,29,22,.9));box-shadow:inset 0 0 30px rgba(215,148,84,.05),0 19px 49px rgba(0,0,0,.3);padding:19px 22px 20px;animation:room-arrival .7s cubic-bezier(.17,.72,.26,1) both;}
+@keyframes room-arrival{0%{opacity:.2;transform:translateY(12px) scale(.975);filter:blur(5px)}100%{opacity:1;transform:none;filter:none;}}
+.room-portal-arch {grid-row:1 / span 2;align-self:stretch;min-height:108px;border:2px solid rgba(227,177,109,.55);border-bottom:3px solid #a97a49;border-radius:55px 55px 8px 8px;display:grid;place-items:center;position:relative;background:radial-gradient(ellipse at 50% 33%,var(--wing-glow),transparent 80%),linear-gradient(145deg,rgba(142,96,60,.2),rgba(9,10,17,.5));box-shadow:inset 0 0 0 5px rgba(16,10,10,.6),inset 0 0 0 7px rgba(221,158,93,.2),0 0 18px var(--wing-glow);}
+.room-portal-arch::after{content:'';position:absolute;left:22%;right:22%;bottom:12px;height:8px;border-top:2px solid rgba(226,174,101,.6);border-bottom:2px solid rgba(226,174,101,.3);}
+.room-portal-arch span{font:54px Georgia,serif;color:#f9ddab;text-shadow:0 0 29px var(--wing-glow);}
+.room-portal-text{min-width:0;}
+.room-portal-kicker{font:700 9px 'DM Sans',sans-serif;color:#dcbd87;letter-spacing:.24em;}
+.room-portal h2{font:600 clamp(27px,3vw,38px)/1 'Cormorant Garamond',Georgia,serif;margin:5px 0;color:#f7dfb9;}
+.room-portal p{font-size:12px;color:#e3c6a4;margin:0 0 7px;line-height:1.45;}
+.room-portal small{font-size:10px;color:#c9b49a;line-height:1.4;display:block;}
+.room-bookshelf{grid-column:2;display:flex;align-items:end;gap:4px;overflow-x:auto;padding:8px 2px 6px;scrollbar-width:thin;scrollbar-color:#a67c4f transparent;max-width:100%;}
+.room-book{position:relative;flex:0 0 25px;min-height:72px;padding:5px 3px;overflow:hidden;border:1px solid rgba(246,216,172,.34);border-bottom:4px solid rgba(67,35,20,.9);border-radius:4px 4px 2px 2px;display:flex;align-items:center;gap:4px;flex-direction:column;justify-content:center;color:#f8e8c7;background:linear-gradient(90deg,rgba(16,10,10,.67),transparent 37%,var(--spine-color) 120%),#5a3926;box-shadow:inset 2px 0 0 rgba(253,214,151,.23),2px 2px 6px rgba(0,0,0,.34);transition:transform .22s ease,min-height .22s ease;}
+.room-book:nth-child(3n){min-height:81px;}
+.room-book:nth-child(4n){min-height:65px;}
+.room-book:nth-child(5n){min-height:88px;}
+.room-book:hover,.room-book-selected {transform:translateY(-7px);border-color:#ffe1ad;box-shadow:0 3px 15px rgba(229,163,89,.34);}
+.room-book-mark{font-size:10px;color:#fde6b3;}
+.room-book-name{writing-mode:vertical-rl;transform:rotate(180deg);display:block;max-height:58px;overflow:hidden;text-overflow:clip;white-space:nowrap;font-size:8px;font-weight:700;letter-spacing:.02em;line-height:1.2;}
+.room-more-books {align-self:center;flex:0 0 118px;font-size:10px;color:#d7b888;padding:10px;line-height:1.4;}
+.public-catalog-status{font-size:11px;color:#d7c9ae;padding:10px 13px;margin:6px 0;background:rgba(46,64,55,.36);border:1px solid rgba(147,200,154,.24);border-radius:9px;}
+.wing-scene-research .atlas-book,.wing-scene-creative .atlas-book,.wing-scene-engineering .atlas-book,.wing-scene-games .atlas-book,.wing-scene-annex .atlas-book{animation:book-room-arrival .6s ease;}
+@keyframes book-room-arrival{from{opacity:.55;transform:translateY(13px) rotateX(5deg)}to{opacity:1;transform:rotateX(2deg)}}
+@media(max-width:740px){.room-portal{grid-template-columns:63px minmax(0,1fr);gap:8px 11px;padding:14px;border-radius:14px;}.room-portal-arch{min-height:94px;}.room-portal-arch span{font-size:38px;}.room-portal h2{font-size:27px;}.room-portal-text p{font-size:11px;}.room-bookshelf{grid-column:1 / -1;}.room-book{flex-basis:23px;}}
+@media(prefers-reduced-motion:reduce){.room-portal,.wing-scene-research .atlas-book,.wing-scene-creative .atlas-book,.wing-scene-engineering .atlas-book,.wing-scene-games .atlas-book,.wing-scene-annex .atlas-book{animation:none;}.room-book{transition:none;}.room-book:hover{transform:none;}}

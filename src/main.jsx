@@ -117,6 +117,7 @@ function App() {
   const [flipping, setFlipping] = useState('');
   const [shelfOpen, setShelfOpen] = useState(false);
   const [portalOpen, setPortalOpen] = useState(false);
+  const [focusMode, setFocusMode] = useState(false);
   const [mirrorDepth, setMirrorDepth] = useState(MIN_MIRROR_DEPTH);
   const [activeTour, setActiveTour] = useState(null);
   const [visitedChapters, setVisitedChapters] = useState(() => {
@@ -130,6 +131,7 @@ function App() {
   const [syncStatus, setSyncStatus] = useState('');
   const [syncing, setSyncing] = useState(false);
   const pendingTimers = useRef([]);
+  const readerRef = useRef(null);
   const handledDeepLink = useRef(false);
 
   const favoriteIds = prefs.favoriteIds || [];
@@ -193,6 +195,23 @@ function App() {
   }, []);
   useEffect(() => () => pendingTimers.current.forEach(clearTimeout), []);
   useEffect(() => { setCurrent(0); }, [category, search, wing]);
+  const scrollToReader = useCallback(() => {
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    window.requestAnimationFrame(() => readerRef.current?.scrollIntoView({
+      behavior: reduceMotion ? 'auto' : 'smooth',
+      block: 'start',
+    }));
+  }, []);
+  useEffect(() => {
+    if (focusMode) scrollToReader();
+  }, [focusMode, scrollToReader]);
+  function exitFocusMode() {
+    setFocusMode(false);
+    window.requestAnimationFrame(() => {
+      const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+      window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+    });
+  }
   useEffect(() => {
     if (!manifestStatus || handledDeepLink.current) return;
     handledDeepLink.current = true;
@@ -222,8 +241,9 @@ function App() {
     if (target >= 0) {
       setCurrent(target);
       setPendingChapterId(null);
+      scrollToReader();
     }
-  }, [pendingChapterId, filtered]);
+  }, [pendingChapterId, filtered, scrollToReader]);
 
   const goTo = useCallback((target, direction = '') => {
     if (flipping || target < 0 || target >= filtered.length || target === index) return;
@@ -240,14 +260,19 @@ function App() {
   }, [goTo, index, filtered.length]);
   useEffect(() => {
     const onKeyDown = e => {
-      if (e.key === 'Escape') { setPortalOpen(false); setShelfOpen(false); setShowHelp(false); setDirectoryOpen(false); setEditorPage(null); return; }
+      if (e.key === 'Escape') {
+        if (portalOpen || shelfOpen || showHelp || directoryOpen || editorPage) {
+          setPortalOpen(false); setShelfOpen(false); setShowHelp(false); setDirectoryOpen(false); setEditorPage(null);
+        } else if (focusMode) exitFocusMode();
+        return;
+      }
       if (portalOpen || shelfOpen || showHelp || directoryOpen || editorPage || /input|textarea|select/i.test(e.target?.tagName || '')) return;
       if (e.key === 'ArrowRight') { e.preventDefault(); turn(1); }
       if (e.key === 'ArrowLeft') { e.preventDefault(); turn(-1); }
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [portalOpen, shelfOpen, showHelp, directoryOpen, editorPage, turn]);
+  }, [portalOpen, shelfOpen, showHelp, directoryOpen, editorPage, focusMode, turn]);
 
   function selectJourney(id, targetRepo = null) {
     const stops = availableJourneyStops(id, catalog);
@@ -376,7 +401,7 @@ function App() {
   const chapter = specialRoman[index] || String(index + 1);
 
   const activeWing = wings.find(w => w.id === wing) || wings[0];
-  return <main className={`study-app ${prefs.night ? 'night-mode' : ''} wing-scene-${wing}`}>
+  return <main className={`study-app ${prefs.night ? 'night-mode' : ''} wing-scene-${wing} ${focusMode ? 'reader-focus-mode' : ''}`}>
     <div className="room-art" role="presentation" />
     <div className="room-tint" role="presentation" />
     <div className="ambient-lights" role="presentation"><i /><i /><i /><i /><i /><i /></div>
@@ -411,6 +436,18 @@ function App() {
       <a className="quick-room-details" href="#study-rooms">Explore rooms <ChevronRight size={13}/></a>
     </nav>
 
+    <div className="reader-toolbar" aria-label="Reader display controls">
+      <div className="reader-toolbar-heading"><span className="reader-toolbar-symbol">✧</span><strong>{focusMode ? 'THE READER’S SANCTUARY' : 'THE LIVING BOOK'}</strong>
+        <small>{focusMode ? 'A quiet moment inside the Field.' : 'Turn a page. Visit a world.'}</small></div>
+      <div className="reader-toolbar-actions">
+        {!focusMode && <button type="button" className="reader-locate" onClick={scrollToReader}><BookOpen size={15}/> To the book</button>}
+        <button type="button" className="reader-focus-toggle" aria-pressed={focusMode}
+          onClick={() => focusMode ? exitFocusMode() : setFocusMode(true)}>
+          {focusMode ? <><LibraryBig size={16}/> Return to Library</> : <><Maximize2 size={16}/> Focus Mode</>}
+        </button>
+      </div>
+    </div>
+
     {journey && journeyStops.length > 0 && <section className="tour-compass" aria-label="Guided visit controls">
       <div className="tour-compass-label"><span>✦ GUIDED WALK</span><strong>{journey.name}</strong>
         <small>Stop {tourStep+1} / {journeyStops.length} · {journeyStops.filter(p=>visitedChapters.includes(p.id)).length} passport stamps</small></div>
@@ -427,7 +464,7 @@ function App() {
       </div>
     </section>}
 
-    <section id="living-book" className="reading-stage" aria-label="Interactive book of GitHub Pages websites">
+    <section id="living-book" ref={readerRef} className="reading-stage" aria-label="Interactive book of GitHub Pages websites">
       <div className="side-ornament left-ornament" aria-hidden="true"><span className="fancy-star">✧</span><span>EXPLORE</span><i /></div>
       <div className="side-ornament right-ornament" aria-hidden="true"><span className="fancy-star">✧</span><span>IMAGINE</span><i /></div>
       <div className="book-floor" aria-hidden="true" />
@@ -491,7 +528,7 @@ function App() {
     </section>
 
     <nav className="chapter-shelf" aria-label="Book chapter index">
-      {filtered.map((p, i) => <button type="button" key={p.id} className={`shelf-chapter ${index===i ? 'selected' : ''}`} onClick={() => goTo(i)} title={p.title}>
+      {filtered.map((p, i) => <button type="button" key={p.id} className={`shelf-chapter ${index===i ? 'selected' : ''}`} onClick={() => { goTo(i); scrollToReader(); }} title={p.title}>
         <span className="shelf-number">{String(i+1).padStart(2,'0')}</span><span className="shelf-icon" style={{'--accent':p.accent}}>✦</span><span className="shelf-name">{p.title}</span>{favoriteIds.includes(p.id) && <Bookmark size={11} fill="currentColor"/>}
       </button>)}
       <button type="button" className="shelf-add" onClick={()=>setShelfOpen(true)}><Plus size={17}/> Add chapter</button>
@@ -545,7 +582,7 @@ function App() {
         {filtered.slice(0, 24).map((p,i) => <button type="button" key={p.id}
           className={`room-book ${index === i ? 'room-book-selected' : ''}`}
           style={{'--spine-color': p.accent || '#a37c51'}}
-          onClick={() => goTo(i)} aria-label={'Open ' + p.title} title={p.title}>
+          onClick={() => { goTo(i); scrollToReader(); }} aria-label={'Open ' + p.title} title={p.title}>
           <span className="room-book-mark">✧</span><span className="room-book-name">{p.title}</span>
         </button>)}
         {filtered.length > 24 && <button className="room-more-books" type="button" onClick={() => {setDirectoryWing(wing);setDirectoryOpen(true);}}>+{filtered.length - 24} more · Browse all</button>}

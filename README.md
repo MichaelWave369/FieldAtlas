@@ -2,6 +2,19 @@
 
 **A cozy, interactive living library of public GitHub Pages projects.**
 
+## v0.8: The Reader's Sanctuary
+
+Focus Mode turns the *existing* living book into the centerpiece of the study without loading a duplicate live website. A compact gold **Focus Mode** button sits just above the reader. Entering sanctuary:
+
+- Dims the room illustration and surrounding lighting, then enlarges the same central book on desktop.
+- Temporarily hides the expansive rooms, Visitor's Desk, chapter shelf, introduction and other surrounding sections. The book's live preview, circular page arrows, chapter filters, and controls remain usable.
+- Offers **Return to Library** in the same toolbar, restoring the full study. **Escape** also exits focus once dialogs are closed.
+- Respects reduced-motion preferences; narrow mobile layouts retain the stacked book format.
+
+**Back to the book:** Selecting a title from the chapter shelf, a room spine or cover, the directory, or a guided tour now smoothly returns the viewport to the existing reader instead of leaving it above the screen. On devices requesting reduced motion, this jump is immediate.
+
+Focus Mode is ephemeral UI state, not stored in the visitor's passport or transmitted to GitHub. Existing bookmarks, public Pages discovery, FieldCeption, and project iframe permissions are unaffected.
+
 ## v0.7: Endless Pages and Book-First Layout
 
 - **Circular book navigation:** When on chapter 1, the left arrow (and `←` key) wraps to the final chapter. At the final chapter, right arrow (`→`) wraps to chapter 1. This works within the current wing, search results, and category filters, with no invalid navigation for a one-chapter or empty result.

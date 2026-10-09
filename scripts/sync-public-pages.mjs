@@ -7,6 +7,7 @@
  * accepts HTTPS redirects (e.g. to a custom domain), and confirms HTML.
  */
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { inferCategory } from '../src/catalog.js';
 
 export const OWNER = 'MichaelWave369';
 export const OUTPUT = 'public/pages-discovered.json';
@@ -100,7 +101,7 @@ export async function buildManifest({ fetcher = fetch, owner = OWNER, token = ''
     ...item,
     url: probes[i].url,
     verified: true,
-    category: 'Other',
+    category: inferCategory(item.repo),
     published: true,
   }] : []);
   pages.sort((a, b) => a.repo.localeCompare(b.repo, 'en', { sensitivity: 'base' }));

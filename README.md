@@ -1,6 +1,17 @@
 # The Field Atlas ✦
 
-**A cozy, interactive library of live GitHub Pages projects.**
+**A cozy, interactive living library of public GitHub Pages projects.**
+
+## v0.2: The Living Library
+
+A new row of themed rooms organizes existing chapters: **Research Wing**, **Creative Wing**, **Engineering Wing**, **Game Room**, and **Curious Annex**, plus the complete library. The book itself stays central, and page-turning still works inside any room.
+
+**New-arrivals inbox:** When an existing browser opens FieldAtlas, the app can check public GitHub repository metadata once every 24 hours. It lists newly discovered Pages-enabled repositories in the Curate dialog for the visitor to inspect, **not** in the actual book. Each arrival has a direct preview link, suggested category, explicit *Add chapter* approval, and a *Dismiss* control. Manual refresh is available, and automatic checks can be disabled. The app requests no GitHub credentials and never mutates repositories.
+
+**What approval means:** browser-specific chapter approvals and dismissals are stored in localStorage. They do not add a site to the canonical public starter book for all visitors. To curate a public chapter for everyone, edit `src/catalog.js` and submit a regular GitHub pull request. This distinction is deliberate: public websites should not be globally featured from unreviewed metadata.
+
+**Discovery limitations:** GitHub's `has_pages` flag is not proof a site is reachable, published correctly, or iframe-embeddable. Custom-domain homepages that do not use the owner's github.io host may require manual URL correction. GitHub API rate limits apply.
+
 
 The React app uses an original AI-generated cozy study illustration as its backdrop, with an interactive illuminated book at its center. Each turn of the page reveals an actual web app in an iframe, along with its story and a direct link.
 
@@ -13,9 +24,9 @@ The React app uses an original AI-generated cozy study illustration as its backd
 - Curated starter chapters from MichaelWave369's GitHub Pages projects.
 - Live embedded website previews, **plus always-visible direct links**. (Iframe embedding is not guaranteed.)
 - Fullscreen reader with direct-link fallback.
-- Search, chapter categories, and bookmarks.
+- Search, chapter categories, bookmarks, and themed library wings.
 - Curate-the-book drawer: add and remove chapters.
-- **Discover public GitHub Pages** with the public GitHub REST API; uses public metadata only and never needs a token.
+- **Discover public GitHub Pages** through the public GitHub REST API with a manual-review inbox; uses public metadata only and never needs a token.
 - Browser-local storage for customized chapters and bookmarks. No server or login.
 - GitHub Actions workflow for GitHub Pages deployment.
 - Mobile-friendly layout and reduced-motion support.
@@ -51,7 +62,7 @@ The Vite config uses relative asset paths so no repo-specific base pathname is r
 
 ## Pages and permissions
 
-The chapter registry is in [`src/catalog.js`](src/catalog.js). Nine examples are seeded. Some URLs were taken directly from the GitHub repository's declared homepage; others follow the GitHub Pages convention. The repository's `has_pages` flag does not guarantee that a deployed URL currently returns a functioning website. Edit or remove any inaccurate entry in the browser.
+The canonical publicly visible starter book is in [`src/catalog.js`](src/catalog.js). Nine examples are seeded. Some URLs were taken directly from the GitHub repository's declared homepage; others follow the GitHub Pages convention. The repository's `has_pages` flag does not guarantee that a deployed URL currently returns a functioning website. Edit or remove any inaccurate entry in the browser.
 
 **No private repositories are scanned or exposed.** GitHub's unauthenticated public API is used for discovery, so the `has_pages` results only cover publicly accessible repositories. GitHub imposes unauthenticated API rate limits. Discovery checks the public repository list, not individual websites' iframe permissions.
 
@@ -81,7 +92,7 @@ public/          Optimized room artwork
 
 ## Next phases
 
-- Persistent canonical catalog synchronized to `catalog.json` in GitHub.
+- Optional review-only GitHub Action proposing new canonical public chapters in a pull request (requires repository-authorized governance).
 - Optional screenshots when a target refuses iframe embedding.
 - Richer 3D camera transitions (Three.js), optional spatial audio, and a walkable VR study.
 - Accessible page thumbnails/reading mode for low-bandwidth devices.

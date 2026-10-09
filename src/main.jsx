@@ -6,11 +6,12 @@ import {
   Search, Settings2, Sparkles, Sun, WandSparkles, X, RefreshCw,
   Globe2, Link2, Info, RotateCcw, Menu, Star, Keyboard,
 } from 'lucide-react';
-import { seedPages, categories, safeUrl, uniqueMerge, discoverGithubPages } from './catalog';
+import { seedPages, categories, wings, wingForCategory, safeUrl, uniqueMerge, newArrivals, shouldAutoDiscover, discoverGithubPages } from './catalog';
 import './style.css';
 
 const STORE_KEY = 'field-atlas-pages-v1';
 const PREF_KEY = 'field-atlas-preferences-v1';
+const DISCOVERY_KEY = 'field-atlas-discovery-v2';
 const specialRoman = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
 
 function readLocal(key, fallback) {
@@ -36,6 +37,16 @@ function App() {
   });
   const [prefs, setPrefs] = useState(() => readLocal(PREF_KEY, { night: false, favoriteIds: [], hintDismissed: false }));
   const [category, setCategory] = useState('All');
+  const [wing, setWing] = useState('all');
+  const [discovery, setDiscovery] = useState(() => {
+    const value = readLocal(DISCOVERY_KEY, {});
+    return {
+      candidates: Array.isArray(value.candidates) ? value.candidates.filter(p => p && p.id && safeUrl(p.url)) : [],
+      dismissedIds: Array.isArray(value.dismissedIds) ? value.dismissedIds : [],
+      lastCheckedAt: Number(value.lastCheckedAt) || 0,
+      autoEnabled: value.autoEnabled !== false,
+    };
+  });
   const [search, setSearch] = useState('');
   const [current, setCurrent] = useState(0);
   const [flipping, setFlipping] = useState('');
@@ -50,17 +61,19 @@ function App() {
 
   const favoriteIds = prefs.favoriteIds || [];
   const filtered = useMemo(() => pages.filter(p => {
+    const matchesWing = wing === 'all' || wingForCategory(p.category) === wing;
     const matchesCategory = category === 'All' || (category === 'Favorites' ? favoriteIds.includes(p.id) : p.category === category);
     const needle = search.trim().toLowerCase();
-    return matchesCategory && (!needle || [p.title, p.repo, p.desc, p.category].join(' ').toLowerCase().includes(needle));
-  }), [pages, category, search, favoriteIds]);
+    return matchesWing && matchesCategory && (!needle || [p.title, p.repo, p.desc, p.category].join(' ').toLowerCase().includes(needle));
+  }), [pages, category, search, favoriteIds, wing]);
   const index = Math.min(Math.max(current, 0), Math.max(0, filtered.length - 1));
   const active = filtered[index];
 
   useEffect(() => { localStorage.setItem(STORE_KEY, JSON.stringify(pages)); }, [pages]);
   useEffect(() => { localStorage.setItem(PREF_KEY, JSON.stringify(prefs)); }, [prefs]);
+  useEffect(() => { localStorage.setItem(DISCOVERY_KEY, JSON.stringify(discovery)); }, [discovery]);
   useEffect(() => () => pendingTimers.current.forEach(clearTimeout), []);
-  useEffect(() => { setCurrent(0); }, [category, search]);
+  useEffect(() => { setCurrent(0); }, [category, search, wing]);
 
   const goTo = useCallback((target, direction = '') => {
     if (flipping || target < 0 || target >= filtered.length || target === index) return;
@@ -99,27 +112,54 @@ function App() {
       pullquote: 'Every great story has another page.', accent: '#e6c893', index: '✦',
     };
     setPages(old => [...old, item]);
-    setCategory('All'); setSearch(''); setCurrent(pages.length);
+    setCategory('All'); setWing('all'); setSearch(''); setCurrent(pages.length);
     setForm({ title: '', url: '', category: 'Other', desc: '' });
     setFormError(''); setShelfOpen(false);
   }
-  async function syncPages() {
-    setSyncing(true); setSyncStatus('Looking for public GitHub Pages sites…');
+  async function scanLibrary(background = false) {
+    setSyncing(true);
+    if (!background) setSyncStatus('Checking public GitHub Pages for new arrivals…');
     try {
       const discovered = await discoverGithubPages();
-      const merged = uniqueMerge(pages, discovered);
-      setPages(merged);
-      setSyncStatus(`Found ${discovered.length} published-Pages repositories. Added ${merged.length - pages.length} new chapters. Review discovered URLs before sharing.`);
-    } catch (e) { setSyncStatus(e.message || 'Could not reach GitHub right now.'); }
-    finally { setSyncing(false); }
+      const candidates = newArrivals(discovered, pages, discovery.dismissedIds);
+      setDiscovery(prev => ({
+        ...prev,
+        candidates: newArrivals(discovered, pages, prev.dismissedIds),
+        lastCheckedAt: Date.now(),
+      }));
+      setSyncStatus('Found ' + discovered.length + ' Pages-enabled public repositories; ' + candidates.length + ' await approval. GitHub Pages status does not guarantee a working live site.');
+    } catch (e) {
+      setSyncStatus(e?.message || 'Could not reach GitHub right now.');
+    } finally {
+      setSyncing(false);
+    }
   }
+  function approveCandidate(id) {
+    const selected = discovery.candidates.find(p => p.id === id);
+    if (!selected) return;
+    setPages(old => uniqueMerge(old, [selected]));
+    setDiscovery(prev => ({ ...prev, candidates: prev.candidates.filter(p => p.id !== id) }));
+    setCategory('All'); setWing('all'); setSearch('');
+  }
+  function dismissCandidate(id) {
+    setDiscovery(prev => ({
+      ...prev,
+      dismissedIds: [...new Set([...prev.dismissedIds, id])],
+      candidates: prev.candidates.filter(p => p.id !== id),
+    }));
+  }
+  useEffect(() => {
+    if (discovery.autoEnabled && shouldAutoDiscover(discovery.lastCheckedAt)) void scanLibrary(true);
+    // One read-only scan at most daily, when this browser opens the site.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   function removePage(id) {
     setPages(old => old.filter(x => x.id !== id));
     setCurrent(0);
   }
   function resetCatalog() {
     if (!window.confirm('Restore the original nine curated chapters? Custom chapters and edits will be removed from this browser.')) return;
-    setPages(seedPages); setCategory('All'); setSearch(''); setCurrent(0);
+    setPages(seedPages); setCategory('All'); setWing('all'); setSearch(''); setCurrent(0);
   }
 
   const fav = active && favoriteIds.includes(active.id);
@@ -138,6 +178,7 @@ function App() {
       <div className="topbar-actions">
         <span className="room-status"><span className="status-glow" /> THE STUDY IS OPEN</span>
         <button className="icon-btn" type="button" title="Change lamplight" aria-label="Toggle lamplight" onClick={() => setPrefs(p => ({...p, night: !p.night}))}>{prefs.night ? <Moon size={19}/> : <Sun size={19}/>}</button>
+        {discovery.candidates.length > 0 && <button className="arrival-alert" type="button" onClick={() => setShelfOpen(true)} aria-label={discovery.candidates.length + ' new arrivals awaiting review'}><Sparkles size={15}/> {discovery.candidates.length} arrivals</button>}
         <button className="soft-btn" type="button" onClick={() => setShelfOpen(true)}><LibraryBig size={17}/> <span>Curate the book</span></button>
       </div>
     </header>
@@ -147,6 +188,19 @@ function App() {
       <h1>A thousand worlds. <em>One book.</em></h1>
       <p>Come in, stay awhile. Every chapter opens a living creation.</p>
     </div>
+
+    <section className="study-wings" aria-label="Explore the library wings">
+      <div className="wings-heading"><span>CHOOSE A ROOM</span><small>{pages.length} approved chapters · {discovery.candidates.length} arrivals to review</small></div>
+      <div className="wings-rail">
+        {wings.map(w => {
+          const count = pages.filter(p => w.id === 'all' || wingForCategory(p.category) === w.id).length;
+          return <button type="button" key={w.id} className={`wing-card ${wing===w.id?'wing-active':''}`} onClick={() => {setWing(w.id);setCategory('All');setSearch('');}} aria-pressed={wing === w.id}>
+            <span className="wing-glyph" aria-hidden="true">{w.glyph}</span><span className="wing-title">{w.name}</span>
+            <small>{w.description}</small><span className="wing-count">{count} {count===1?'chapter':'chapters'}</span>
+          </button>;
+        })}
+      </div>
+    </section>
 
     <section className="reading-stage" aria-label="Interactive book of GitHub Pages websites">
       <div className="side-ornament left-ornament" aria-hidden="true"><span className="fancy-star">✧</span><span>EXPLORE</span><i /></div>
@@ -220,13 +274,17 @@ function App() {
       <p className="modal-embed-hint">If a page is blank, its host may prevent iframe embedding. Use “Open outside atlas.”</p>
     </div>}
 
-    {showHelp && <div className="modal-cover" onMouseDown={()=>setShowHelp(false)}><section className="small-modal" role="dialog" aria-modal="true" aria-labelledby="help-title" onMouseDown={e=>e.stopPropagation()}><button className="modal-x" aria-label="Close" onClick={()=>setShowHelp(false)}><X/></button><span className="eyebrow">A NOTE FROM THE LIBRARY</span><h2 id="help-title">A book made of doorways.</h2><p>The Field Atlas is a real React app, wrapped in a warm study. Each chapter previews a GitHub Pages website in an iframe and offers a direct link. Some browsers and projects refuse embedded frames, so the direct link is always available.</p><p>Turn chapters with the arrows or keyboard, bookmark favorites, use the category shelf, add sites by URL, or discover public GitHub Pages repositories. Your changes are stored in this browser only.</p><div className="modal-notice"><Star size={18}/> The book is a guide, never a permission grant. Embedded sites keep their own functionality and safety rules.</div></section></div>}
+    {showHelp && <div className="modal-cover" onMouseDown={()=>setShowHelp(false)}><section className="small-modal" role="dialog" aria-modal="true" aria-labelledby="help-title" onMouseDown={e=>e.stopPropagation()}><button className="modal-x" aria-label="Close" onClick={()=>setShowHelp(false)}><X/></button><span className="eyebrow">A NOTE FROM THE LIBRARY</span><h2 id="help-title">A book made of doorways.</h2><p>The Field Atlas is a real React app, wrapped in a warm study. Each chapter previews a GitHub Pages website in an iframe and offers a direct link. Some browsers and projects refuse embedded frames, so the direct link is always available.</p><p>Turn chapters with the arrows or keyboard, choose a library wing, bookmark favorites, or add sites by URL. Public GitHub Pages discovery puts suggestions in an approval inbox, never directly into the public book. Changes and approvals are stored in this browser only.</p><div className="modal-notice"><Star size={18}/> The book is a guide, never a permission grant. Embedded sites keep their own functionality and safety rules.</div></section></div>}
 
     {shelfOpen && <div className="modal-cover" onMouseDown={()=>setShelfOpen(false)}><section className="curate-modal" role="dialog" aria-modal="true" aria-labelledby="curate-title" onMouseDown={e=>e.stopPropagation()}>
       <button type="button" className="modal-x" aria-label="Close shelf editor" onClick={()=>setShelfOpen(false)}><X size={23}/></button>
       <span className="eyebrow"><WandSparkles size={15}/> YOUR LIBRARY, YOUR CHAPTERS</span>
       <h2 id="curate-title">Curate the Atlas</h2>
-      <p className="modal-lede">Add a favorite GitHub Page, discover public sites, or prune your shelf. Nothing here alters your GitHub repositories.</p>
+      <p className="modal-lede">Explore new public Pages, approve arrivals individually, or curate your personal shelf. Nothing here alters GitHub repositories, and browser approvals do not publish to other visitors.</p>
+      <div className="discovery-controls"><label className="scan-toggle"><input type="checkbox" checked={discovery.autoEnabled} onChange={e => setDiscovery(d => ({...d, autoEnabled:e.target.checked}))}/> Check for new sites once daily when this browser opens the Atlas</label><button type="button" className="discover-btn scan-inline" onClick={() => scanLibrary(false)} disabled={syncing}><RefreshCw size={16} className={syncing ? 'spinning':''}/>{syncing ? 'Scanning public sites…' : 'Scan GitHub Pages now'}</button></div>
+      {syncStatus && <p className="sync-status" role="status">{syncStatus}</p>}
+      <section className="arrivals-board" aria-label="New project arrivals"><div className="arrivals-header"><h3><Sparkles size={18}/> New arrivals <span>{discovery.candidates.length}</span></h3><small>Suggested rooms need approval. A Pages flag does not verify a live or embeddable website.</small></div>
+      {discovery.candidates.length ? <div className="arrivals-list">{discovery.candidates.map(p => <div className="arrival-entry" key={p.id}><div><strong>{p.title}</strong><small>{wings.find(w => w.id===wingForCategory(p.category))?.shortName || 'Other'} · {p.url}</small><p>{p.desc}</p></div><div className="arrival-actions"><a href={p.url} target="_blank" rel="noopener noreferrer" title={'Visit '+p.title}>Preview ↗</a><button className="arrival-approve" onClick={() => approveCandidate(p.id)}><Check size={14}/> Add chapter</button><button className="arrival-dismiss" aria-label={'Dismiss '+p.title} onClick={() => dismissCandidate(p.id)}><X size={16}/></button></div></div>)}</div> : <p className="arrivals-empty">No waiting arrivals. New public GitHub Pages projects will appear here after the next scan.</p>}</section>
       <div className="curate-grid">
         <div className="curate-left">
           <h3>Add a doorway</h3>
@@ -238,9 +296,7 @@ function App() {
             {formError && <p className="form-error">{formError}</p>}
             <button className="gold-btn" type="submit"><Plus size={16}/> Add to book</button>
           </form>
-          <button className="discover-btn" onClick={syncPages} disabled={syncing}><RefreshCw size={16} className={syncing ? 'spinning':''}/>{syncing ? 'Finding pages...' : 'Discover my public GitHub Pages'}</button>
-          {syncStatus && <p className="sync-status" role="status">{syncStatus}</p>}
-          <p className="tiny-note">Discovery reads public GitHub metadata. A Pages flag does not guarantee the guessed URL is live or embeddable.</p>
+          <p className="tiny-note">Public discoveries await review in the arrivals inbox above. Only this browser sees approved custom chapters until the repository catalog is updated.</p>
         </div>
         <div className="curate-right"><div className="shelf-heading"><h3>Current chapters <small>{pages.length}</small></h3><button title="Reset to curated nine" onClick={resetCatalog}><RotateCcw size={15}/> Reset</button></div>
           <div className="curate-list">{pages.map((p,i)=><div key={p.id} className="curate-entry"><span className="curate-index">{String(i+1).padStart(2,'0')}</span><span className="curate-entry-main"><strong>{p.title}</strong><small>{p.url}</small></span><button className="curate-remove" title={`Remove ${p.title} from this browser's book`} aria-label={`Remove ${p.title}`} onClick={()=>removePage(p.id)}><X size={17}/></button></div>)}</div>

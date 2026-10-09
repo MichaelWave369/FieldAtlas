@@ -76,6 +76,25 @@ export const owner = 'MichaelWave369';
 
 export const categories = ['All', 'Intelligence', 'Systems', 'Creative', 'Tools', 'Research', 'Games', 'Other'];
 
+// Wings organize the *book*, not GitHub permissions. New projects receive a
+// suggested wing until someone explicitly approves their chapter.
+export const wings = [
+  { id: 'all', name: 'The Whole Library', shortName: 'All rooms', description: 'Every little world, gathered into one living book.', glyph: '✧' },
+  { id: 'research', name: 'The Research Wing', shortName: 'Research', description: 'Questions, experiments, geometry, and measured ideas.', glyph: '◇' },
+  { id: 'creative', name: 'The Creative Wing', shortName: 'Creative', description: 'Visual art, sound, studios, and exhibitions.', glyph: '✦' },
+  { id: 'engineering', name: 'The Engineering Wing', shortName: 'Engineering', description: 'Operating systems, agents, bridges, and useful tools.', glyph: '⌘' },
+  { id: 'games', name: 'The Game Room', shortName: 'Games', description: 'Playful worlds, arcade adventures, and experiments.', glyph: '♠' },
+  { id: 'annex', name: 'The Curious Annex', shortName: 'Other', description: 'Surprises that do not need a conventional shelf.', glyph: '☆' },
+];
+
+export function wingForCategory(category) {
+  if (category === 'Research') return 'research';
+  if (category === 'Creative') return 'creative';
+  if (['Intelligence', 'Systems', 'Tools'].includes(category)) return 'engineering';
+  if (category === 'Games') return 'games';
+  return 'annex';
+}
+
 export function safeUrl(input) {
   try {
     const value = new URL(input);
@@ -84,35 +103,57 @@ export function safeUrl(input) {
   } catch { return null; }
 }
 
+function normalizedUrl(url) {
+  const safe = safeUrl(url);
+  return safe ? safe.replace(/\/$/, '').toLowerCase() : '';
+}
+
 export function uniqueMerge(oldItems, additions) {
   const ids = new Set(oldItems.map(p => p.id));
-  const urls = new Set(oldItems.map(p => p.url.replace(/\/$/, '').toLowerCase()));
+  const urls = new Set(oldItems.map(p => normalizedUrl(p.url)).filter(Boolean));
+  const repos = new Set(oldItems.map(p => String(p.repo || '').toLowerCase()).filter(Boolean));
   const next = [...oldItems];
   for (const page of additions) {
     const normalized = safeUrl(page.url);
-    if (!normalized || ids.has(page.id) || urls.has(normalized.replace(/\/$/, '').toLowerCase())) continue;
+    const repo = String(page.repo || '').toLowerCase();
+    if (!normalized || ids.has(page.id) || urls.has(normalizedUrl(normalized)) || (repo && repos.has(repo))) continue;
     next.push({ ...page, url: normalized });
     ids.add(page.id);
-    urls.add(normalized.replace(/\/$/, '').toLowerCase());
+    urls.add(normalizedUrl(normalized));
+    if (repo) repos.add(repo);
   }
   return next;
 }
 
 export function githubPagesUrl(repo) {
   const homepage = safeUrl(repo.homepage || '');
-  if (homepage && new URL(homepage).hostname.endsWith('.github.io')) return homepage;
-  return `https://${owner.toLowerCase()}.github.io/${encodeURIComponent(repo.name)}/`;
+  const pagesHost = owner.toLowerCase() + '.github.io';
+  if (homepage && new URL(homepage).hostname.toLowerCase() === pagesHost) return homepage;
+  // A user/org Pages repo is hosted at the root, not /owner.github.io/.
+  if (repo.name.toLowerCase() === pagesHost) return 'https://' + pagesHost + '/';
+  return 'https://' + pagesHost + '/' + encodeURIComponent(repo.name) + '/';
+}
+
+export function inferCategory(name = '') {
+  const n = name.toLowerCase();
+  if (/museum|louvre|studio|auralith|domistika|pixel|art|music|cinema|cineswarm|creative|forge.*image/.test(n)) return 'Creative';
+  if (/game|arcade|cade|rumble|circuit|sparkthesubstrate|gilt|meme/.test(n)) return 'Games';
+  if (/research|bubble|mirror|lattice|metric|chron|quantum|cymatic|phi369-element|experiment|equation/.test(n)) return 'Research';
+  if (/vessel|brain|agent|intelligence|ai$/.test(n)) return 'Intelligence';
+  if (/os$|kernel|network|porch|accord|bridge|flow|cloud/.test(n)) return 'Systems';
+  if (/deck|budget|medic|label|tool|bot|app/.test(n)) return 'Tools';
+  return 'Other';
 }
 
 export function makeDiscoveredPage(repo) {
   return {
-    id: `gh-${repo.id}`,
+    id: 'gh-' + repo.id,
     repo: repo.name,
     title: repo.name.replace(/[-_]/g, ' '),
     kicker: 'FOUND IN THE FIELD',
-    category: 'Other',
+    category: inferCategory(repo.name),
     url: githubPagesUrl(repo),
-    desc: repo.description || 'Another doorway in the growing Field collection.',
+    desc: String(repo.description || 'Another doorway in the growing Field collection.').slice(0, 300),
     pullquote: 'Every repository is a little universe.',
     accent: '#e6c893',
     index: '★',
@@ -120,14 +161,40 @@ export function makeDiscoveredPage(repo) {
   };
 }
 
-export async function discoverGithubPages(user = owner) {
+export function newArrivals(discovered, current, dismissedIds = []) {
+  const ids = new Set(current.map(p => p.id));
+  const urls = new Set(current.map(p => normalizedUrl(p.url)).filter(Boolean));
+  const repos = new Set(current.map(p => String(p.repo || '').toLowerCase()).filter(Boolean));
+  const ignored = new Set(dismissedIds);
+  const seen = new Set();
+  return discovered.filter(item => {
+    const url = normalizedUrl(item.url), repo = String(item.repo || '').toLowerCase();
+    if (!url || !item.id || ids.has(item.id) || urls.has(url) || (repo && repos.has(repo)) || ignored.has(item.id) || seen.has(item.id) || seen.has(url)) return false;
+    seen.add(item.id); seen.add(url);
+    return true;
+  });
+}
+
+export const DISCOVERY_INTERVAL_MS = 24 * 60 * 60 * 1000;
+
+export function shouldAutoDiscover(lastCheck, now = Date.now()) {
+  return !Number.isFinite(lastCheck) || lastCheck <= 0 || now - lastCheck >= DISCOVERY_INTERVAL_MS;
+}
+
+// Read-only, public metadata only. 'has_pages' means enabled, not that a site
+// is reachable, embeddable, or safe to feature. Candidates need approval.
+export async function discoverGithubPages(user = owner, fetcher = fetch) {
+  if (!/^[a-z\d](?:[a-z\d-]{0,37}[a-z\d])?$/i.test(user)) throw new Error('Invalid GitHub owner.');
   const found = [];
   for (let page = 1; page <= 4; page++) {
-    const resp = await fetch(`https://api.github.com/users/${encodeURIComponent(user)}/repos?per_page=100&page=${page}&type=owner&sort=full_name`);
-    if (!resp.ok) throw new Error(`GitHub returned ${resp.status}. Try again after the API rate limit resets.`);
+    const resp = await fetcher('https://api.github.com/users/' + encodeURIComponent(user) + '/repos?per_page=100&page=' + page + '&type=owner&sort=full_name', {
+      headers: { Accept: 'application/vnd.github+json' },
+    });
+    if (!resp.ok) throw new Error('GitHub returned ' + resp.status + '. Try again after the API rate limit resets.');
     const list = await resp.json();
+    if (!Array.isArray(list)) throw new Error('Unexpected GitHub response.');
     for (const repo of list) {
-      if (repo.owner?.login?.toLowerCase() === user.toLowerCase() && repo.has_pages && !repo.private && !repo.archived) found.push(makeDiscoveredPage(repo));
+      if (repo.owner?.login?.toLowerCase() === user.toLowerCase() && repo.has_pages && !repo.private && repo.visibility !== 'private' && !repo.archived && typeof repo.name === 'string') found.push(makeDiscoveredPage(repo));
     }
     if (list.length < 100) break;
   }

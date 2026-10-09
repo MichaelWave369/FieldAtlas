@@ -409,6 +409,26 @@ function App() {
       <div className="directory-shortcut"><span>{catalog.length} living chapters across the Field</span><button type="button" onClick={() => {setDirectoryWing('all');setDirectorySearch('');setDirectoryOpen(true);}}><Search size={16}/> Browse the complete directory <ArrowRight size={15}/></button></div>
     </section>
 
+    <details className="visitor-desk">
+      <summary><span className="visitor-desk-emblem">✧</span><strong>VISITOR'S DESK</strong><span>Choose a guided walk through the Field</span>
+        <span className="passport-summary"><Bookmark size={14}/>{catalog.filter(p=>visitedChapters.includes(p.id)).length} of {catalog.length} explored</span>
+        <ChevronRight className="visitor-desk-chevron" size={17}/></summary>
+      <div className="journey-options" aria-label="Guided walks">
+        {visitorJourneys.map(route => {
+          const stops = availableJourneyStops(route, catalog);
+          const visited = stops.filter(p => visitedChapters.includes(p.id)).length;
+          return <button type="button" className="journey-card" key={route.id} disabled={!stops.length}
+            style={{'--journey-accent':route.accent}} onClick={() => selectJourney(route.id)}>
+            <span className="journey-glyph" aria-hidden="true">{route.glyph}</span>
+            <span className="journey-kicker">{route.kicker}</span><strong>{route.name}</strong>
+            <small>{route.description}</small>
+            <span className="journey-foot">{stops.length} stops · {visited} stamped <ArrowRight size={14}/></span>
+          </button>;
+        })}
+      </div>
+      <p className="visitor-desk-footnote">Your visitor passport stays in this browser. The tours only open already-published public chapters.</p>
+    </details>
+
     <section className={`room-portal ${enteredWing ? 'room-entered' : 'room-at-door'}`} key={wing} aria-label={'Now visiting ' + activeWing.name}>
       <button type="button" className={`room-portal-arch ${enteredWing ? 'door-open' : ''}`}
         onClick={() => setEnteredWing(true)} aria-label={'Enter ' + activeWing.name} disabled={enteredWing}>
@@ -438,6 +458,22 @@ function App() {
         )}</div>
       </div>}
     </section>
+
+    {journey && journeyStops.length > 0 && <section className="tour-compass" aria-label="Guided visit controls">
+      <div className="tour-compass-label"><span>✦ GUIDED WALK</span><strong>{journey.name}</strong>
+        <small>Stop {tourStep+1} / {journeyStops.length} · {journeyStops.filter(p=>visitedChapters.includes(p.id)).length} passport stamps</small></div>
+      <div className="tour-compass-stops">{journeyStops.map((p,i) =>
+        <button key={p.id} className={`tour-stop ${i===tourStep?'tour-stop-active':''}`}
+          type="button" onClick={() => visitTourStep(i)} aria-current={i===tourStep?'step':undefined}
+          title={p.title} aria-label={`Visit stop ${i+1}: ${p.title}`}>
+          <span>{visitedChapters.includes(p.id) ? '✦' : String(i+1)}</span><small>{p.title}</small>
+        </button>)}</div>
+      <div className="tour-compass-controls">
+        <button type="button" onClick={() => visitTourStep(tourStep-1)} disabled={tourStep===0} aria-label="Previous tour stop"><ChevronLeft size={18}/></button>
+        <button className="tour-next-button" type="button" onClick={() => visitTourStep(tourStep+1)} disabled={tourStep>=journeyStops.length-1}>{tourStep===journeyStops.length-1?'Tour complete':'Next stop'}<ChevronRight size={15}/></button>
+        <button type="button" onClick={()=>setActiveTour(null)} aria-label="Leave guided tour"><X size={17}/></button>
+      </div>
+    </section>}
 
     <section className="reading-stage" aria-label="Interactive book of GitHub Pages websites">
       <div className="side-ornament left-ornament" aria-hidden="true"><span className="fancy-star">✧</span><span>EXPLORE</span><i /></div>
@@ -480,8 +516,10 @@ function App() {
             </div>
             <div className="portal-actions">
               <a className="gold-btn" href={active.url} target="_blank" rel="noopener noreferrer"><ExternalLink size={15}/> Open this world</a>
+              {active.repo && <button type="button" className="outline-btn share-chapter" onClick={shareChapter}><Link2 size={15}/> Share chapter</button>}
               <button type="button" className="outline-btn" onClick={() => setPortalOpen(true)}><Maximize2 size={15}/> Fullscreen reader</button>
             </div>
+            {shareNotice && <div className="share-status" role="status">{shareNotice.startsWith('https://') ? <><span>Copy this chapter link:</span><input aria-label="Chapter link to copy" readOnly value={shareNotice} onFocus={e=>e.target.select()}/></> : shareNotice}</div>}
             <div className="folio-bottom dark-folio"><span>AN OPEN WINDOW TO THE FIELD</span><span>{String(index + 1).padStart(2,'0')} / {String(filtered.length).padStart(2,'0')}</span></div>
           </article>
           {flipping && <div className="turning-leaf" aria-hidden="true"><div className="turning-leaf-face"/><div className="turning-leaf-back"/></div>}

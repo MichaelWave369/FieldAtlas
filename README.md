@@ -2,6 +2,37 @@
 
 **A cozy, interactive living library of public GitHub Pages projects.**
 
+## v0.6: The Visitor's Desk
+
+The Field Atlas now has **four guided discovery walks** for people who have never seen the ecosystem:
+
+- **First Light:** SuperPhiVessel → FieldAtlas → PhiOS → FieldDeck → FieldAccord.
+- **The Artist's Lantern:** Domistika → Silicon Louvre → PixelForge → Auralith → Infinity Lens.
+- **Research Constellation:** NestedBubbleGear → PhiMirrorHex → ParticleForge → Schumann Resonance Observatory → VAL.
+- **After Hours:** GiltHouse → PhiCade → PorchQuest → Parallax Arc → NightCircuit.
+
+Tours only include projects already present in the accessible public or locally curated catalog; missing or unavailable stops are skipped. Their order is intentionally editorial, not an objective project ranking.
+
+The compact **Visitor's Desk** stays collapsed until opened, preserving the main book-first layout. Selecting a walk reveals its tour compass with direct stop navigation, previous/next controls and an exit. The existing animated pages, themed wings, book covers, library directory and FieldCeption mirror chamber are unchanged.
+
+### Visitor passport
+
+A browser-local passport stamps the IDs of viewed chapters and shows progress on each available tour. It requires no login, stores no personal identifiers, and is not synchronized across devices. Clearing browser site data resets the passport.
+
+### Shareable chapter links
+
+Click **Share chapter** to copy a URL such as:
+
+`https://michaelwave369.github.io/FieldAtlas/?chapter=Domistika`
+
+When sharing a tour stop, the URL also carries `tour=artists-lantern`. The destination initializes **only after** its public catalog is loaded. Unknown or malformed chapter names and tour identifiers cannot cause an external URL redirect or expose a private repository. If clipboard access is unavailable, the book displays a selectable link instead.
+
+### Notes
+
+- This release does not introduce accounts, analytics, external dependencies, or private repository access.
+- Guided tours never execute actions in destination apps; the normal public preview and direct external link rules still apply.
+- The visitor passport represents viewed chapters, not proof that a visitor read or completed a linked application.
+
 ## v0.5: FieldCeption · The Infinite Atlas
 
 A lighthearted Easter egg inspired by the Atlas opening itself inside the Atlas.

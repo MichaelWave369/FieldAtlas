@@ -10,6 +10,7 @@ import { seedPages, categories, wings, wingForCategory, safeUrl, uniqueMerge, ne
 import { curateProject, applyLocalEdits, categoryPalette } from './curation';
 import { isInfiniteAtlas, MAX_MIRROR_DEPTH, MIN_MIRROR_DEPTH, mirrorLayers, nextMirrorDepth } from './fieldception';
 import { visitorJourneys, findJourney, availableJourneyStops, readAtlasLink, buildAtlasLink, locateSharedChapter } from './journeys';
+import { wrapChapterIndex, canTurnChapters, wrapDestinationLabel } from './navigation';
 import './style.css';
 
 const STORE_KEY = 'field-atlas-pages-v1';
@@ -232,7 +233,11 @@ function App() {
     pendingTimers.current.push(setTimeout(() => setFlipping(''), 640));
   }, [flipping, filtered, index, activeTour, journeyStops, tourStep]);
 
-  const turn = useCallback((delta) => goTo(index + delta, delta > 0 ? 'next' : 'prev'), [goTo, index]);
+  const turn = useCallback((delta) => {
+    if (!canTurnChapters(filtered.length)) return;
+    const target = wrapChapterIndex(index, delta, filtered.length);
+    if (target !== null) goTo(target, delta > 0 ? 'next' : 'prev');
+  }, [goTo, index, filtered.length]);
   useEffect(() => {
     const onKeyDown = e => {
       if (e.key === 'Escape') { setPortalOpen(false); setShelfOpen(false); setShowHelp(false); setDirectoryOpen(false); setEditorPage(null); return; }
@@ -395,7 +400,104 @@ function App() {
       <p>Come in, stay awhile. Every chapter opens a living creation.</p>
     </div>
 
-    <section className="study-wings" aria-label="Explore the library wings">
+    <nav className="quick-room-rail" aria-label="Quick room selection">
+      <span className="quick-room-label">YOUR LIVING BOOK</span>
+      <div className="quick-room-options">
+        {wings.map(w => <button type="button" key={w.id} className={`quick-room-option ${wing===w.id ? 'quick-room-selected' : ''}`} aria-pressed={wing===w.id}
+          onClick={() => { setActiveTour(null); setWing(w.id); setEnteredWing(w.id==='all'); setCategory('All'); setSearch(''); }}>
+          <span aria-hidden="true">{w.glyph}</span> {w.shortName}
+        </button>)}
+      </div>
+      <a className="quick-room-details" href="#study-rooms">Explore rooms <ChevronRight size={13}/></a>
+    </nav>
+
+    {journey && journeyStops.length > 0 && <section className="tour-compass" aria-label="Guided visit controls">
+      <div className="tour-compass-label"><span>✦ GUIDED WALK</span><strong>{journey.name}</strong>
+        <small>Stop {tourStep+1} / {journeyStops.length} · {journeyStops.filter(p=>visitedChapters.includes(p.id)).length} passport stamps</small></div>
+      <div className="tour-compass-stops">{journeyStops.map((p,i) =>
+        <button key={p.id} className={`tour-stop ${i===tourStep?'tour-stop-active':''}`}
+          type="button" onClick={() => visitTourStep(i)} aria-current={i===tourStep?'step':undefined}
+          title={p.title} aria-label={`Visit stop ${i+1}: ${p.title}`}>
+          <span>{visitedChapters.includes(p.id) ? '✦' : String(i+1)}</span><small>{p.title}</small>
+        </button>)}</div>
+      <div className="tour-compass-controls">
+        <button type="button" onClick={() => visitTourStep(tourStep-1)} disabled={tourStep===0} aria-label="Previous tour stop"><ChevronLeft size={18}/></button>
+        <button className="tour-next-button" type="button" onClick={() => visitTourStep(tourStep+1)} disabled={tourStep>=journeyStops.length-1}>{tourStep===journeyStops.length-1?'Tour complete':'Next stop'}<ChevronRight size={15}/></button>
+        <button type="button" onClick={()=>setActiveTour(null)} aria-label="Leave guided tour"><X size={17}/></button>
+      </div>
+    </section>}
+
+    <section id="living-book" className="reading-stage" aria-label="Interactive book of GitHub Pages websites">
+      <div className="side-ornament left-ornament" aria-hidden="true"><span className="fancy-star">✧</span><span>EXPLORE</span><i /></div>
+      <div className="side-ornament right-ornament" aria-hidden="true"><span className="fancy-star">✧</span><span>IMAGINE</span><i /></div>
+      <div className="book-floor" aria-hidden="true" />
+      <div className={`atlas-book ${flipping ? `is-flipping flip-${flipping}` : ''}`}>
+        <div className="leather-spine" />
+        <div className="book-edges edge-left" /><div className="book-edges edge-right" />
+        {!active ? <div className="empty-book"><BookOpen size={38}/><h2>No chapters found</h2><p>Try another search or add a page to your book.</p><button className="gold-btn" onClick={() => {setSearch(''); setCategory('All');}}>Show all chapters</button></div> : <>
+          <article className="book-page story-page" aria-live="polite">
+            <div className="folio-top"><span>FIELD NOTES · {active.category?.toUpperCase()}</span><span>{chapter}</span></div>
+            <div className="story-main">
+              <span className="chapter-label">CHAPTER {chapter}</span>
+              <div className="small-rule" />
+              <h2>{active.title}</h2>
+              <p className="story-kicker">{active.kicker}</p>
+              <Artwork accent={active.accent} category={active.category}/>
+              <p className="story-desc">{active.desc}</p>
+              <p className="story-quote">“{active.pullquote || 'A different page, a different world.'}”</p>
+            </div>
+            <div className="folio-bottom"><span>MICHAELWAVE369 · THE FIELD</span><span>✧ &nbsp; {String(index + 1).padStart(2, '0')}</span></div>
+          </article>
+
+          <article className="book-page portal-page" aria-label={`Live preview of ${active.title}`}>
+            <div className="folio-top dark-folio"><span>THE LIVING PAGE</span><button className="favorite-btn" title={fav ? 'Remove bookmark' : 'Bookmark chapter'} onClick={() => toggleFavorite(active.id)} aria-label={fav ? 'Remove bookmark' : 'Bookmark this chapter'}><Bookmark size={17} fill={fav ? 'currentColor' : 'none'} /></button></div>
+            <div className="portal-frame" style={{ '--portal-accent': active.accent }}>
+              <div className="site-chrome">
+                <div className="chrome-dots"><i/><i/><i/></div>
+                <div className="address-pill"><Globe2 size={13}/><span title={active.url}>{new URL(active.url).host}{new URL(active.url).pathname}</span></div>
+                <ExternalLink size={14}/>
+              </div>
+              <div className="iframe-shell">
+                {fieldception
+                  ? <MirrorChamber depth={mirrorDepth}
+                      onDeeper={() => setMirrorDepth(d => nextMirrorDepth(d, 1))}
+                      onSurface={() => setMirrorDepth(d => nextMirrorDepth(d, -1))} />
+                  : <iframe key={active.id + active.url} title={`Live website: ${active.title}`} loading="lazy" src={active.url} referrerPolicy="strict-origin-when-cross-origin" allow="fullscreen; clipboard-read; clipboard-write" />}
+              </div>
+              <div className="preview-footnote"><span className="live-dot" /> {fieldception ? 'SAFE MIRROR CHAMBER' : 'LIVE WEBSITE PREVIEW'} <span className="preview-hint">{fieldception ? 'Five illustrated reflections, zero recursive iframes.' : 'Some sites block embedding. Open the portal instead.'}</span></div>
+            </div>
+            <div className="portal-actions">
+              <a className="gold-btn" href={active.url} target="_blank" rel="noopener noreferrer"><ExternalLink size={15}/> Open this world</a>
+              {active.repo && <button type="button" className="outline-btn share-chapter" onClick={shareChapter}><Link2 size={15}/> Share chapter</button>}
+              <button type="button" className="outline-btn" onClick={() => setPortalOpen(true)}><Maximize2 size={15}/> Fullscreen reader</button>
+            </div>
+            {shareNotice && <div className="share-status" role="status">{shareNotice.startsWith('https://') ? <><span>Copy this chapter link:</span><input aria-label="Chapter link to copy" readOnly value={shareNotice} onFocus={e=>e.target.select()}/></> : shareNotice}</div>}
+            <div className="folio-bottom dark-folio"><span>AN OPEN WINDOW TO THE FIELD</span><span>{String(index + 1).padStart(2,'0')} / {String(filtered.length).padStart(2,'0')}</span></div>
+          </article>
+          {flipping && <div className="turning-leaf" aria-hidden="true"><div className="turning-leaf-face"/><div className="turning-leaf-back"/></div>}
+        </>}
+      </div>
+      <button type="button" className="page-turn turn-left" aria-label={wrapDestinationLabel('prev', index, filtered.length)} title={wrapDestinationLabel('prev', index, filtered.length)} disabled={!canTurnChapters(filtered.length) || !!flipping || !active} onClick={() => turn(-1)}><ChevronLeft size={25}/></button>
+      <button type="button" className="page-turn turn-right" aria-label={wrapDestinationLabel('next', index, filtered.length)} title={wrapDestinationLabel('next', index, filtered.length)} disabled={!canTurnChapters(filtered.length) || !!flipping || !active} onClick={() => turn(1)}><ChevronRight size={25}/></button>
+    </section>
+
+    <section className="reading-controls" aria-label="Browse chapters">
+      <div className="chapter-progress"><span className="small-label">YOUR PLACE IN THE BOOK</span><strong>{String(active ? index+1 : 0).padStart(2,'0')} <span>/</span> {String(filtered.length).padStart(2,'0')}</strong><div className="progress-track"><div style={{width:`${filtered.length ? (index+1)/filtered.length*100 : 0}%`}} /></div></div>
+      <div className="chapter-filters">
+        <div className="search-wrap"><Search size={16}/><input aria-label="Search chapters" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Find a chapter..."/></div>
+        <select aria-label="Filter by category" value={category} onChange={e=>setCategory(e.target.value)}>{[...categories, 'Favorites'].map(c=><option key={c}>{c}</option>)}</select>
+      </div>
+      <div className="keyboard-hint"><Keyboard size={15}/> ← → turn pages · loops endlessly</div>
+    </section>
+
+    <nav className="chapter-shelf" aria-label="Book chapter index">
+      {filtered.map((p, i) => <button type="button" key={p.id} className={`shelf-chapter ${index===i ? 'selected' : ''}`} onClick={() => goTo(i)} title={p.title}>
+        <span className="shelf-number">{String(i+1).padStart(2,'0')}</span><span className="shelf-icon" style={{'--accent':p.accent}}>✦</span><span className="shelf-name">{p.title}</span>{favoriteIds.includes(p.id) && <Bookmark size={11} fill="currentColor"/>}
+      </button>)}
+      <button type="button" className="shelf-add" onClick={()=>setShelfOpen(true)}><Plus size={17}/> Add chapter</button>
+    </nav>
+
+    <section id="study-rooms" className="study-wings" aria-label="Explore the library wings">
       <div className="wings-heading"><span>CHOOSE A ROOM</span><small>{catalog.length} available chapters · {discovery.candidates.length} awaiting review</small></div>
       <div className="wings-rail">
         {wings.map(w => {
@@ -458,92 +560,6 @@ function App() {
         )}</div>
       </div>}
     </section>
-
-    {journey && journeyStops.length > 0 && <section className="tour-compass" aria-label="Guided visit controls">
-      <div className="tour-compass-label"><span>✦ GUIDED WALK</span><strong>{journey.name}</strong>
-        <small>Stop {tourStep+1} / {journeyStops.length} · {journeyStops.filter(p=>visitedChapters.includes(p.id)).length} passport stamps</small></div>
-      <div className="tour-compass-stops">{journeyStops.map((p,i) =>
-        <button key={p.id} className={`tour-stop ${i===tourStep?'tour-stop-active':''}`}
-          type="button" onClick={() => visitTourStep(i)} aria-current={i===tourStep?'step':undefined}
-          title={p.title} aria-label={`Visit stop ${i+1}: ${p.title}`}>
-          <span>{visitedChapters.includes(p.id) ? '✦' : String(i+1)}</span><small>{p.title}</small>
-        </button>)}</div>
-      <div className="tour-compass-controls">
-        <button type="button" onClick={() => visitTourStep(tourStep-1)} disabled={tourStep===0} aria-label="Previous tour stop"><ChevronLeft size={18}/></button>
-        <button className="tour-next-button" type="button" onClick={() => visitTourStep(tourStep+1)} disabled={tourStep>=journeyStops.length-1}>{tourStep===journeyStops.length-1?'Tour complete':'Next stop'}<ChevronRight size={15}/></button>
-        <button type="button" onClick={()=>setActiveTour(null)} aria-label="Leave guided tour"><X size={17}/></button>
-      </div>
-    </section>}
-
-    <section className="reading-stage" aria-label="Interactive book of GitHub Pages websites">
-      <div className="side-ornament left-ornament" aria-hidden="true"><span className="fancy-star">✧</span><span>EXPLORE</span><i /></div>
-      <div className="side-ornament right-ornament" aria-hidden="true"><span className="fancy-star">✧</span><span>IMAGINE</span><i /></div>
-      <div className="book-floor" aria-hidden="true" />
-      <div className={`atlas-book ${flipping ? `is-flipping flip-${flipping}` : ''}`}>
-        <div className="leather-spine" />
-        <div className="book-edges edge-left" /><div className="book-edges edge-right" />
-        {!active ? <div className="empty-book"><BookOpen size={38}/><h2>No chapters found</h2><p>Try another search or add a page to your book.</p><button className="gold-btn" onClick={() => {setSearch(''); setCategory('All');}}>Show all chapters</button></div> : <>
-          <article className="book-page story-page" aria-live="polite">
-            <div className="folio-top"><span>FIELD NOTES · {active.category?.toUpperCase()}</span><span>{chapter}</span></div>
-            <div className="story-main">
-              <span className="chapter-label">CHAPTER {chapter}</span>
-              <div className="small-rule" />
-              <h2>{active.title}</h2>
-              <p className="story-kicker">{active.kicker}</p>
-              <Artwork accent={active.accent} category={active.category}/>
-              <p className="story-desc">{active.desc}</p>
-              <p className="story-quote">“{active.pullquote || 'A different page, a different world.'}”</p>
-            </div>
-            <div className="folio-bottom"><span>MICHAELWAVE369 · THE FIELD</span><span>✧ &nbsp; {String(index + 1).padStart(2, '0')}</span></div>
-          </article>
-
-          <article className="book-page portal-page" aria-label={`Live preview of ${active.title}`}>
-            <div className="folio-top dark-folio"><span>THE LIVING PAGE</span><button className="favorite-btn" title={fav ? 'Remove bookmark' : 'Bookmark chapter'} onClick={() => toggleFavorite(active.id)} aria-label={fav ? 'Remove bookmark' : 'Bookmark this chapter'}><Bookmark size={17} fill={fav ? 'currentColor' : 'none'} /></button></div>
-            <div className="portal-frame" style={{ '--portal-accent': active.accent }}>
-              <div className="site-chrome">
-                <div className="chrome-dots"><i/><i/><i/></div>
-                <div className="address-pill"><Globe2 size={13}/><span title={active.url}>{new URL(active.url).host}{new URL(active.url).pathname}</span></div>
-                <ExternalLink size={14}/>
-              </div>
-              <div className="iframe-shell">
-                {fieldception
-                  ? <MirrorChamber depth={mirrorDepth}
-                      onDeeper={() => setMirrorDepth(d => nextMirrorDepth(d, 1))}
-                      onSurface={() => setMirrorDepth(d => nextMirrorDepth(d, -1))} />
-                  : <iframe key={active.id + active.url} title={`Live website: ${active.title}`} loading="lazy" src={active.url} referrerPolicy="strict-origin-when-cross-origin" allow="fullscreen; clipboard-read; clipboard-write" />}
-              </div>
-              <div className="preview-footnote"><span className="live-dot" /> {fieldception ? 'SAFE MIRROR CHAMBER' : 'LIVE WEBSITE PREVIEW'} <span className="preview-hint">{fieldception ? 'Five illustrated reflections, zero recursive iframes.' : 'Some sites block embedding. Open the portal instead.'}</span></div>
-            </div>
-            <div className="portal-actions">
-              <a className="gold-btn" href={active.url} target="_blank" rel="noopener noreferrer"><ExternalLink size={15}/> Open this world</a>
-              {active.repo && <button type="button" className="outline-btn share-chapter" onClick={shareChapter}><Link2 size={15}/> Share chapter</button>}
-              <button type="button" className="outline-btn" onClick={() => setPortalOpen(true)}><Maximize2 size={15}/> Fullscreen reader</button>
-            </div>
-            {shareNotice && <div className="share-status" role="status">{shareNotice.startsWith('https://') ? <><span>Copy this chapter link:</span><input aria-label="Chapter link to copy" readOnly value={shareNotice} onFocus={e=>e.target.select()}/></> : shareNotice}</div>}
-            <div className="folio-bottom dark-folio"><span>AN OPEN WINDOW TO THE FIELD</span><span>{String(index + 1).padStart(2,'0')} / {String(filtered.length).padStart(2,'0')}</span></div>
-          </article>
-          {flipping && <div className="turning-leaf" aria-hidden="true"><div className="turning-leaf-face"/><div className="turning-leaf-back"/></div>}
-        </>}
-      </div>
-      <button type="button" className="page-turn turn-left" aria-label="Previous chapter" disabled={index <= 0 || !!flipping || !active} onClick={() => turn(-1)}><ChevronLeft size={25}/></button>
-      <button type="button" className="page-turn turn-right" aria-label="Next chapter" disabled={index >= filtered.length - 1 || !!flipping || !active} onClick={() => turn(1)}><ChevronRight size={25}/></button>
-    </section>
-
-    <section className="reading-controls" aria-label="Browse chapters">
-      <div className="chapter-progress"><span className="small-label">YOUR PLACE IN THE BOOK</span><strong>{String(active ? index+1 : 0).padStart(2,'0')} <span>/</span> {String(filtered.length).padStart(2,'0')}</strong><div className="progress-track"><div style={{width:`${filtered.length ? (index+1)/filtered.length*100 : 0}%`}} /></div></div>
-      <div className="chapter-filters">
-        <div className="search-wrap"><Search size={16}/><input aria-label="Search chapters" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Find a chapter..."/></div>
-        <select aria-label="Filter by category" value={category} onChange={e=>setCategory(e.target.value)}>{[...categories, 'Favorites'].map(c=><option key={c}>{c}</option>)}</select>
-      </div>
-      <div className="keyboard-hint"><Keyboard size={15}/> Use ← → to turn pages</div>
-    </section>
-
-    <nav className="chapter-shelf" aria-label="Book chapter index">
-      {filtered.map((p, i) => <button type="button" key={p.id} className={`shelf-chapter ${index===i ? 'selected' : ''}`} onClick={() => goTo(i)} title={p.title}>
-        <span className="shelf-number">{String(i+1).padStart(2,'0')}</span><span className="shelf-icon" style={{'--accent':p.accent}}>✦</span><span className="shelf-name">{p.title}</span>{favoriteIds.includes(p.id) && <Bookmark size={11} fill="currentColor"/>}
-      </button>)}
-      <button type="button" className="shelf-add" onClick={()=>setShelfOpen(true)}><Plus size={17}/> Add chapter</button>
-    </nav>
 
     <footer className="bottom-bar"><span>MADE WITH CURIOSITY · BUILT TO BE SHARED</span><button onClick={()=>setShowHelp(true)}><Info size={15}/> About the atlas</button><span>ENTER THE FIELD <span className="bottom-flower">✻</span> 2026</span></footer>
 

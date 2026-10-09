@@ -9,12 +9,14 @@ import {
 import { seedPages, categories, wings, wingForCategory, safeUrl, uniqueMerge, newArrivals, shouldAutoDiscover, discoverGithubPages, isVerifiedPublishedPage } from './catalog';
 import { curateProject, applyLocalEdits, categoryPalette } from './curation';
 import { isInfiniteAtlas, MAX_MIRROR_DEPTH, MIN_MIRROR_DEPTH, mirrorLayers, nextMirrorDepth } from './fieldception';
+import { visitorJourneys, findJourney, availableJourneyStops, readAtlasLink, buildAtlasLink, locateSharedChapter } from './journeys';
 import './style.css';
 
 const STORE_KEY = 'field-atlas-pages-v1';
 const PREF_KEY = 'field-atlas-preferences-v1';
 const DISCOVERY_KEY = 'field-atlas-discovery-v2';
 const EDITS_KEY = 'field-atlas-curation-edits-v4';
+const PASSPORT_KEY = 'field-atlas-visitor-passport-v6';
 const specialRoman = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
 
 function readLocal(key, fallback) {
@@ -115,12 +117,19 @@ function App() {
   const [shelfOpen, setShelfOpen] = useState(false);
   const [portalOpen, setPortalOpen] = useState(false);
   const [mirrorDepth, setMirrorDepth] = useState(MIN_MIRROR_DEPTH);
+  const [activeTour, setActiveTour] = useState(null);
+  const [visitedChapters, setVisitedChapters] = useState(() => {
+    const ids = readLocal(PASSPORT_KEY, []);
+    return Array.isArray(ids) ? ids.filter(x => typeof x === 'string').slice(0, 1000) : [];
+  });
+  const [shareNotice, setShareNotice] = useState('');
   const [showHelp, setShowHelp] = useState(false);
   const [form, setForm] = useState({ title: '', url: '', category: 'Other', desc: '' });
   const [formError, setFormError] = useState('');
   const [syncStatus, setSyncStatus] = useState('');
   const [syncing, setSyncing] = useState(false);
   const pendingTimers = useRef([]);
+  const handledDeepLink = useRef(false);
 
   const favoriteIds = prefs.favoriteIds || [];
   // Canonical base + verified public sites from the daily deployment manifest.
@@ -139,6 +148,9 @@ function App() {
   }), [catalog, category, search, favoriteIds, wing]);
   const index = Math.min(Math.max(current, 0), Math.max(0, filtered.length - 1));
   const active = filtered[index];
+  const journey = activeTour ? findJourney(activeTour.id) : null;
+  const journeyStops = useMemo(() => availableJourneyStops(journey, catalog), [journey, catalog]);
+  const tourStep = Math.min(activeTour?.step ?? 0, Math.max(0, journeyStops.length - 1));
   const fieldception = isInfiniteAtlas(active);
   useEffect(() => { setMirrorDepth(MIN_MIRROR_DEPTH); }, [active?.id]);
   const directoryResults = useMemo(() => catalog.filter(p => {
@@ -150,6 +162,8 @@ function App() {
   useEffect(() => { localStorage.setItem(STORE_KEY, JSON.stringify(pages)); }, [pages]);
   useEffect(() => { localStorage.setItem(PREF_KEY, JSON.stringify(prefs)); }, [prefs]);
   useEffect(() => { localStorage.setItem(EDITS_KEY, JSON.stringify(localEdits)); }, [localEdits]);
+  useEffect(() => { localStorage.setItem(PASSPORT_KEY, JSON.stringify(visitedChapters)); }, [visitedChapters]);
+  useEffect(() => { if (active?.id) setVisitedChapters(old => old.includes(active.id) ? old : [...old, active.id].slice(-1000)); }, [active?.id]);
   useEffect(() => { localStorage.setItem(DISCOVERY_KEY, JSON.stringify(discovery)); }, [discovery]);
   useEffect(() => {
     let cancelled = false;
@@ -178,6 +192,29 @@ function App() {
   useEffect(() => () => pendingTimers.current.forEach(clearTimeout), []);
   useEffect(() => { setCurrent(0); }, [category, search, wing]);
   useEffect(() => {
+    if (!manifestStatus || handledDeepLink.current) return;
+    handledDeepLink.current = true;
+    const link = readAtlasLink(window.location.search);
+    if (link.tour) {
+      const stops = availableJourneyStops(link.tour, catalog);
+      if (stops.length) {
+        const matchingIndex = link.chapter ? stops.findIndex(p => p.repo?.toLowerCase() === link.chapter.toLowerCase()) : -1;
+        const step = matchingIndex >= 0 ? matchingIndex : 0;
+        setActiveTour({ id: link.tour, step });
+        setWing('all'); setEnteredWing(true); setCategory('All'); setSearch('');
+        setPendingChapterId(stops[step].id);
+        return;
+      }
+    }
+    if (link.chapter) {
+      const match = locateSharedChapter(catalog, link.chapter);
+      if (match) {
+        setWing('all'); setEnteredWing(true); setCategory('All'); setSearch('');
+        setPendingChapterId(match.id);
+      }
+    }
+  }, [manifestStatus, catalog]);
+  useEffect(() => {
     if (!pendingChapterId) return;
     const target = filtered.findIndex(p => p.id === pendingChapterId);
     if (target >= 0) {
@@ -188,10 +225,11 @@ function App() {
 
   const goTo = useCallback((target, direction = '') => {
     if (flipping || target < 0 || target >= filtered.length || target === index) return;
+    if (activeTour && filtered[target]?.id !== journeyStops[tourStep]?.id) setActiveTour(null);
     setFlipping(direction || (target > index ? 'next' : 'prev'));
     pendingTimers.current.push(setTimeout(() => setCurrent(target), 260));
     pendingTimers.current.push(setTimeout(() => setFlipping(''), 640));
-  }, [flipping, filtered.length, index]);
+  }, [flipping, filtered, index, activeTour, journeyStops, tourStep]);
 
   const turn = useCallback((delta) => goTo(index + delta, delta > 0 ? 'next' : 'prev'), [goTo, index]);
   useEffect(() => {
@@ -205,7 +243,36 @@ function App() {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [portalOpen, shelfOpen, showHelp, directoryOpen, editorPage, turn]);
 
+  function selectJourney(id, targetRepo = null) {
+    const stops = availableJourneyStops(id, catalog);
+    if (!stops.length) return;
+    const matched = targetRepo ? stops.findIndex(p => p.repo?.toLowerCase() === targetRepo.toLowerCase()) : -1;
+    const step = matched >= 0 ? matched : 0;
+    setActiveTour({ id, step });
+    setPendingChapterId(stops[step].id);
+    setWing('all'); setEnteredWing(true); setCategory('All'); setSearch('');
+    setShareNotice('');
+  }
+  function visitTourStep(step) {
+    if (!journey || step < 0 || step >= journeyStops.length) return;
+    setActiveTour({id: journey.id, step});
+    setPendingChapterId(journeyStops[step].id);
+    setWing('all'); setEnteredWing(true); setCategory('All'); setSearch('');
+    setShareNotice('');
+  }
+  async function shareChapter() {
+    if (!active?.repo) return;
+    const link = buildAtlasLink(window.location.href, active.repo, journey?.id || null);
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
+      await navigator.clipboard.writeText(link);
+      setShareNotice('Link copied! Share this doorway with someone.');
+    } catch {
+      setShareNotice(link);
+    }
+  }
   function openChapterFromDirectory(page) {
+    setActiveTour(null);
     // Selection is resolved after the new wing/filter has rendered.
     setPendingChapterId(page.id);
     setWing('all'); setEnteredWing(true); setCategory('All'); setSearch('');

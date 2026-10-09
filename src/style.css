@@ -538,3 +538,91 @@ a { color:inherit; }
   .reader-focus-mode .reader-toolbar,.reader-focus-mode .reading-stage{animation:none;}
   .reader-toolbar-actions button{transition:none;}
 }
+
+
+/* v0.9 · The Cartographer's Room: an interactive map made from live catalog data. */
+.quick-room-map{display:inline-flex;align-items:center;justify-content:center;gap:7px;flex:0 0 auto;border:1px solid rgba(236,195,135,.64);border-radius:8px;background:linear-gradient(135deg,rgba(121,78,44,.83),rgba(64,42,34,.9));color:#ffe2b5;font-weight:700;font-size:11px;min-height:32px;padding:6px 11px;white-space:nowrap;}
+.quick-room-map:hover{background:linear-gradient(135deg,#92643c,#614333);border-color:#f4d49f;}
+.quick-room-map:focus-visible{outline:3px solid #ffe0a4;outline-offset:2px;}
+.atlas-map-backdrop{position:fixed;inset:0;z-index:190;display:flex;align-items:center;justify-content:center;padding:14px;background:rgba(9,7,12,.86);backdrop-filter:blur(10px);}
+.atlas-map-dialog{width:min(1140px,100%);max-height:min(94dvh,960px);display:flex;flex-direction:column;min-height:0;overflow:hidden;color:#f5d9b0;border:2px solid #b99463;border-radius:20px;background:linear-gradient(145deg,#30211f,#1a1925 80%);box-shadow:0 30px 100px rgba(0,0,0,.83),inset 0 0 0 4px rgba(229,190,124,.09);animation:atlas-map-arrival .4s ease both;}
+@keyframes atlas-map-arrival{from{opacity:.4;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+.atlas-map-header{position:relative;flex:0 0 auto;display:flex;align-items:center;gap:17px;padding:17px 20px 13px;border-bottom:1px solid rgba(240,191,132,.25);background:radial-gradient(ellipse at 18% 0%,rgba(152,108,57,.2),transparent 80%);}
+.atlas-map-header-mark{border:1px solid rgba(232,191,132,.65);width:46px;height:46px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;color:#efd19a;background:rgba(60,38,27,.76);box-shadow:inset 0 0 0 4px rgba(230,181,116,.13);}
+.atlas-map-eyebrow{font-size:9px;font-weight:700;letter-spacing:.22em;color:#d9b787;}
+.atlas-map-header h2{font:600 clamp(29px,4vw,43px)/1 'Cormorant Garamond',Georgia,serif;margin:5px 0;color:#ffe4bf;}
+.atlas-map-header p{font-size:11px;line-height:1.35;color:#d7bea4;margin:3px 0 0;}
+.atlas-map-close{flex:0 0 auto;margin-left:auto;align-self:flex-start;border:1px solid rgba(232,190,133,.56);border-radius:8px;background:rgba(91,57,39,.73);color:#f5dfc0;padding:9px;display:grid;place-items:center;}
+.atlas-map-close:hover{background:#865534;}
+.atlas-map-dialog button:focus-visible{outline:3px solid #fee1ae;outline-offset:2px;}
+.atlas-map-scroll{overflow:auto;min-height:0;overscroll-behavior:contain;padding:13px 17px;scrollbar-color:#bd9160 #211b1d;}
+.atlas-map-paper{position:relative;min-height:620px;isolation:isolate;border:6px double rgba(183,135,85,.67);border-radius:11px;overflow:hidden;background:radial-gradient(ellipse at center,rgba(242,215,159,.45),transparent 62%),repeating-linear-gradient(45deg,transparent 0 20px,rgba(94,69,43,.035) 20px 22px),linear-gradient(135deg,#c3a77b,#edd9ab 42%,#b99b71 100%);color:#493624;box-shadow:inset 0 0 64px rgba(90,57,23,.25),0 8px 30px rgba(0,0,0,.3);}
+.atlas-map-paper:before{content:'';position:absolute;inset:12px;border:1px solid rgba(103,75,42,.44);border-radius:5px;pointer-events:none;z-index:4;}
+.atlas-map-paper:after{content:'✧     ✥     ✧';position:absolute;top:11px;left:50%;transform:translateX(-50%);color:#95714b;font:16px Georgia,serif;letter-spacing:18px;white-space:nowrap;z-index:0;}
+.atlas-map-compass{position:absolute;left:25px;top:28px;z-index:3;display:flex;align-items:center;flex-direction:column;font:700 11px Georgia,serif;color:#775236;gap:2px;}
+.atlas-map-compass span:nth-child(2){font-size:26px;}
+.atlas-map-routes{position:absolute;inset:0;width:100%;height:100%;z-index:0;color:rgba(122,88,49,.57);pointer-events:none;}
+.atlas-map-floorplan{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(3,minmax(178px,auto));grid-template-areas:"research . creative" "engineering atrium games" ". annex .";align-items:center;gap:10px;min-height:590px;position:relative;z-index:1;padding:36px 43px 25px;}
+.atlas-map-room{position:relative;display:flex;flex-direction:column;align-items:center;gap:5px;width:min(100%,280px);min-width:0;min-height:168px;padding:10px 9px;border:2px solid rgba(121,79,45,.63);border-radius:13px 13px 9px 9px;text-align:center;background:linear-gradient(150deg,rgba(255,247,218,.94),rgba(221,195,149,.92));box-shadow:inset 0 0 0 3px rgba(255,232,181,.65),0 4px 17px rgba(88,56,28,.24);justify-self:center;}
+.map-room-research{grid-area:research;}.map-room-creative{grid-area:creative;}.map-room-engineering{grid-area:engineering;}.map-room-atrium{grid-area:atrium;}.map-room-games{grid-area:games;}.map-room-annex{grid-area:annex;}
+.map-room-atrium{background:radial-gradient(circle at 50% 0%,rgba(255,240,179,.99),rgba(220,189,132,.97));border-color:#9d723d;box-shadow:0 0 0 5px rgba(160,110,59,.21),0 7px 27px rgba(79,45,20,.3);width:min(100%,260px);}
+.map-room-current{border-color:#7c526e;box-shadow:inset 0 0 0 3px rgba(252,224,165,.64),0 0 0 4px rgba(119,80,119,.35),0 8px 16px rgba(88,56,28,.22);}
+.atlas-map-room-top{display:flex;align-items:center;justify-content:center;gap:10px;min-height:26px;}
+.atlas-map-room-glyph{font:28px/1 Georgia,serif;color:#7f563c;}
+.atlas-map-you-are-here{font:700 8px/1.2 'DM Sans',sans-serif;letter-spacing:.08em;padding:4px 6px;border-radius:12px;border:1px solid rgba(100,67,96,.58);background:#eee0dd;color:#70496a;}
+.atlas-map-room h3{font:600 23px/1 'Cormorant Garamond',Georgia,serif;color:#4b3020;margin:0;}
+.atlas-map-room-desc{font:10px/1.25 'DM Sans',sans-serif;color:#715338;margin:0;min-height:24px;max-width:240px;}
+.atlas-map-room-meta{display:flex;justify-content:center;gap:13px;color:#755036;font-size:10px;font-weight:700;}
+.atlas-map-enter{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:28px;width:auto;padding:6px 9px;border-radius:7px;background:#66412c;border:1px solid #93653d;color:#f9e7c5;font-size:10px;font-weight:700;}
+.atlas-map-enter:hover:not(:disabled){background:#8a5732;}
+.atlas-map-enter:disabled{opacity:.45;cursor:not-allowed;}
+.atlas-map-preview{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px;max-width:100%;}
+.atlas-map-preview button{display:inline-flex;align-items:center;gap:4px;max-width:100%;min-height:22px;padding:4px 7px;border:1px solid rgba(105,80,53,.35);border-radius:5px;color:#5b3b2c;background:rgba(251,236,198,.65);font-size:9px;}
+.atlas-map-preview button:hover{background:rgba(255,250,220,.92);border-color:#7d5238;}
+.atlas-map-preview button span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:130px;}
+.atlas-map-watermark{position:relative;z-index:2;margin:0;padding:0 10px 13px;color:#77583b;text-align:center;font:700 9px Georgia,serif;letter-spacing:.1em;}
+.atlas-map-footer{flex:0 0 auto;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 20px;border-top:1px solid rgba(240,191,132,.24);background:rgba(16,16,24,.68);}
+.atlas-map-footer>span{display:inline-flex;align-items:center;gap:8px;font-size:10px;color:#dbc19e;}
+.atlas-map-footer button{display:inline-flex;align-items:center;gap:8px;flex:0 0 auto;padding:9px 12px;border-radius:8px;background:rgba(110,78,47,.82);border:1px solid rgba(232,197,143,.52);color:#ffe1b8;font-size:11px;font-weight:700;}
+.atlas-map-footer button:hover{background:#93683e;}
+@media(max-width:850px){
+ .atlas-map-floorplan{padding:36px 20px 25px;gap:8px;grid-template-rows:repeat(3,minmax(190px,auto));}
+ .atlas-map-room{padding:9px 6px;}
+ .atlas-map-room h3{font-size:20px;}
+ .atlas-map-room-desc{font-size:9px;}
+ .atlas-map-preview button span{max-width:88px;}
+ .atlas-map-paper:after{display:none;}
+ .atlas-map-compass{left:12px;top:12px;opacity:.6;}
+ .quick-room-map{font-size:10px;}
+}
+@media(max-width:620px){
+ .atlas-map-backdrop{padding:6px;}
+ .atlas-map-dialog{max-height:98dvh;border-radius:11px;}
+ .atlas-map-header{padding:12px;gap:9px;}
+ .atlas-map-header-mark{width:33px;height:33px;}
+ .atlas-map-header-mark svg{width:20px;}
+ .atlas-map-header h2{font-size:27px;}
+ .atlas-map-header p{font-size:10px;}
+ .atlas-map-eyebrow{font-size:7px;letter-spacing:.12em;}
+ .atlas-map-scroll{padding:7px;}
+ .atlas-map-paper{min-height:0;}
+ .atlas-map-floorplan{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:none;grid-template-areas:"atrium atrium" "research creative" "engineering games" "annex annex";padding:24px 9px 16px;gap:11px;min-height:0;}
+ .atlas-map-routes{display:none;}
+ .atlas-map-compass{display:none;}
+ .atlas-map-room{max-width:none;min-height:151px;padding:9px 6px;}
+ .atlas-map-room h3{font-size:20px;}
+ .atlas-map-room-desc{min-height:24px;}
+ .atlas-map-preview button{font-size:8px;}
+ .atlas-map-preview button span{max-width:110px;}
+ .map-room-atrium,.map-room-annex{width:min(100%,360px);}
+ .atlas-map-footer{padding:9px 11px;flex-wrap:wrap;}
+ .atlas-map-footer>span{font-size:9px;}
+ .atlas-map-footer button{margin-left:auto;}
+ .quick-room-map{padding:8px;min-width:35px;font-size:0;}
+ .quick-room-map svg{height:17px;width:17px;}
+}
+@media(max-width:370px){
+ .atlas-map-floorplan{grid-template-columns:1fr;grid-template-areas:"atrium" "research" "creative" "engineering" "games" "annex";}
+ .atlas-map-room{width:100%;min-height:0;}
+}
+@media(prefers-reduced-motion:reduce){.atlas-map-dialog{animation:none;}}

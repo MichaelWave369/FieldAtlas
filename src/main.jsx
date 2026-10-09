@@ -4,10 +4,12 @@ import {
   ArrowLeft, ArrowRight, BookOpen, Bookmark, Check, ChevronLeft, ChevronRight,
   ExternalLink, Heart, LampDesk, LibraryBig, Maximize2, Moon, Plus,
   Search, Settings2, Sparkles, Sun, WandSparkles, X, RefreshCw,
-  Globe2, Link2, Info, RotateCcw, Menu, Star, Keyboard,
+  Globe2, Link2, Info, RotateCcw, Menu, Star, Keyboard, Map as MapIcon,
 } from 'lucide-react';
 import { seedPages, categories, wings, wingForCategory, safeUrl, uniqueMerge, newArrivals, shouldAutoDiscover, discoverGithubPages, isVerifiedPublishedPage } from './catalog';
 import { curateProject, applyLocalEdits, categoryPalette } from './curation';
+import LibraryMap from './LibraryMap';
+import { getMapChapterWing } from './library-map';
 import { isInfiniteAtlas, MAX_MIRROR_DEPTH, MIN_MIRROR_DEPTH, mirrorLayers, nextMirrorDepth } from './fieldception';
 import { visitorJourneys, findJourney, availableJourneyStops, readAtlasLink, buildAtlasLink, locateSharedChapter } from './journeys';
 import { wrapChapterIndex, canTurnChapters, wrapDestinationLabel } from './navigation';
@@ -118,6 +120,7 @@ function App() {
   const [shelfOpen, setShelfOpen] = useState(false);
   const [portalOpen, setPortalOpen] = useState(false);
   const [focusMode, setFocusMode] = useState(false);
+  const [mapOpen, setMapOpen] = useState(false);
   const [mirrorDepth, setMirrorDepth] = useState(MIN_MIRROR_DEPTH);
   const [activeTour, setActiveTour] = useState(null);
   const [visitedChapters, setVisitedChapters] = useState(() => {
@@ -261,18 +264,18 @@ function App() {
   useEffect(() => {
     const onKeyDown = e => {
       if (e.key === 'Escape') {
-        if (portalOpen || shelfOpen || showHelp || directoryOpen || editorPage) {
-          setPortalOpen(false); setShelfOpen(false); setShowHelp(false); setDirectoryOpen(false); setEditorPage(null);
+        if (portalOpen || shelfOpen || showHelp || directoryOpen || editorPage || mapOpen) {
+          setPortalOpen(false); setShelfOpen(false); setShowHelp(false); setDirectoryOpen(false); setEditorPage(null); setMapOpen(false);
         } else if (focusMode) exitFocusMode();
         return;
       }
-      if (portalOpen || shelfOpen || showHelp || directoryOpen || editorPage || /input|textarea|select/i.test(e.target?.tagName || '')) return;
+      if (portalOpen || shelfOpen || showHelp || directoryOpen || editorPage || mapOpen || /input|textarea|select/i.test(e.target?.tagName || '')) return;
       if (e.key === 'ArrowRight') { e.preventDefault(); turn(1); }
       if (e.key === 'ArrowLeft') { e.preventDefault(); turn(-1); }
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [portalOpen, shelfOpen, showHelp, directoryOpen, editorPage, focusMode, turn]);
+  }, [portalOpen, shelfOpen, showHelp, directoryOpen, editorPage, mapOpen, focusMode, turn]);
 
   function selectJourney(id, targetRepo = null) {
     const stops = availableJourneyStops(id, catalog);
@@ -301,6 +304,26 @@ function App() {
     } catch {
       setShareNotice(link);
     }
+  }
+  function enterRoomFromMap(id) {
+    setMapOpen(false);
+    setActiveTour(null);
+    setWing(id);
+    setEnteredWing(true);
+    setCategory('All');
+    setSearch('');
+    setCurrent(0);
+    scrollToReader();
+  }
+  function openChapterFromMap(page) {
+    if (!page) return;
+    setMapOpen(false);
+    setActiveTour(null);
+    setPendingChapterId(page.id);
+    setWing(getMapChapterWing(page));
+    setEnteredWing(true);
+    setCategory('All');
+    setSearch('');
   }
   function openChapterFromDirectory(page) {
     setActiveTour(null);
@@ -433,6 +456,7 @@ function App() {
           <span aria-hidden="true">{w.glyph}</span> {w.shortName}
         </button>)}
       </div>
+      <button className="quick-room-map" type="button" onClick={() => setMapOpen(true)} aria-haspopup="dialog" aria-label="Open interactive library map"><MapIcon size={15}/> Library Map</button>
       <a className="quick-room-details" href="#study-rooms">Explore rooms <ChevronRight size={13}/></a>
     </nav>
 
@@ -609,6 +633,9 @@ function App() {
         : <iframe key={'full-'+active.id} title={`Fullscreen website ${active.title}`} src={active.url} allow="fullscreen; clipboard-read; clipboard-write" />}
       <p className="modal-embed-hint">{fieldception ? 'The Infinite Atlas is a bounded illustration. Open outside the Atlas to view the actual site.' : 'If a page is blank, its host may prevent iframe embedding. Use “Open outside atlas.”'}</p>
     </div>}
+
+    {mapOpen && <LibraryMap wings={wings} catalog={catalog} currentWing={wing} visitedIds={visitedChapters}
+      onClose={() => setMapOpen(false)} onEnterWing={enterRoomFromMap} onOpenChapter={openChapterFromMap}/>}
 
     {directoryOpen && <div className="directory-overlay" role="presentation" onMouseDown={() => setDirectoryOpen(false)}>
       <section className="directory-panel" role="dialog" aria-modal="true" aria-labelledby="directory-title" onMouseDown={e=>e.stopPropagation()}>

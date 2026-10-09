@@ -2,6 +2,24 @@
 
 **A cozy, interactive living library of public GitHub Pages projects.**
 
+## v0.4: The Library Curator
+
+A more welcoming library, while keeping the original central book and the entire public Pages inventory:
+
+- **Curated titles and sections:** `src/curation.js` maps publicly described projects into Research, Creative, Engineering (Systems, Intelligence and Tools), Games, and the Curious Annex. Unknown projects remain in the Annex rather than being misrepresented.
+- **Ornamental book covers:** each wing has a horizontally scrollable gallery of CSS-only covers, using category-specific colors, symbols, and gold filigree. No external image fetches required.
+- **Doors you can enter:** clicking a wing opens an animated two-leaf door; the room reveals its cover gallery and keeps the original live page reader underneath. Accessible button controls and reduced-motion support preserve usability.
+- **Complete directory:** search every available published chapter, filter by wing, browse project descriptions, visit the live site directly, or jump to that page in the Atlas.
+- **Editable labels:** locally customize a title, summary, and category for your browser. Editing does not modify GitHub or change anyone else's catalog, ID, or URL.
+
+The shared public catalog still updates automatically when deploy-time verification confirms an HTML website. The curator improves titles/categories for those verified entries. It **does not** publish any private repository or infer hidden content.
+
+This is still a lightweight, responsive React/2.5D site. Walkable 3D rooms and camera controls remain future work.
+
+### Curating a label for everyone
+
+Update the public-safe metadata overrides in `src/curation.js`, review the change, and merge it. Browser-local edits in the directory are never sent to the server or merged automatically.
+
 ## v0.3: Enter the wings, open the world
 
 **The immersive study stays lightweight.** Enter the Research, Creative, Engineering, Games, or Curious Annex rooms for an animated arched doorway, atmospheric themed light, a small interactive bookshelf with book-spine shortcuts, and the existing full living reader. Everything still works without a 3D graphics card. This is a *cinematic 2.5D transition*, not yet a walkable Three.js room.

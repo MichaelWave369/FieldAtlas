@@ -8,6 +8,7 @@
  */
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { inferCategory } from '../src/catalog.js';
+import { curateProject } from '../src/curation.js';
 
 export const OWNER = 'MichaelWave369';
 export const OUTPUT = 'public/pages-discovered.json';
@@ -97,13 +98,13 @@ export async function buildManifest({ fetcher = fetch, owner = OWNER, token = ''
   const repositories = await publicRepositories(fetcher, owner, token);
   const candidates = repositories.map(r => pagesCandidate(r, owner)).filter(Boolean);
   const probes = await parallelMap(candidates, 8, c => probePages(c.url, fetcher));
-  const pages = candidates.flatMap((item, i) => probes[i].reachable ? [{
+  const pages = candidates.flatMap((item, i) => probes[i].reachable ? [curateProject({
     ...item,
     url: probes[i].url,
     verified: true,
-    category: inferCategory(item.repo),
+    category: inferCategory(item.repo, item.desc),
     published: true,
-  }] : []);
+  })] : []);
   pages.sort((a, b) => a.repo.localeCompare(b.repo, 'en', { sensitivity: 'base' }));
   return {
     schema_version: 1,

@@ -7,11 +7,13 @@ import {
   Globe2, Link2, Info, RotateCcw, Menu, Star, Keyboard,
 } from 'lucide-react';
 import { seedPages, categories, wings, wingForCategory, safeUrl, uniqueMerge, newArrivals, shouldAutoDiscover, discoverGithubPages } from './catalog';
+import { curateProject, applyLocalEdits, categoryPalette } from './curation';
 import './style.css';
 
 const STORE_KEY = 'field-atlas-pages-v1';
 const PREF_KEY = 'field-atlas-preferences-v1';
 const DISCOVERY_KEY = 'field-atlas-discovery-v2';
+const EDITS_KEY = 'field-atlas-curation-edits-v4';
 const specialRoman = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
 
 function readLocal(key, fallback) {
@@ -38,6 +40,14 @@ function App() {
   const [prefs, setPrefs] = useState(() => readLocal(PREF_KEY, { night: false, favoriteIds: [], hintDismissed: false }));
   const [category, setCategory] = useState('All');
   const [wing, setWing] = useState('all');
+  const [enteredWing, setEnteredWing] = useState(true);
+  const [directoryOpen, setDirectoryOpen] = useState(false);
+  const [directorySearch, setDirectorySearch] = useState('');
+  const [directoryWing, setDirectoryWing] = useState('all');
+  const [localEdits, setLocalEdits] = useState(() => readLocal(EDITS_KEY, {}));
+  const [editorPage, setEditorPage] = useState(null);
+  const [editForm, setEditForm] = useState({ title: '', desc: '', category: 'Other' });
+  const [pendingChapterId, setPendingChapterId] = useState(null);
   const [discovery, setDiscovery] = useState(() => {
     const value = readLocal(DISCOVERY_KEY, {});
     return {
@@ -67,7 +77,10 @@ function App() {
   // Hiding a site only affects the current browser, not its public repository.
   const catalog = useMemo(() => uniqueMerge(
     pages, publishedPages.filter(p => !discovery.hiddenIds.includes(p.id))
-  ), [pages, publishedPages, discovery.hiddenIds]);
+  ).map(p => {
+    const curated = curateProject(p);
+    return applyLocalEdits(curated, localEdits);
+  }), [pages, publishedPages, discovery.hiddenIds, localEdits]);
   const filtered = useMemo(() => catalog.filter(p => {
     const matchesWing = wing === 'all' || wingForCategory(p.category) === wing;
     const matchesCategory = category === 'All' || (category === 'Favorites' ? favoriteIds.includes(p.id) : p.category === category);
@@ -76,9 +89,15 @@ function App() {
   }), [catalog, category, search, favoriteIds, wing]);
   const index = Math.min(Math.max(current, 0), Math.max(0, filtered.length - 1));
   const active = filtered[index];
+  const directoryResults = useMemo(() => catalog.filter(p => {
+    const q = directorySearch.trim().toLowerCase();
+    return (directoryWing === 'all' || wingForCategory(p.category) === directoryWing) &&
+      (!q || [p.title, p.repo, p.desc, p.category].join(' ').toLowerCase().includes(q));
+  }).sort((a,b)=>a.title.localeCompare(b.title)), [catalog, directorySearch, directoryWing]);
 
   useEffect(() => { localStorage.setItem(STORE_KEY, JSON.stringify(pages)); }, [pages]);
   useEffect(() => { localStorage.setItem(PREF_KEY, JSON.stringify(prefs)); }, [prefs]);
+  useEffect(() => { localStorage.setItem(EDITS_KEY, JSON.stringify(localEdits)); }, [localEdits]);
   useEffect(() => { localStorage.setItem(DISCOVERY_KEY, JSON.stringify(discovery)); }, [discovery]);
   useEffect(() => {
     let cancelled = false;
@@ -108,6 +127,14 @@ function App() {
   }, []);
   useEffect(() => () => pendingTimers.current.forEach(clearTimeout), []);
   useEffect(() => { setCurrent(0); }, [category, search, wing]);
+  useEffect(() => {
+    if (!pendingChapterId) return;
+    const target = filtered.findIndex(p => p.id === pendingChapterId);
+    if (target >= 0) {
+      setCurrent(target);
+      setPendingChapterId(null);
+    }
+  }, [pendingChapterId, filtered]);
 
   const goTo = useCallback((target, direction = '') => {
     if (flipping || target < 0 || target >= filtered.length || target === index) return;
@@ -119,15 +146,37 @@ function App() {
   const turn = useCallback((delta) => goTo(index + delta, delta > 0 ? 'next' : 'prev'), [goTo, index]);
   useEffect(() => {
     const onKeyDown = e => {
-      if (e.key === 'Escape') { setPortalOpen(false); setShelfOpen(false); setShowHelp(false); return; }
-      if (portalOpen || shelfOpen || showHelp || /input|textarea|select/i.test(e.target?.tagName || '')) return;
+      if (e.key === 'Escape') { setPortalOpen(false); setShelfOpen(false); setShowHelp(false); setDirectoryOpen(false); setEditorPage(null); return; }
+      if (portalOpen || shelfOpen || showHelp || directoryOpen || editorPage || /input|textarea|select/i.test(e.target?.tagName || '')) return;
       if (e.key === 'ArrowRight') { e.preventDefault(); turn(1); }
       if (e.key === 'ArrowLeft') { e.preventDefault(); turn(-1); }
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [portalOpen, shelfOpen, showHelp, turn]);
+  }, [portalOpen, shelfOpen, showHelp, directoryOpen, editorPage, turn]);
 
+  function openChapterFromDirectory(page) {
+    // Selection is resolved after the new wing/filter has rendered.
+    setPendingChapterId(page.id);
+    setWing('all'); setEnteredWing(true); setCategory('All'); setSearch('');
+    setDirectoryOpen(false);
+    setShelfOpen(false);
+  }
+  function beginEdit(page) {
+    setEditorPage(page);
+    setEditForm({ title: page.title || '', desc: page.desc || '', category: page.category || 'Other' });
+  }
+  function saveEditedChapter(event) {
+    event.preventDefault();
+    if (!editorPage || !editForm.title.trim()) return;
+    const key = String(editorPage.repo || editorPage.id).toLowerCase();
+    setLocalEdits(prev => ({ ...prev, [key]: {
+      title: editForm.title.trim().slice(0, 80),
+      desc: editForm.desc.trim().slice(0, 300),
+      category: editForm.category,
+    } }));
+    setEditorPage(null);
+  }
   function toggleFavorite(id) {
     setPrefs(p => ({ ...p, favoriteIds: (p.favoriteIds || []).includes(id) ? p.favoriteIds.filter(x => x !== id) : [...(p.favoriteIds || []), id] }));
   }
@@ -196,7 +245,7 @@ function App() {
   }
   function resetCatalog() {
     if (!window.confirm('Restore the original nine curated chapters? Custom chapters and edits will be removed from this browser.')) return;
-    setPages(seedPages); setDiscovery(prev => ({...prev, hiddenIds: []})); setCategory('All'); setWing('all'); setSearch(''); setCurrent(0);
+    setPages(seedPages); setDiscovery(prev => ({...prev, hiddenIds: []})); setLocalEdits({}); setCategory('All'); setWing('all'); setSearch(''); setCurrent(0);
   }
 
   const fav = active && favoriteIds.includes(active.id);
@@ -232,7 +281,7 @@ function App() {
       <div className="wings-rail">
         {wings.map(w => {
           const count = catalog.filter(p => w.id === 'all' || wingForCategory(p.category) === w.id).length;
-          return <button type="button" key={w.id} className={`wing-card ${wing===w.id?'wing-active':''}`} onClick={() => {setWing(w.id);setCategory('All');setSearch('');}} aria-pressed={wing === w.id}>
+          return <button type="button" key={w.id} className={`wing-card ${wing===w.id?'wing-active':''}`} onClick={() => {setWing(w.id);setEnteredWing(w.id === 'all');setCategory('All');setSearch('');}} aria-pressed={wing === w.id}>
             <span className="wing-glyph" aria-hidden="true">{w.glyph}</span><span className="wing-title">{w.name}</span>
             <small>{w.description}</small><span className="wing-count">{count} {count===1?'chapter':'chapters'}</span>
           </button>;

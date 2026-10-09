@@ -2,6 +2,19 @@
 
 **A cozy, interactive living library of public GitHub Pages projects.**
 
+## v0.5: FieldCeption · The Infinite Atlas
+
+A lighthearted Easter egg inspired by the Atlas opening itself inside the Atlas.
+
+- The public `FieldAtlas` chapter appears as **The Infinite Atlas · Φ∞**, with a violet-gold infinity crest.
+- On that one verified GitHub Pages link, the right-hand live-preview page becomes a **Mirror Chamber**: illustrations of smaller books nested within smaller books.
+- The **Go Deeper** and **Surface** controls change the illustrated reflection depth between **1 and 5**. A hard maximum stops accidental unbounded rendering.
+- The mirror uses **React/CSS only**. No recursive iframe, recursive network fetch, server execution, or copies of the application are instantiated. The separate **Open this world** button still links to the real Atlas in a new tab.
+- The fullscreen reader shows the same bounded mirror chamber. Arrow navigation, bookmarks, search and all other chapters behave normally.
+- The public Pages manifest validator is now tested with real `gh-123` identifiers. This fixes a double-escaped regex that previously rejected verified public catalog entries and displayed a misleading **zero verified websites** status.
+
+FieldCeption is a whimsical visualization, not a recursive browsing engine. The original working book and cozy study remain intact.
+
 ## v0.4: The Library Curator
 
 A more welcoming library, while keeping the original central book and the entire public Pages inventory:

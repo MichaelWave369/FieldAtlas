@@ -6,8 +6,9 @@ import {
   Search, Settings2, Sparkles, Sun, WandSparkles, X, RefreshCw,
   Globe2, Link2, Info, RotateCcw, Menu, Star, Keyboard,
 } from 'lucide-react';
-import { seedPages, categories, wings, wingForCategory, safeUrl, uniqueMerge, newArrivals, shouldAutoDiscover, discoverGithubPages } from './catalog';
+import { seedPages, categories, wings, wingForCategory, safeUrl, uniqueMerge, newArrivals, shouldAutoDiscover, discoverGithubPages, isVerifiedPublishedPage } from './catalog';
 import { curateProject, applyLocalEdits, categoryPalette } from './curation';
+import { isInfiniteAtlas, MAX_MIRROR_DEPTH, MIN_MIRROR_DEPTH, mirrorLayers, nextMirrorDepth } from './fieldception';
 import './style.css';
 
 const STORE_KEY = 'field-atlas-pages-v1';
@@ -45,6 +46,41 @@ function BookCover({ page, onOpen, compact = false }) {
   </button>;
 }
 
+/**
+ * Recursive in appearance, NOT recursive in execution.
+ * Five illustration frames at most. Never embeds a second copy of the app.
+ */
+function MirrorVista({ depth }) {
+  let inside = <div className="mirror-final" aria-hidden="true"><span>∞</span><small>THE FIELD CONTINUES</small></div>;
+  for (const layer of mirrorLayers(depth).reverse()) {
+    inside = <div className="mirror-mini-room" key={layer}>
+      <div className="mirror-mini-lamp" aria-hidden="true">✧</div>
+      <div className="mirror-mini-heading">THE FIELD ATLAS <span>Φ∞ · {layer}</span></div>
+      <div className="mirror-mini-wings" aria-hidden="true"><i/><i/><i/><i/></div>
+      <div className="mirror-mini-book">
+        <div className="mirror-mini-paper"><b>FIELD</b><strong>Φ</strong><small>PAGE {layer}</small></div>
+        <div className="mirror-mini-screen">{inside}</div>
+      </div>
+      <div className="mirror-mini-floor" />
+    </div>;
+  }
+  return <div className="mirror-vista" aria-hidden="true">{inside}</div>;
+}
+
+function MirrorChamber({depth, onDeeper, onSurface}) {
+  return <div className="mirror-chamber">
+    <header className="mirror-chamber-header"><span>THE MIRROR ROOM · Φ∞</span><span>DEPTH {depth} / {MAX_MIRROR_DEPTH}</span></header>
+    <MirrorVista depth={depth}/>
+    <div className="mirror-console">
+      <p>{depth >= MAX_MIRROR_DEPTH ? 'The fifth reflection is the end of this safe little rabbit hole.' : 'Every book contains a smaller book. Follow the reflection.'}</p>
+      <div className="mirror-controls">
+        <button type="button" onClick={onSurface} disabled={depth <= MIN_MIRROR_DEPTH} aria-label="Return toward the first reflection"><ChevronLeft size={14}/> Surface</button>
+        <button type="button" onClick={onDeeper} disabled={depth >= MAX_MIRROR_DEPTH} aria-label="Go one reflection deeper">Go Deeper <ChevronRight size={14}/></button>
+      </div>
+    </div>
+  </div>;
+}
+
 function App() {
   const [pages, setPages] = useState(() => {
     const loaded = readLocal(STORE_KEY, seedPages);
@@ -78,6 +114,7 @@ function App() {
   const [flipping, setFlipping] = useState('');
   const [shelfOpen, setShelfOpen] = useState(false);
   const [portalOpen, setPortalOpen] = useState(false);
+  const [mirrorDepth, setMirrorDepth] = useState(MIN_MIRROR_DEPTH);
   const [showHelp, setShowHelp] = useState(false);
   const [form, setForm] = useState({ title: '', url: '', category: 'Other', desc: '' });
   const [formError, setFormError] = useState('');
@@ -102,6 +139,8 @@ function App() {
   }), [catalog, category, search, favoriteIds, wing]);
   const index = Math.min(Math.max(current, 0), Math.max(0, filtered.length - 1));
   const active = filtered[index];
+  const fieldception = isInfiniteAtlas(active);
+  useEffect(() => { setMirrorDepth(MIN_MIRROR_DEPTH); }, [active?.id]);
   const directoryResults = useMemo(() => catalog.filter(p => {
     const q = directorySearch.trim().toLowerCase();
     return (directoryWing === 'all' || wingForCategory(p.category) === directoryWing) &&
@@ -120,9 +159,7 @@ function App() {
       if (manifest.schema_version !== 1 || manifest.owner !== 'MichaelWave369' || !Array.isArray(manifest.pages)) {
         throw new Error('Unexpected public catalog format');
       }
-      const valid = manifest.pages.filter(item => item && item.verified === true
-        && /^gh-\\d+$/.test(item.id) && /^[\\w.-]+$/.test(item.repo || '')
-        && safeUrl(item.url)?.startsWith('https://')).map(item => ({
+      const valid = manifest.pages.filter(isVerifiedPublishedPage).map(item => ({
           ...item, title: String(item.title || item.repo).slice(0, 80),
           desc: String(item.desc || '').slice(0, 300),
           kicker: 'LIVE FROM THE FIELD',
@@ -365,9 +402,13 @@ function App() {
                 <ExternalLink size={14}/>
               </div>
               <div className="iframe-shell">
-                <iframe key={active.id + active.url} title={`Live website: ${active.title}`} loading="lazy" src={active.url} referrerPolicy="strict-origin-when-cross-origin" allow="fullscreen; clipboard-read; clipboard-write" />
+                {fieldception
+                  ? <MirrorChamber depth={mirrorDepth}
+                      onDeeper={() => setMirrorDepth(d => nextMirrorDepth(d, 1))}
+                      onSurface={() => setMirrorDepth(d => nextMirrorDepth(d, -1))} />
+                  : <iframe key={active.id + active.url} title={`Live website: ${active.title}`} loading="lazy" src={active.url} referrerPolicy="strict-origin-when-cross-origin" allow="fullscreen; clipboard-read; clipboard-write" />}
               </div>
-              <div className="preview-footnote"><span className="live-dot" /> LIVE WEBSITE PREVIEW <span className="preview-hint">Some sites block embedding. Open the portal instead.</span></div>
+              <div className="preview-footnote"><span className="live-dot" /> {fieldception ? 'SAFE MIRROR CHAMBER' : 'LIVE WEBSITE PREVIEW'} <span className="preview-hint">{fieldception ? 'Five illustrated reflections, zero recursive iframes.' : 'Some sites block embedding. Open the portal instead.'}</span></div>
             </div>
             <div className="portal-actions">
               <a className="gold-btn" href={active.url} target="_blank" rel="noopener noreferrer"><ExternalLink size={15}/> Open this world</a>
@@ -402,8 +443,12 @@ function App() {
 
     {portalOpen && active && <div className="portal-modal" role="dialog" aria-modal="true" aria-label={`${active.title} fullscreen reader`}>
       <div className="portal-modal-header"><span><BookOpen size={19}/> {active.title} <small>LIVE SITE</small></span><div><a href={active.url} target="_blank" rel="noopener noreferrer"><ExternalLink size={16}/> Open outside atlas</a><button aria-label="Close fullscreen reader" onClick={()=>setPortalOpen(false)}><X size={20}/></button></div></div>
-      <iframe key={'full-'+active.id} title={`Fullscreen website ${active.title}`} src={active.url} allow="fullscreen; clipboard-read; clipboard-write" />
-      <p className="modal-embed-hint">If a page is blank, its host may prevent iframe embedding. Use “Open outside atlas.”</p>
+      {fieldception
+        ? <MirrorChamber depth={mirrorDepth}
+            onDeeper={() => setMirrorDepth(d => nextMirrorDepth(d, 1))}
+            onSurface={() => setMirrorDepth(d => nextMirrorDepth(d, -1))}/>
+        : <iframe key={'full-'+active.id} title={`Fullscreen website ${active.title}`} src={active.url} allow="fullscreen; clipboard-read; clipboard-write" />}
+      <p className="modal-embed-hint">{fieldception ? 'The Infinite Atlas is a bounded illustration. Open outside the Atlas to view the actual site.' : 'If a page is blank, its host may prevent iframe embedding. Use “Open outside atlas.”'}</p>
     </div>}
 
     {directoryOpen && <div className="directory-overlay" role="presentation" onMouseDown={() => setDirectoryOpen(false)}>

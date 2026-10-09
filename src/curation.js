@@ -1,3 +1,4 @@
+import { isInfiniteAtlas } from './fieldception.js';
 /**
  * Field Atlas v0.4 public-safe library catalog curator.
  * Names/categories below come from publicly described projects, not private
@@ -38,7 +39,7 @@ export const projectOverrides = Object.freeze({
   'brainsweatstudios': { title:'BrainSweat Studios', category:'Creative' },
   'WaveForgeStudio': { title:'WaveForge Studio', category:'Creative' },
   'lumen_sword_369': { title:'Lumen Sword', category:'Creative' },
-  'FieldAtlas': { title:'The Field Atlas', category:'Tools' },
+  'FieldAtlas': { title:'The Infinite Atlas · Φ∞', category:'Other', desc:'The book that contains itself: a bounded mirror chamber where the Field reflects the Field.' },
   'LabelFit': { title:'LabelFit', category:'Tools' },
   'MoreBounceLabs': { title:'More Bounce Labs', category:'Creative' },
   'MemeForge': { title:'MemeForge', category:'Creative' },
@@ -101,9 +102,9 @@ export function curateProject(page) {
     ...page,
     title: override?.title || page.title || page.repo,
     category,
-    accent: theme.color,
-    coverTone: theme.tone,
-    coverGlyph: theme.glyph,
+    accent: isInfiniteAtlas(page) ? '#d4b7ff' : theme.color,
+    coverTone: isInfiniteAtlas(page) ? 'mirrors' : theme.tone,
+    coverGlyph: isInfiniteAtlas(page) ? '∞' : theme.glyph,
     ...(override?.desc ? { desc: override.desc } : {}),
   };
 }
@@ -117,5 +118,5 @@ export function applyLocalEdits(page, edits = {}) {
   const desc = typeof update.desc === 'string' ? update.desc.trim().slice(0, 300) : page.desc;
   const category = validCategory || page.category;
   const theme = categoryPalette[category] || categoryPalette.Other;
-  return { ...page, title, desc, category, accent: theme.color, coverTone: theme.tone, coverGlyph: theme.glyph };
+  return { ...page, title, desc, category, accent: isInfiniteAtlas(page) ? '#d4b7ff' : theme.color, coverTone: isInfiniteAtlas(page) ? 'mirrors' : theme.tone, coverGlyph: isInfiniteAtlas(page) ? '∞' : theme.glyph };
 }

@@ -321,3 +321,49 @@ a { color:inherit; }
 @media(max-width:850px){.directory-results{grid-template-columns:1fr;}.directory-panel{max-height:94vh;}}
 @media(max-width:620px){.room-cover-gallery{gap:9px;}.atlas-cover-compact{width:103px;height:145px;}.room-portal{grid-template-rows:auto auto auto;}.room-portal-arch .door-light{font-size:37px;}.directory-shortcut{align-items:flex-start;flex-direction:column;}.directory-overlay{padding:7px;}.directory-head{padding:18px 14px 12px;}.directory-tools{padding:10px 13px;}.directory-results{padding:11px 9px;}.directory-entry{gap:8px;padding:9px;}.directory-entry .atlas-cover{width:74px;min-width:74px;height:113px;}.directory-entry .cover-title{font-size:11px;}.directory-entry-copy h3{font-size:19px;}.directory-entry-actions button,.directory-entry-actions a{font-size:9px;}.directory-note{padding:10px 13px;}.directory-tools select{max-width:none;}}
 @media(prefers-reduced-motion:reduce){.room-portal-arch .door-leaf,.atlas-cover{transition:none;}.atlas-cover:hover{transform:none;}}
+
+
+/* v0.5 FieldCeption: a safe, finite infinity room, never a self-embedding iframe. */
+.mirror-chamber{position:relative;display:flex;flex-direction:column;min-height:0;width:100%;height:100%;background:radial-gradient(ellipse at 50% 37%,rgba(123,76,164,.41),transparent 58%),linear-gradient(160deg,#070f1c 0%,#231227 48%,#110d19 100%);color:#f8e7cb;isolation:isolate;overflow:hidden;}
+.mirror-chamber::before{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent 0 12px,rgba(254,203,141,.028) 13px 14px),radial-gradient(ellipse at center,transparent 27%,rgba(3,3,10,.63));z-index:0;}
+.mirror-chamber-header{flex-shrink:0;position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-bottom:1px solid rgba(250,208,154,.3);background:rgba(8,10,19,.75);font-weight:700;letter-spacing:.13em;color:#e7c9fa;font-size:9px;}
+.mirror-chamber-header span:last-child{color:#ebc88c;letter-spacing:.06em;white-space:nowrap;}
+.mirror-vista{flex:1;min-height:0;position:relative;z-index:1;display:grid;place-items:center;padding:10px 15px;overflow:hidden;perspective:1100px;}
+.mirror-mini-room{width:100%;height:100%;min-height:0;min-width:0;position:relative;display:flex;flex-direction:column;gap:4px;align-items:center;padding:8px 11px;border:2px solid rgba(226,186,131,.82);border-radius:11px;background:radial-gradient(ellipse at 48% 20%,rgba(196,142,210,.21),transparent 69%),linear-gradient(135deg,#211523,#0e101a 50%,#201222);box-shadow:inset 0 0 0 3px rgba(25,12,13,.7),0 0 14px rgba(225,175,121,.19),0 9px 22px rgba(0,0,0,.34);overflow:hidden;transform:rotateX(1.4deg);animation:mirror-shimmer .65s ease-out both;}
+.mirror-mini-room .mirror-mini-room{padding:4px 5px;gap:2px;border-width:1px;border-radius:5px;box-shadow:0 0 6px rgba(225,175,121,.16);animation:none;}
+.mirror-mini-lamp{position:absolute;top:7px;left:9px;font-size:15px;line-height:1;color:#ffe1b0;opacity:.75;text-shadow:0 0 9px #edab74;}
+.mirror-mini-heading{display:flex;justify-content:center;gap:6px;text-align:center;max-width:100%;font:700 clamp(7px,1vw,11px)/1.1 Georgia,serif;letter-spacing:.07em;color:#ffe8b7;white-space:nowrap;}
+.mirror-mini-heading span{color:#cdb0ee;}
+.mirror-mini-wings{width:73%;flex-shrink:0;height:9%;max-height:24px;min-height:4px;display:flex;gap:3px;margin-top:1px;}
+.mirror-mini-wings i{flex:1;border:1px solid rgba(213,173,114,.6);border-radius:3px;background:linear-gradient(130deg,#4b2a24,#241825);}
+.mirror-mini-wings i:nth-child(2){background:linear-gradient(140deg,#57436e,#191722);}
+.mirror-mini-wings i:nth-child(3){background:linear-gradient(140deg,#354d52,#191722);}
+.mirror-mini-wings i:nth-child(4){background:linear-gradient(140deg,#654121,#191722);}
+.mirror-mini-book{flex:1;width:78%;min-height:0;display:grid;grid-template-columns:42% 58%;background:#e4ce9a;border:3px solid #775137;border-radius:5px;box-shadow:0 8px 11px rgba(0,0,0,.54),0 0 0 1px #c89d6c;overflow:hidden;position:relative;}
+.mirror-mini-book::after{content:'';position:absolute;top:0;bottom:0;left:42%;width:5px;transform:translateX(-50%);pointer-events:none;background:linear-gradient(to right,rgba(85,58,33,.38),rgba(255,244,196,.54),rgba(66,43,27,.4));}
+.mirror-mini-paper{min-height:0;display:flex;align-items:center;justify-content:center;gap:3px;flex-direction:column;background:linear-gradient(90deg,#c5a576 0%,#f4e5c1 15%,#f0dcb4 88%,#ae8b59);color:#745034;}
+.mirror-mini-paper b{font:700 9px Georgia,serif;letter-spacing:.15em;}
+.mirror-mini-paper strong{font:600 clamp(21px,4vw,44px)/1 Georgia,serif;color:#936344;}
+.mirror-mini-paper small{font:700 7px Georgia,serif;color:#91724c;}
+.mirror-mini-screen{min-width:0;min-height:0;background:linear-gradient(145deg,#12151f,#231c31);padding:5px;display:grid;place-items:stretch;overflow:hidden;}
+.mirror-mini-room .mirror-mini-room .mirror-mini-screen{padding:2px;}
+.mirror-mini-floor{height:7px;width:94%;flex-shrink:0;background:radial-gradient(ellipse at center,rgba(221,171,108,.34),transparent 70%);}
+.mirror-final{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;width:100%;height:100%;min-height:0;color:#e0c2fa;background:radial-gradient(circle at center,rgba(196,164,246,.38),transparent 65%),#14101d;border:1px solid rgba(201,161,246,.3);border-radius:4px;overflow:hidden;}
+.mirror-final span{font:600 clamp(24px,4vw,55px)/1 Georgia,serif;color:#f1d7ff;text-shadow:0 0 14px rgba(225,176,255,.7);}
+.mirror-final small{font:700 6px Georgia,serif;letter-spacing:.05em;color:#e9c5ff;text-align:center;}
+/* Nested frames automatically simplify as they shrink, avoiding tiny illegible text. */
+.mirror-mini-room .mirror-mini-room .mirror-mini-lamp,.mirror-mini-room .mirror-mini-room .mirror-mini-floor,.mirror-mini-room .mirror-mini-room .mirror-mini-paper small{display:none;}
+.mirror-mini-room .mirror-mini-room .mirror-mini-heading{font-size:5px;letter-spacing:0;}
+.mirror-mini-room .mirror-mini-room .mirror-mini-wings{height:4px;min-height:3px;margin:0;}
+.mirror-mini-room .mirror-mini-room .mirror-mini-book{width:95%;border-width:1px;}
+.mirror-mini-room .mirror-mini-room .mirror-mini-paper strong{font-size:14px;}
+.mirror-console{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 13px;background:rgba(10,10,19,.87);border-top:1px solid rgba(223,182,239,.27);flex-shrink:0;}
+.mirror-console p{font:italic 12px/1.25 'Cormorant Garamond',Georgia,serif;color:#f6d8fa;margin:0;max-width:280px;}
+.mirror-controls{display:flex;flex-shrink:0;align-items:center;gap:6px;}
+.mirror-controls button{display:inline-flex;align-items:center;gap:4px;justify-content:center;min-height:30px;padding:7px 10px;border-radius:7px;border:1px solid rgba(231,190,150,.68);color:#ffe4b8;background:rgba(97,53,80,.82);font-size:10px;font-weight:700;white-space:nowrap;}
+.mirror-controls button:not(:disabled):hover{background:rgba(140,70,103,.95);}
+.mirror-controls button:disabled{cursor:default;opacity:.38;}
+.portal-modal > .mirror-chamber{flex:1;min-height:0;}
+@keyframes mirror-shimmer{from{opacity:.48;transform:scale(.92) rotateX(9deg)}to{opacity:1;transform:scale(1) rotateX(1.4deg)}}
+@media(max-width:680px){.mirror-chamber-header{font-size:7px;padding:6px 8px;}.mirror-vista{padding:5px;}.mirror-mini-room{padding:4px;}.mirror-mini-book{width:93%;}.mirror-console{gap:6px;padding:7px;flex-wrap:wrap;}.mirror-console p{font-size:10px;}.mirror-controls button{font-size:9px;padding:6px 8px;min-height:25px;}}
+@media(prefers-reduced-motion:reduce){.mirror-mini-room{animation:none;}}

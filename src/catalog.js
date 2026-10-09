@@ -105,6 +105,17 @@ export function safeUrl(input) {
   } catch { return null; }
 }
 
+/**
+ * Validate the signed-off, public-only manifest rows before showing them.
+ * This intentionally uses literal regex escapes (\\d, \\w in source are bugs).
+ */
+export function isVerifiedPublishedPage(item) {
+  return Boolean(item && item.verified === true &&
+    /^gh-\d+$/.test(String(item.id || '')) &&
+    /^[\w.-]+$/.test(String(item.repo || '')) &&
+    safeUrl(item.url)?.startsWith('https://'));
+}
+
 function normalizedUrl(url) {
   const safe = safeUrl(url);
   return safe ? safe.replace(/\/$/, '').toLowerCase() : '';

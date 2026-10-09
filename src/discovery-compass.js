@@ -18,7 +18,7 @@ export function availableSurprises(catalog = [], wing = 'all', excludeId = null)
   if (!Array.isArray(catalog) || !compassFilters.some(f => f.id === wing)) return [];
   const seen = new Set();
   return catalog.filter(page => {
-    if (!page || !page.id || !safeUrl(page.url) || page.id === excludeId) return false;
+    if (!page || !page.id || !safeUrl(page.url)?.startsWith('https://') || page.id === excludeId) return false;
     if (wing !== 'all' && wingForCategory(page.category) !== wing) return false;
     if (seen.has(page.id)) return false;
     seen.add(page.id);

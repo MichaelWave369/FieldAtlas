@@ -1,3 +1,5 @@
+import { inferProjectCategory, curateProject } from './curation.js';
+
 /**
  * Starter book pages.
  * homepage-derived URLs were read from the owner's public GitHub repository metadata.
@@ -134,31 +136,24 @@ export function githubPagesUrl(repo) {
   return 'https://' + pagesHost + '/' + encodeURIComponent(repo.name) + '/';
 }
 
-export function inferCategory(name = '') {
-  const n = name.toLowerCase();
-  if (/museum|louvre|studio|auralith|domistika|pixel|art|music|cinema|cineswarm|creative|forge.*image/.test(n)) return 'Creative';
-  if (/game|arcade|cade|rumble|circuit|sparkthesubstrate|gilt|meme/.test(n)) return 'Games';
-  if (/research|bubble|mirror|lattice|metric|chron|quantum|cymatic|phi369-element|experiment|equation/.test(n)) return 'Research';
-  if (/vessel|brain|agent|intelligence|ai$/.test(n)) return 'Intelligence';
-  if (/os$|kernel|network|porch|accord|bridge|flow|cloud/.test(n)) return 'Systems';
-  if (/deck|budget|medic|label|tool|bot|app/.test(n)) return 'Tools';
-  return 'Other';
+export function inferCategory(name = '', description = '') {
+  return inferProjectCategory(name, description);
 }
 
 export function makeDiscoveredPage(repo) {
-  return {
+  return curateProject({
     id: 'gh-' + repo.id,
     repo: repo.name,
     title: repo.name.replace(/[-_]/g, ' '),
     kicker: 'FOUND IN THE FIELD',
-    category: inferCategory(repo.name),
+    category: inferCategory(repo.name, repo.description),
     url: githubPagesUrl(repo),
     desc: String(repo.description || 'Another doorway in the growing Field collection.').slice(0, 300),
     pullquote: 'Every repository is a little universe.',
     accent: '#e6c893',
     index: '★',
     discovered: true,
-  };
+  });
 }
 
 export function newArrivals(discovered, current, dismissedIds = []) {

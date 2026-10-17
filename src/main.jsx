@@ -36,7 +36,7 @@ function Artwork({ accent = '#c8ab79', category = 'Other' }) {
     <div className="sigil-outer" />
     <div className="sigil-inner" />
     <div className="sigil-diamond" />
-    <span className="sigil-mark">{({Creative:'✦', Systems:'✧', Games:'♠', Intelligence:'Φ', Research:'◇', Publications:'▤', Tools:'⌘'})[category] || '✦'}</span>
+    <span className="sigil-mark">{({Creative:'✦', Systems:'✧', Games:'♠', Intelligence:'Φ', Research:'◇', Publications:'▤', Learning:'✎', Music:'♫', Galleries:'▧', 'People & Practice':'♡', Tools:'⌘'})[category] || '✦'}</span>
     <div className="sigil-stars">✦ &nbsp; ✧ &nbsp; ✦</div>
   </div>;
 }

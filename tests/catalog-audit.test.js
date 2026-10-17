@@ -36,9 +36,9 @@ test('An existing Zenodo chapter is flagged for review without being changed', (
   assert.equal(audit.review_count, 1);
   assert.equal(audit.category_counts.Research, 2);
   assert.equal(audit.category_counts.Publications, 1);
-  assert.equal(audit.chapters[1].suggested_category, 'Publications');
-  assert.equal(audit.chapters[1].needs_category_review, true);
-  assert.equal(audit.chapters[1].category, 'Research');
+  assert.equal(audit.chapters[2].suggested_category, 'Publications');
+  assert.equal(audit.chapters[2].needs_category_review, true);
+  assert.equal(audit.chapters[2].category, 'Research');
   assert.equal(suggestedChapterCategory(original[1]), null);
   assert.equal(JSON.stringify(original), before);
   assert.ok(!JSON.stringify(audit).includes('passport'));

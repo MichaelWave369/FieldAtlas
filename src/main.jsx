@@ -9,6 +9,7 @@ import {
 import { seedPages, categories, wings, wingForCategory, safeUrl, uniqueMerge, newArrivals, shouldAutoDiscover, discoverGithubPages, isVerifiedPublishedPage } from './catalog';
 import { curateProject, applyLocalEdits, categoryPalette } from './curation';
 import { createCatalogAudit, isZenodoEntry } from './catalog-audit.js';
+import { publicationChapters, isPublicationChapter } from './publications.js';
 import LibraryMap from './LibraryMap';
 import { getMapChapterWing } from './library-map';
 import { compassFilters, pickSurpriseChapter, remainingSurpriseCount, availableSurprises } from './discovery-compass';
@@ -89,6 +90,22 @@ function MirrorChamber({depth, onDeeper, onSurface}) {
   </div>;
 }
 
+function PublicationLeaf({ page, fullscreen = false }) {
+  return <section className={`publication-leaf ${fullscreen ? 'publication-leaf-fullscreen' : ''}`} aria-label="Curated research record">
+    <div className="publication-leaf-mark" aria-hidden="true">▤</div>
+    <span className="publication-leaf-label">ENTER THE FIELD · RESEARCH RECORD</span>
+    <strong className="publication-leaf-kind">{page.recordType || 'Research object'}</strong>
+    <h3>{page.title}</h3>
+    <p>{page.desc}</p>
+    <div className="publication-leaf-ledger">
+      <span>DOI: <strong>{page.doi}</strong></span>
+      <span>Archive index date: <strong>{page.recordDate}</strong></span>
+    </div>
+    <p className="publication-leaf-note">Curated from the public research index. Zenodo controls authoritative metadata, availability, versions, and files.</p>
+    <a href={page.url} target="_blank" rel="noopener noreferrer">Open the Zenodo record ↗</a>
+  </section>;
+}
+
 function App() {
   const [pages, setPages] = useState(() => {
     const loaded = readLocal(STORE_KEY, seedPages);
@@ -147,7 +164,8 @@ function App() {
   // Canonical base + verified public sites from the daily deployment manifest.
   // Hiding a site only affects the current browser, not its public repository.
   const catalog = useMemo(() => uniqueMerge(
-    pages, publishedPages.filter(p => !discovery.hiddenIds.includes(p.id))
+    uniqueMerge(pages, publishedPages.filter(p => !discovery.hiddenIds.includes(p.id))),
+    publicationChapters.filter(p => !discovery.hiddenIds.includes(p.id))
   ).map(p => {
     const curated = curateProject(p);
     return applyLocalEdits(curated, localEdits);
@@ -164,6 +182,7 @@ function App() {
   const journeyStops = useMemo(() => availableJourneyStops(journey, catalog), [journey, catalog]);
   const tourStep = Math.min(activeTour?.step ?? 0, Math.max(0, journeyStops.length - 1));
   const fieldception = isInfiniteAtlas(active);
+  const publication = isPublicationChapter(active);
   const compassChoices = useMemo(() => availableSurprises(catalog, compassWing), [catalog, compassWing]);
   const undiscoveredCount = useMemo(() => remainingSurpriseCount(catalog, compassWing, visitedChapters), [catalog, compassWing, visitedChapters]);
   useEffect(() => { setMirrorDepth(MIN_MIRROR_DEPTH); }, [active?.id]);
@@ -453,7 +472,7 @@ function App() {
   }, []);
   function removePage(id) {
     setPages(old => old.filter(x => x.id !== id));
-    if (publishedPages.some(p => p.id === id)) {
+    if (publishedPages.some(p => p.id === id) || publicationChapters.some(p => p.id === id)) {
       setDiscovery(prev => ({ ...prev, hiddenIds: [...new Set([...prev.hiddenIds, id])] }));
     }
     setCurrent(0);
@@ -570,8 +589,8 @@ function App() {
             <div className="folio-bottom"><span>MICHAELWAVE369 · THE FIELD</span><span>✧ &nbsp; {String(index + 1).padStart(2, '0')}</span></div>
           </article>
 
-          <article className="book-page portal-page" aria-label={`Live preview of ${active.title}`}>
-            <div className="folio-top dark-folio"><span>THE LIVING PAGE</span><button className="favorite-btn" title={fav ? 'Remove bookmark' : 'Bookmark chapter'} onClick={() => toggleFavorite(active.id)} aria-label={fav ? 'Remove bookmark' : 'Bookmark this chapter'}><Bookmark size={17} fill={fav ? 'currentColor' : 'none'} /></button></div>
+          <article className="book-page portal-page" aria-label={publication ? `Research record for ${active.title}` : `Live preview of ${active.title}`}>
+            <div className="folio-top dark-folio"><span>{publication ? 'THE RESEARCH RECORD' : 'THE LIVING PAGE'}</span><button className="favorite-btn" title={fav ? 'Remove bookmark' : 'Bookmark chapter'} onClick={() => toggleFavorite(active.id)} aria-label={fav ? 'Remove bookmark' : 'Bookmark this chapter'}><Bookmark size={17} fill={fav ? 'currentColor' : 'none'} /></button></div>
             <div className="portal-frame" style={{ '--portal-accent': active.accent }}>
               <div className="site-chrome">
                 <div className="chrome-dots"><i/><i/><i/></div>
@@ -583,12 +602,14 @@ function App() {
                   ? <MirrorChamber depth={mirrorDepth}
                       onDeeper={() => setMirrorDepth(d => nextMirrorDepth(d, 1))}
                       onSurface={() => setMirrorDepth(d => nextMirrorDepth(d, -1))} />
-                  : <iframe key={active.id + active.url} title={`Live website: ${active.title}`} loading="lazy" src={active.url} referrerPolicy="strict-origin-when-cross-origin" allow="fullscreen; clipboard-read; clipboard-write" />}
+                  : publication
+                    ? <PublicationLeaf page={active}/>
+                    : <iframe key={active.id + active.url} title={`Live website: ${active.title}`} loading="lazy" src={active.url} referrerPolicy="strict-origin-when-cross-origin" allow="fullscreen; clipboard-read; clipboard-write" />}
               </div>
-              <div className="preview-footnote"><span className="live-dot" /> {fieldception ? 'SAFE MIRROR CHAMBER' : 'LIVE WEBSITE PREVIEW'} <span className="preview-hint">{fieldception ? 'Five illustrated reflections, zero recursive iframes.' : 'Some sites block embedding. Open the portal instead.'}</span></div>
+              <div className="preview-footnote"><span className="live-dot" /> {fieldception ? 'SAFE MIRROR CHAMBER' : publication ? 'CURATED ARCHIVE REFERENCE' : 'LIVE WEBSITE PREVIEW'} <span className="preview-hint">{fieldception ? 'Five illustrated reflections, zero recursive iframes.' : publication ? 'Zenodo is authoritative. No remote PDF is embedded.' : 'Some sites block embedding. Open the portal instead.'}</span></div>
             </div>
             <div className="portal-actions">
-              <a className="gold-btn" href={active.url} target="_blank" rel="noopener noreferrer"><ExternalLink size={15}/> Open this world</a>
+              <a className="gold-btn" href={active.url} target="_blank" rel="noopener noreferrer"><ExternalLink size={15}/> {publication ? 'Open Zenodo record' : 'Open this world'}</a>
               {futureArchivePrintUrl(active.repo) && <a className="outline-btn" href={futureArchivePrintUrl(active.repo)} target="_blank" rel="noopener noreferrer"><ExternalLink size={15}/> View the art print</a>}
               {active.repo && <button type="button" className="outline-btn share-chapter" onClick={shareChapter}><Link2 size={15}/> Share chapter</button>}
               <button type="button" className="outline-btn" onClick={() => setPortalOpen(true)}><Maximize2 size={15}/> Fullscreen reader</button>
@@ -686,13 +707,15 @@ function App() {
     <footer className="bottom-bar"><span>MADE WITH CURIOSITY · BUILT TO BE SHARED</span><button onClick={()=>setShowHelp(true)}><Info size={15}/> About the atlas</button><span>ENTER THE FIELD <span className="bottom-flower">✻</span> 2026</span></footer>
 
     {portalOpen && active && <div className="portal-modal" role="dialog" aria-modal="true" aria-label={`${active.title} fullscreen reader`}>
-      <div className="portal-modal-header"><span><BookOpen size={19}/> {active.title} <small>LIVE SITE</small></span><div><a href={active.url} target="_blank" rel="noopener noreferrer"><ExternalLink size={16}/> Open outside atlas</a><button aria-label="Close fullscreen reader" onClick={()=>setPortalOpen(false)}><X size={20}/></button></div></div>
+      <div className="portal-modal-header"><span><BookOpen size={19}/> {active.title} <small>{publication ? 'ZENODO RECORD' : 'LIVE SITE'}</small></span><div><a href={active.url} target="_blank" rel="noopener noreferrer"><ExternalLink size={16}/> Open outside atlas</a><button aria-label="Close fullscreen reader" onClick={()=>setPortalOpen(false)}><X size={20}/></button></div></div>
       {fieldception
         ? <MirrorChamber depth={mirrorDepth}
             onDeeper={() => setMirrorDepth(d => nextMirrorDepth(d, 1))}
             onSurface={() => setMirrorDepth(d => nextMirrorDepth(d, -1))}/>
-        : <iframe key={'full-'+active.id} title={`Fullscreen website ${active.title}`} src={active.url} allow="fullscreen; clipboard-read; clipboard-write" />}
-      <p className="modal-embed-hint">{fieldception ? 'The Infinite Atlas is a bounded illustration. Open outside the Atlas to view the actual site.' : 'If a page is blank, its host may prevent iframe embedding. Use “Open outside atlas.”'}</p>
+        : publication
+          ? <PublicationLeaf page={active} fullscreen/>
+          : <iframe key={'full-'+active.id} title={`Fullscreen website ${active.title}`} src={active.url} allow="fullscreen; clipboard-read; clipboard-write" />}
+      <p className="modal-embed-hint">{fieldception ? 'The Infinite Atlas is a bounded illustration. Open outside the Atlas to view the actual site.' : publication ? 'This is an index reference, not a live PDF preview. Open Zenodo for the original record and files.' : 'If a page is blank, its host may prevent iframe embedding. Use “Open outside atlas.”'}</p>
     </div>}
 
     {mapOpen && <LibraryMap wings={wings} catalog={catalog} currentWing={wing} visitedIds={visitedChapters}

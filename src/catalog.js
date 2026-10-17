@@ -83,7 +83,7 @@ export const seedPages = [
 
 export const owner = 'MichaelWave369';
 
-export const categories = ['All', 'Intelligence', 'Systems', 'Creative', 'Tools', 'Research', 'Games', 'Other'];
+export const categories = ['All', 'Intelligence', 'Systems', 'Creative', 'Tools', 'Research', 'Publications', 'Games', 'Other'];
 
 // Wings organize the *book*, not GitHub permissions. New projects receive a
 // suggested wing until someone explicitly approves their chapter.
@@ -97,7 +97,7 @@ export const wings = [
 ];
 
 export function wingForCategory(category) {
-  if (category === 'Research') return 'research';
+  if (category === 'Research' || category === 'Publications') return 'research';
   if (category === 'Creative') return 'creative';
   if (['Intelligence', 'Systems', 'Tools'].includes(category)) return 'engineering';
   if (category === 'Games') return 'games';

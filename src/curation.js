@@ -1,4 +1,5 @@
 import { isInfiniteAtlas } from './fieldception.js';
+import { censusCategoryForRepo } from './census-categories.js';
 /**
  * Field Atlas v0.4 public-safe library catalog curator.
  * Names/categories below come from publicly described projects, not private
@@ -66,12 +67,18 @@ export const categoryPalette = Object.freeze({
   Tools: { color: '#a6cda6', glyph: '✧', tone: 'workshop' },
   Research: { color: '#b4c9ef', glyph: '◇', tone: 'observatory' },
   Publications: { color: '#dcc9a8', glyph: '▤', tone: 'archive' },
+  Learning: { color: '#b5d7c8', glyph: '✎', tone: 'observatory' },
+  Music: { color: '#ceafe0', glyph: '♫', tone: 'artistry' },
+  Galleries: { color: '#ecc3a4', glyph: '▧', tone: 'artistry' },
+  'People & Practice': { color: '#e5bfc1', glyph: '♡', tone: 'mystery' },
   Games: { color: '#e6b77d', glyph: '♠', tone: 'adventure' },
   Other: { color: '#d5bba5', glyph: '☆', tone: 'mystery' },
 });
 
 /** Public metadata based suggestion. Unknown projects stay Other. */
 export function inferProjectCategory(name = '', description = '') {
+  const censusCategory = censusCategoryForRepo(name);
+  if (censusCategory) return censusCategory;
   const override = lookup.get(String(name).toLowerCase());
   if (override?.category) return override.category;
   const n = String(name).toLowerCase(), d = String(description || '').toLowerCase();
@@ -97,7 +104,7 @@ export function curateProject(page) {
   if (!page || typeof page !== 'object') return page;
   if (page.featured || !page.repo || String(page.id || '').startsWith('custom-')) return page;
   const override = lookup.get(String(page.repo).toLowerCase());
-  const category = override?.category || inferProjectCategory(page.repo, page.desc || '');
+  const category = censusCategoryForRepo(page.repo) || override?.category || inferProjectCategory(page.repo, page.desc || '');
   const theme = categoryPalette[category] || categoryPalette.Other;
   return {
     ...page,

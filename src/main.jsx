@@ -90,6 +90,22 @@ function MirrorChamber({depth, onDeeper, onSurface}) {
   </div>;
 }
 
+function PublicationLeaf({ page, fullscreen = false }) {
+  return <section className={`publication-leaf ${fullscreen ? 'publication-leaf-fullscreen' : ''}`} aria-label="Curated research record">
+    <div className="publication-leaf-mark" aria-hidden="true">▤</div>
+    <span className="publication-leaf-label">ENTER THE FIELD · RESEARCH RECORD</span>
+    <strong className="publication-leaf-kind">{page.recordType || 'Research object'}</strong>
+    <h3>{page.title}</h3>
+    <p>{page.desc}</p>
+    <div className="publication-leaf-ledger">
+      <span>DOI: <strong>{page.doi}</strong></span>
+      <span>Archive index date: <strong>{page.recordDate}</strong></span>
+    </div>
+    <p className="publication-leaf-note">Curated from the public research index. Zenodo controls authoritative metadata, availability, versions, and files.</p>
+    <a href={page.url} target="_blank" rel="noopener noreferrer">Open the Zenodo record ↗</a>
+  </section>;
+}
+
 function App() {
   const [pages, setPages] = useState(() => {
     const loaded = readLocal(STORE_KEY, seedPages);
@@ -586,7 +602,9 @@ function App() {
                   ? <MirrorChamber depth={mirrorDepth}
                       onDeeper={() => setMirrorDepth(d => nextMirrorDepth(d, 1))}
                       onSurface={() => setMirrorDepth(d => nextMirrorDepth(d, -1))} />
-                  : <iframe key={active.id + active.url} title={`Live website: ${active.title}`} loading="lazy" src={active.url} referrerPolicy="strict-origin-when-cross-origin" allow="fullscreen; clipboard-read; clipboard-write" />}
+                  : publication
+                    ? <PublicationLeaf page={active}/>
+                    : <iframe key={active.id + active.url} title={`Live website: ${active.title}`} loading="lazy" src={active.url} referrerPolicy="strict-origin-when-cross-origin" allow="fullscreen; clipboard-read; clipboard-write" />}
               </div>
               <div className="preview-footnote"><span className="live-dot" /> {fieldception ? 'SAFE MIRROR CHAMBER' : publication ? 'CURATED ARCHIVE REFERENCE' : 'LIVE WEBSITE PREVIEW'} <span className="preview-hint">{fieldception ? 'Five illustrated reflections, zero recursive iframes.' : publication ? 'Zenodo is authoritative. No remote PDF is embedded.' : 'Some sites block embedding. Open the portal instead.'}</span></div>
             </div>
@@ -694,7 +712,9 @@ function App() {
         ? <MirrorChamber depth={mirrorDepth}
             onDeeper={() => setMirrorDepth(d => nextMirrorDepth(d, 1))}
             onSurface={() => setMirrorDepth(d => nextMirrorDepth(d, -1))}/>
-        : <iframe key={'full-'+active.id} title={`Fullscreen website ${active.title}`} src={active.url} allow="fullscreen; clipboard-read; clipboard-write" />}
+        : publication
+          ? <PublicationLeaf page={active} fullscreen/>
+          : <iframe key={'full-'+active.id} title={`Fullscreen website ${active.title}`} src={active.url} allow="fullscreen; clipboard-read; clipboard-write" />}
       <p className="modal-embed-hint">{fieldception ? 'The Infinite Atlas is a bounded illustration. Open outside the Atlas to view the actual site.' : publication ? 'This is an index reference, not a live PDF preview. Open Zenodo for the original record and files.' : 'If a page is blank, its host may prevent iframe embedding. Use “Open outside atlas.”'}</p>
     </div>}
 

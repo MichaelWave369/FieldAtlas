@@ -65,6 +65,7 @@ export const categoryPalette = Object.freeze({
   Creative: { color: '#f0adbc', glyph: '✦', tone: 'artistry' },
   Tools: { color: '#a6cda6', glyph: '✧', tone: 'workshop' },
   Research: { color: '#b4c9ef', glyph: '◇', tone: 'observatory' },
+  Publications: { color: '#dcc9a8', glyph: '▤', tone: 'archive' },
   Games: { color: '#e6b77d', glyph: '♠', tone: 'adventure' },
   Other: { color: '#d5bba5', glyph: '☆', tone: 'mystery' },
 });

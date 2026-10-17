@@ -168,6 +168,12 @@ The React app uses an original AI-generated cozy study illustration as its backd
 - GitHub Actions workflow for GitHub Pages deployment.
 - Mobile-friendly layout and reduced-motion support.
 
+## Category audit and publications
+
+In **Curate the Atlas**, choose **Export category audit (.json)** to download a read-only list of the actual chapters in that browser (shared public Pages plus its local additions and edits). The report includes current wing/category counts and flags Zenodo/Zenodo-DOI entries still assigned outside **Publications**. It does **not** silently reclassify or remove them. Review the export before sharing: personal chapter links and descriptions are included; visitor passport, bookmarks and hidden chapters are not.
+
+**Publications** is a category/shelf inside the existing Research Wing, not an extra room on the map. New manually added Zenodo links default to Publications while keeping the category selector editable. Other projects keep their current classification pending a real inventory review; do not infer a subject from a URL or turn an unverified link into a public shared chapter.
+
 ## Run locally
 
 Node.js 20.19+ or Node.js 22+ recommended.

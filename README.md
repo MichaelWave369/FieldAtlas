@@ -1,5 +1,12 @@
 # The Field Atlas ✦
 
+## The Future Archive bridge
+
+The Atlas has a permanent doorway to the independent [Future Archive art gallery](https://michaelwave369.github.io/FutureArchive/). Matching public projects in the living book expose their original art print, and new visitors get a curated Future Archive chapter in the Creative wing and the Artist's Lantern route. Nothing embeds or copies the poster files into this repository; visitors open the original hosted gallery.
+
+The chapter list is browser-local and customizable. Returning visitors who already saved a catalog will still see the permanent gallery link, but the new curated chapter is not silently forced into their personalized shelf. Existing opt-in discovery and curation remain in control.
+
+
 **A cozy, interactive living library of public GitHub Pages projects.**
 
 ## v1.0 Grand Opening Candidate: Discovery Compass + Explorer's Journey

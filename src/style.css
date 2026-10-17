@@ -83,6 +83,20 @@ a { color:inherit; }
 .address-pill span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .iframe-shell {min-height:0;flex:1;background:radial-gradient(ellipse at center, color-mix(in srgb, var(--portal-accent) 25%, #1c2634), #1e2024);position:relative;}
 .iframe-shell iframe{border:0;width:100%;height:100%;display:block;position:absolute;inset:0;background:#eee;}
+/* Curated archive reference leaves: intentionally no cross-site PDF iframe. */
+.publication-leaf {display:flex;flex-direction:column;justify-content:center;gap:9px;width:100%;height:100%;overflow:auto;padding:clamp(14px,2.1vw,25px);color:#eadbbb;background:radial-gradient(circle at 50% 5%,#4b3c31,#192a30 74%);font-family:'DM Sans',system-ui,sans-serif;}
+.publication-leaf-mark {font:42px Georgia,serif;color:#dbbc88;line-height:1;}
+.publication-leaf-label {font-size:9px;letter-spacing:.13em;color:#ccb589;}
+.publication-leaf-kind {font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#d1e2cf;}
+.publication-leaf h3 {font:600 clamp(16px,2vw,24px)/1.14 'Cormorant Garamond',Georgia,serif;margin:0;color:#ffe9c1;}
+.publication-leaf p {font-size:11px;line-height:1.5;margin:0;}
+.publication-leaf-ledger {display:flex;flex-direction:column;gap:3px;font-size:10px;word-break:break-word;}
+.publication-leaf-note {color:#cab99e;font-style:italic;}
+.publication-leaf a {color:#f8d69a;text-decoration:underline;text-underline-offset:3px;font-weight:700;font-size:11px;}
+.publication-leaf-fullscreen {flex:1;min-height:0;align-items:center;text-align:center;padding:clamp(24px,8vw,80px);}
+.publication-leaf-fullscreen h3 {font-size:clamp(25px,4vw,45px);max-width:900px;}
+.publication-leaf-fullscreen p {max-width:800px;font-size:clamp(14px,1.7vw,19px);}
+@media(max-width:680px){.publication-leaf{justify-content:flex-start;gap:7px;padding:12px}.publication-leaf h3{font-size:16px}.publication-leaf p{font-size:10px}.publication-leaf-mark{font-size:28px}.publication-leaf-fullscreen{padding:24px;justify-content:center}}
 .preview-footnote {min-height:27px;display:flex;align-items:center;gap:8px;justify-content:flex-start;padding:0 11px;font-weight:700;font-size:8px;letter-spacing:.13em;white-space:nowrap;overflow:hidden;background:#272621;color:#dccbb1;}
 .preview-footnote .live-dot {width:6px;height:6px;}
 .preview-hint {font-size:8px;letter-spacing:0;font-weight:400;opacity:.58;margin-left:auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}

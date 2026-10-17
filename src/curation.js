@@ -102,6 +102,7 @@ export function inferProjectCategory(name = '', description = '') {
 /** Preserve the original nine hand-authored stories and personal custom links. */
 export function curateProject(page) {
   if (!page || typeof page !== 'object') return page;
+  if (page.sourceKind === 'curated-research-record') return page;
   if (page.featured || !page.repo || String(page.id || '').startsWith('custom-')) return page;
   const override = lookup.get(String(page.repo).toLowerCase());
   const category = censusCategoryForRepo(page.repo) || override?.category || inferProjectCategory(page.repo, page.desc || '');

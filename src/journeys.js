@@ -12,7 +12,7 @@ export const visitorJourneys = Object.freeze([
   {
     id: 'artists-lantern', name: "The Artist's Lantern", glyph: '✦', accent: '#ecb0b4',
     kicker: 'ART & SOUND', description: 'A gallery walk through color, sound, images, and creative tools.',
-    repos: ['Domistika', 'SiliconLouvre', 'parallax-pixelforge', 'Auralith369', 'infinitylens369'],
+    repos: ['Domistika', 'SiliconLouvre', 'FutureArchive', 'parallax-pixelforge', 'Auralith369', 'infinitylens369'],
   },
   {
     id: 'research-constellation', name: 'Research Constellation', glyph: '◇', accent: '#b8cdf0',

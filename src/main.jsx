@@ -14,6 +14,7 @@ import { compassFilters, pickSurpriseChapter, remainingSurpriseCount, availableS
 import { isInfiniteAtlas, MAX_MIRROR_DEPTH, MIN_MIRROR_DEPTH, mirrorLayers, nextMirrorDepth } from './fieldception';
 import { visitorJourneys, findJourney, availableJourneyStops, readAtlasLink, buildAtlasLink, locateSharedChapter } from './journeys';
 import { wrapChapterIndex, canTurnChapters, wrapDestinationLabel } from './navigation';
+import { futureArchivePrintUrl, FUTURE_ARCHIVE_URL } from './future-archive';
 import './style.css';
 
 const STORE_KEY = 'field-atlas-pages-v1';
@@ -439,7 +440,7 @@ function App() {
     setCurrent(0);
   }
   function resetCatalog() {
-    if (!window.confirm('Restore the original nine curated chapters? Custom chapters and edits will be removed from this browser.')) return;
+    if (!window.confirm('Restore the original ten curated chapters? Custom chapters and edits will be removed from this browser.')) return;
     setPages(seedPages); setDiscovery(prev => ({...prev, hiddenIds: []})); setLocalEdits({}); setActiveTour(null); setCategory('All'); setWing('all'); setSearch(''); setCurrent(0);
   }
 
@@ -461,6 +462,7 @@ function App() {
         <span className="room-status"><span className="status-glow" /> THE STUDY IS OPEN</span>
         <button className="icon-btn" type="button" title="Change lamplight" aria-label="Toggle lamplight" onClick={() => setPrefs(p => ({...p, night: !p.night}))}>{prefs.night ? <Moon size={19}/> : <Sun size={19}/>}</button>
         {discovery.candidates.length > 0 && <button className="arrival-alert" type="button" onClick={() => setShelfOpen(true)} aria-label={discovery.candidates.length + ' new arrivals awaiting review'}><Sparkles size={15}/> {discovery.candidates.length} arrivals</button>}
+        <a className="soft-btn" href={FUTURE_ARCHIVE_URL} target="_blank" rel="noopener noreferrer" aria-label="Visit the Future Archive poster gallery"><Sparkles size={17}/> <span>Future Archive</span></a>
         <button className="soft-btn" type="button" onClick={() => setShelfOpen(true)}><LibraryBig size={17}/> <span>Curate the book</span></button>
       </div>
     </header>
@@ -568,6 +570,7 @@ function App() {
             </div>
             <div className="portal-actions">
               <a className="gold-btn" href={active.url} target="_blank" rel="noopener noreferrer"><ExternalLink size={15}/> Open this world</a>
+              {futureArchivePrintUrl(active.repo) && <a className="outline-btn" href={futureArchivePrintUrl(active.repo)} target="_blank" rel="noopener noreferrer"><ExternalLink size={15}/> View the art print</a>}
               {active.repo && <button type="button" className="outline-btn share-chapter" onClick={shareChapter}><Link2 size={15}/> Share chapter</button>}
               <button type="button" className="outline-btn" onClick={() => setPortalOpen(true)}><Maximize2 size={15}/> Fullscreen reader</button>
             </div>

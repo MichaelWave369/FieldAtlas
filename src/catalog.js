@@ -72,6 +72,13 @@ export const seedPages = [
     desc: 'A Vegas-inspired game world with classic casino atmosphere, exploration, and a growing city beyond.',
     pullquote: 'Some stories begin with one more hand.', accent: '#f4d17f', index: 'IX',
   },
+  {
+    id: 'futurearchive', repo: 'FutureArchive', title: 'Future Archive', kicker: 'THE RETROFUTURE GALLERY',
+    category: 'Creative',
+    url: 'https://michaelwave369.github.io/FutureArchive/',
+    desc: 'Eighteen illustrated doorways into open projects: an eighties-inflected art gallery that leads back to the working code.',
+    pullquote: 'Code, cast in chrome.', accent: '#efc38e', index: 'X',
+  },
 ];
 
 export const owner = 'MichaelWave369';

@@ -174,6 +174,12 @@ In **Curate the Atlas**, choose **Export category audit (.json)** to download a 
 
 **Publications** is a category/shelf inside the existing Research Wing, not an extra room on the map. New manually added Zenodo links default to Publications while keeping the category selector editable. Other projects keep their current classification pending a real inventory review; do not infer a subject from a URL or turn an unverified link into a public shared chapter.
 
+## Research-object chapters · Curated Zenodo references
+
+The Publications shelf now includes **15 individually addressable research-object references** from the author-maintained [Enter the Field Research Archive](https://github.com/MichaelWave369/enter-the-field-research), in addition to that archive's existing chapter. The titles, dates, and DOI references are taken from its published fallback catalog and have **not been independently revalidated against Zenodo's live API**. Zenodo remains authoritative for current metadata, versions, and files.
+
+Publication pages use a readable **static record leaf**, not a third-party iframe or a copy of the PDF. Each has a direct official Zenodo link. These chapters are available in older browsers with saved local catalogs, can be bookmarked/shared/hidden locally, and preserve existing tour/map arrangements and overrides. Details and limitations: [Research-object chapters](docs/PUBLICATIONS_RESEARCH_RECORDS.md).
+
 ## Run locally
 
 Node.js 20.19+ or Node.js 22+ recommended.

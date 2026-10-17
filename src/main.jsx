@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { seedPages, categories, wings, wingForCategory, safeUrl, uniqueMerge, newArrivals, shouldAutoDiscover, discoverGithubPages, isVerifiedPublishedPage } from './catalog';
 import { curateProject, applyLocalEdits, categoryPalette } from './curation';
+import { createCatalogAudit, isZenodoEntry } from './catalog-audit.js';
 import LibraryMap from './LibraryMap';
 import { getMapChapterWing } from './library-map';
 import { compassFilters, pickSurpriseChapter, remainingSurpriseCount, availableSurprises } from './discovery-compass';
@@ -35,7 +36,7 @@ function Artwork({ accent = '#c8ab79', category = 'Other' }) {
     <div className="sigil-outer" />
     <div className="sigil-inner" />
     <div className="sigil-diamond" />
-    <span className="sigil-mark">{({Creative:'✦', Systems:'✧', Games:'♠', Intelligence:'Φ', Research:'◇', Tools:'⌘'})[category] || '✦'}</span>
+    <span className="sigil-mark">{({Creative:'✦', Systems:'✧', Games:'♠', Intelligence:'Φ', Research:'◇', Publications:'▤', Tools:'⌘'})[category] || '✦'}</span>
     <div className="sigil-stars">✦ &nbsp; ✧ &nbsp; ✦</div>
   </div>;
 }
@@ -136,6 +137,7 @@ function App() {
   const [form, setForm] = useState({ title: '', url: '', category: 'Other', desc: '' });
   const [formError, setFormError] = useState('');
   const [syncStatus, setSyncStatus] = useState('');
+  const [auditNotice, setAuditNotice] = useState('');
   const [syncing, setSyncing] = useState(false);
   const pendingTimers = useRef([]);
   const readerRef = useRef(null);
@@ -356,6 +358,23 @@ function App() {
     setWing('all'); setEnteredWing(true); setCategory('All'); setSearch('');
     setDirectoryOpen(false);
     setShelfOpen(false);
+  }
+  function downloadCatalogAudit() {
+    try {
+      const audit = createCatalogAudit(catalog);
+      const blob = new Blob([JSON.stringify(audit, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'fieldatlas-catalog-category-audit.json';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setAuditNotice('Prepared a local category-audit download for ' + audit.chapter_count + ' chapters, with ' + audit.review_count + ' suggested reviews.');
+    } catch {
+      setAuditNotice('Unable to prepare the category audit in this browser.');
+    }
   }
   function beginEdit(page) {
     setDirectoryOpen(false);
@@ -730,6 +749,8 @@ function App() {
       <h2 id="curate-title">Curate the Atlas</h2>
       <p className="modal-lede">Verified public GitHub Pages are added to the shared book during daily deployment. Other Pages-enabled repositories remain in the review inbox until you approve them locally. No private repository is scanned.</p>
       <p className="public-catalog-status" role="status">{manifestStatus || 'Loading the public Pages inventory…'}</p>
+      <div className="discovery-controls"><button type="button" className="discover-btn scan-inline" onClick={downloadCatalogAudit}><BookOpen size={16}/> Export category audit (.json)</button><small>Read-only export of visible chapter titles, links, descriptions and categories, including personal links. Review before sharing. Nothing uploads or changes.</small></div>
+      {auditNotice && <p className="sync-status" role="status">{auditNotice}</p>}
       <div className="discovery-controls"><label className="scan-toggle"><input type="checkbox" checked={discovery.autoEnabled} onChange={e => setDiscovery(d => ({...d, autoEnabled:e.target.checked}))}/> Check for new sites once daily when this browser opens the Atlas</label><button type="button" className="discover-btn scan-inline" onClick={() => scanLibrary(false)} disabled={syncing}><RefreshCw size={16} className={syncing ? 'spinning':''}/>{syncing ? 'Scanning public sites…' : 'Scan GitHub Pages now'}</button></div>
       {syncStatus && <p className="sync-status" role="status">{syncStatus}</p>}
       <section className="arrivals-board" aria-label="New project arrivals"><div className="arrivals-header"><h3><Sparkles size={18}/> New arrivals <span>{discovery.candidates.length}</span></h3><small>Suggested rooms need approval. A Pages flag does not verify a live or embeddable website.</small></div>
@@ -739,7 +760,7 @@ function App() {
           <h3>Add a doorway</h3>
           <form onSubmit={addPage} className="page-form">
             <label>Chapter name<input required maxLength={80} placeholder="The next wonderful thing" value={form.title} onChange={e=>setForm(f=>({...f,title:e.target.value}))}/></label>
-            <label>Published site URL<input type="url" required placeholder="https://michaelwave369.github.io/..." value={form.url} onChange={e=>setForm(f=>({...f,url:e.target.value}))}/></label>
+            <label>Published site URL<input type="url" required placeholder="https://michaelwave369.github.io/..." value={form.url} onChange={e=>setForm(f=>({...f,url:e.target.value,category:isZenodoEntry(e.target.value) && f.category==='Other' ? 'Publications' : f.category}))}/></label>
             <label>Category<select value={form.category} onChange={e=>setForm(f=>({...f,category:e.target.value}))}>{categories.filter(c=>c!=='All').map(c=><option key={c}>{c}</option>)}</select></label>
             <label>Description<textarea rows={3} maxLength={300} placeholder="What is this world for?" value={form.desc} onChange={e=>setForm(f=>({...f,desc:e.target.value}))}/></label>
             {formError && <p className="form-error">{formError}</p>}

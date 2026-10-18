@@ -253,7 +253,44 @@ a { color:inherit; }
 .room-book:hover,.room-book-selected {transform:translateY(-7px);border-color:#ffe1ad;box-shadow:0 3px 15px rgba(229,163,89,.34);}
 .room-book-mark{font-size:10px;color:#fde6b3;}
 .room-book-name{writing-mode:vertical-rl;transform:rotate(180deg);display:block;max-height:58px;overflow:hidden;text-overflow:clip;white-space:nowrap;font-size:8px;font-weight:700;letter-spacing:.02em;line-height:1.2;}
-.room-more-books {align-self:center;flex:0 0 118px;font-size:10px;color:#d7b888;padding:10px;line-height:1.4;}
+/* A quiet walnut-and-brass Phi bookend, not the browser's default white button. */
+.room-more-books {
+  appearance:none;-webkit-appearance:none;
+  position:relative;align-self:flex-end;flex:0 0 74px;min-width:74px;min-height:92px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+  padding:9px 6px 7px;margin:0;
+  border:1px solid #927449;border-bottom:5px solid #634425;border-radius:10px 10px 4px 4px;
+  background:linear-gradient(90deg,rgba(230,187,111,.13),transparent 18%,rgba(224,168,86,.045) 75%,rgba(8,5,3,.21)),
+    linear-gradient(155deg,#392d26 0%,#251e1b 62%,#34271f 100%);
+  color:#e7cd9d;text-align:center;line-height:1.15;font-family:inherit;cursor:pointer;
+  box-shadow:inset 2px 0 0 rgba(251,213,150,.15),inset -1px 0 0 rgba(10,5,3,.27),
+    2px 3px 7px rgba(0,0,0,.38);
+  transition:transform .18s ease,background-color .18s ease,border-color .18s ease;
+}
+.room-more-books::before {
+  content:'';position:absolute;inset:5px 6px 8px;
+  border:1px solid rgba(225,177,109,.23);border-radius:6px 6px 2px 2px;
+  pointer-events:none;
+}
+.room-more-books-phi {
+  display:block;color:#dcb77b;font:600 31px/.98 Georgia,serif;
+  text-shadow:0 1px 1px #100a07,0 0 11px rgba(202,144,63,.12);
+}
+.room-more-books-count {display:block;color:#e8c68d;font-size:10px;font-weight:800;white-space:nowrap;}
+.room-more-books-label {
+  display:flex;align-items:center;justify-content:center;gap:2px;
+  color:#cbb08a;font-size:9px;font-weight:700;white-space:nowrap;
+}
+.room-more-books:hover {
+  transform:translateY(-2px);border-color:#d2aa6e;
+  background:linear-gradient(155deg,#493829 0%,#2b231e 65%,#3c2c23 100%);
+}
+.room-more-books:focus-visible {outline:2px solid #f7d69b;outline-offset:3px;}
+.room-more-books:active {transform:translateY(0);}
+@media(prefers-reduced-motion:reduce) {
+  .room-more-books {transition:none;}
+  .room-more-books:hover,.room-more-books:active {transform:none;}
+}
 .public-catalog-status{font-size:11px;color:#d7c9ae;padding:10px 13px;margin:6px 0;background:rgba(46,64,55,.36);border:1px solid rgba(147,200,154,.24);border-radius:9px;}
 .wing-scene-research .atlas-book,.wing-scene-creative .atlas-book,.wing-scene-engineering .atlas-book,.wing-scene-games .atlas-book,.wing-scene-annex .atlas-book{animation:book-room-arrival .6s ease;}
 @keyframes book-room-arrival{from{opacity:.55;transform:translateY(13px) rotateX(5deg)}to{opacity:1;transform:rotateX(2deg)}}

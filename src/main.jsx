@@ -691,7 +691,14 @@ function App() {
           onClick={() => { goTo(i); scrollToReader(); }} aria-label={'Open ' + p.title} title={p.title}>
           <span className="room-book-mark">✧</span><span className="room-book-name">{p.title}</span>
         </button>)}
-        {filtered.length > 24 && <button className="room-more-books" type="button" onClick={() => {setDirectoryWing(wing);setDirectoryOpen(true);}}>+{filtered.length - 24} more · Browse all</button>}
+        {filtered.length > 24 && <button className="room-more-books" type="button"
+          onClick={() => {setDirectoryWing(wing);setDirectoryOpen(true);}}
+          aria-label={`Browse all ${filtered.length} chapters in ${activeWing.name}. ${filtered.length - 24} more than shown on this shelf.`}
+          title={`Browse all ${filtered.length} chapters in ${activeWing.name}`}>
+          <span className="room-more-books-phi" aria-hidden="true">Φ</span>
+          <span className="room-more-books-count" aria-hidden="true">+{filtered.length - 24} more</span>
+          <span className="room-more-books-label" aria-hidden="true">Browse all <ArrowRight size={10}/></span>
+        </button>}
       </div>
       {enteredWing && <div className="room-gallery">
         <div className="room-gallery-heading"><strong>Books in this room</strong><button type="button" onClick={() => {setDirectoryWing(wing);setDirectoryOpen(true);}}><Search size={13}/> View entire directory <ArrowRight size={13}/></button></div>

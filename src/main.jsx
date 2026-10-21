@@ -490,6 +490,7 @@ function App() {
 
   const activeWing = wings.find(w => w.id === wing) || wings[0];
   return <main className={`study-app ${prefs.night ? 'night-mode' : ''} wing-scene-${wing} ${focusMode ? 'reader-focus-mode' : ''}`}>
+    <a href="#living-book" className="skip-to-reader">Skip to living book</a>
     <div className="room-art" role="presentation" />
     <div className="room-tint" role="presentation" />
     <div className="ambient-lights" role="presentation"><i /><i /><i /><i /><i /><i /></div>
@@ -534,7 +535,7 @@ function App() {
       </div>
     </section>}
 
-    <section id="living-book" ref={readerRef} className="reading-stage" aria-label="Interactive book of GitHub Pages websites">
+    <section id="living-book" ref={readerRef} tabIndex={-1} className="reading-stage" aria-label="Interactive book of GitHub Pages websites">
       <div className="side-ornament left-ornament" aria-hidden="true"><span className="fancy-star">✧</span><span>EXPLORE</span><i /></div>
       <div className="side-ornament right-ornament" aria-hidden="true"><span className="fancy-star">✧</span><span>IMAGINE</span><i /></div>
       <div className="book-floor" aria-hidden="true" />

@@ -19,6 +19,8 @@ import { wrapChapterIndex, canTurnChapters, wrapDestinationLabel } from './navig
 import { futureArchivePrintUrl, FUTURE_ARCHIVE_URL } from './future-archive';
 import BookForeEdge from './BookForeEdge';
 import DirectoryPeek from './DirectoryPeek';
+import FieldThreads from './FieldThreads';
+import { findFieldThreads } from './field-threads.js';
 import { PREVIEW_SANDBOX } from './preview-policy.js';
 import { activateModalFocus } from './modal-focus.js';
 import useAtlasCatalog from './hooks/useAtlasCatalog.js';
@@ -167,6 +169,7 @@ function App() {
   catalogRef.current = catalog;
   const index = Math.min(Math.max(current, 0), Math.max(0, filtered.length - 1));
   const active = filtered[index];
+  const relatedThreads = useMemo(() => findFieldThreads(active, catalog, 5), [active, catalog]);
   const visitedChapters = useAtlasPassport(active?.id);
   const directoryCounts = useMemo(() => directoryCollectionCounts(catalog, {
     wing: directoryWing, visitedIds: visitedChapters, favoriteIds,
@@ -386,6 +389,14 @@ function App() {
     setDirectoryOpen(false);
     setShelfOpen(false);
   }
+  function followFieldThread(page) {
+    // Relations are suggestions; only the original reader navigates/stamps.
+    if (!page || !catalog.some(item => item.id === page.id)) return;
+    setActiveTour(null);
+    setPendingChapterId(page.id);
+    setWing('all'); setEnteredWing(true); setCategory('All'); setSearch('');
+    setBookPanel(null);
+  }
   function downloadCatalogAudit() {
     try {
       const audit = createCatalogAudit(catalog);
@@ -564,6 +575,9 @@ function App() {
       </div>
       <div className="keyboard-hint"><Keyboard size={15}/> ← → turn pages · loops endlessly</div>
     </section>
+
+    <FieldThreads active={active} threads={relatedThreads}
+      visitedIds={visitedChapters} onFollow={followFieldThread} />
 
     <nav className="chapter-shelf" aria-label="Book chapter index">
       {filtered.map((p, i) => <button type="button" key={p.id} className={`shelf-chapter ${index===i ? 'selected' : ''}`} onClick={() => { goTo(i); scrollToReader(); }} title={p.title}>

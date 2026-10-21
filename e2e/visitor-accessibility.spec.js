@@ -34,7 +34,6 @@ test('directory isolates focus and restores the original opener after Escape', a
   await expect(dialog).toBeVisible();
   await expect(dialog.getByRole('textbox', { name: 'Search the Atlas directory' })).toBeFocused();
   await page.keyboard.press('Tab');
-  await expect(page.locator('header.topbar')).not.toContainText('this-impossible-text');
   await expect.poll(async () => page.evaluate(() => {
     const active = document.activeElement;
     const modal = document.querySelector('[data-atlas-modal="directory"]');

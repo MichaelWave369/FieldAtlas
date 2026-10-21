@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { mergePassportBackup } from '../passport-transfer.js';
 import { PASSPORT_KEY, normalizePassportIds, markChapterVisited } from '../passport-storage.js';
 
 /** Preserve the visitor's v6 local-only passport across architecture changes. */
@@ -10,6 +11,8 @@ export default function useAtlasPassport(activeId) {
       return [];
     }
   });
+  const latestVisits = useRef(visitedChapters);
+  latestVisits.current = visitedChapters;
 
   useEffect(() => {
     localStorage.setItem(PASSPORT_KEY, JSON.stringify(visitedChapters));
@@ -22,5 +25,12 @@ export default function useAtlasPassport(activeId) {
     }
   }, [activeId]);
 
-  return visitedChapters;
+  function importVisitedChapters(imported, catalog) {
+    const result = mergePassportBackup(latestVisits.current, imported, catalog);
+    latestVisits.current = result.visitedIds;
+    setVisitedChapters(result.visitedIds);
+    return result;
+  }
+
+  return { visitedChapters, importVisitedChapters };
 }

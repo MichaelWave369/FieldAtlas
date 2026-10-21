@@ -26,6 +26,7 @@ import { PREVIEW_SANDBOX } from './preview-policy.js';
 import { activateModalFocus } from './modal-focus.js';
 import useAtlasCatalog from './hooks/useAtlasCatalog.js';
 import useAtlasPassport from './hooks/useAtlasPassport.js';
+import { makePassportBackup, readPassportBackup, PASSPORT_TRANSFER_MAX_BYTES } from './passport-transfer.js';
 import useAtlasManifest from './hooks/useAtlasManifest.js';
 import useAtlasCuration from './hooks/useAtlasCuration.js';
 import useAtlasDiscovery from './hooks/useAtlasDiscovery.js';
@@ -157,6 +158,8 @@ function App() {
   const [shareNotice, setShareNotice] = useState('');
   const [showHelp, setShowHelp] = useState(false);
   const [auditNotice, setAuditNotice] = useState('');
+  const [passportNotice, setPassportNotice] = useState('');
+  const passportFileInput = useRef(null);
   const pendingTimers = useRef([]);
   const readerRef = useRef(null);
   const handledDeepLink = useRef(false);
@@ -172,7 +175,7 @@ function App() {
   const active = filtered[index];
   const relatedThreads = useMemo(() => findFieldThreads(active, catalog, 5), [active, catalog]);
   const documentedConnections = useMemo(() => resolveDocumentedConnections(active, catalog), [active, catalog]);
-  const visitedChapters = useAtlasPassport(active?.id);
+  const { visitedChapters, importVisitedChapters } = useAtlasPassport(active?.id);
   const directoryCounts = useMemo(() => directoryCollectionCounts(catalog, {
     wing: directoryWing, visitedIds: visitedChapters, favoriteIds,
   }), [catalog, directoryWing, visitedChapters, favoriteIds]);
@@ -399,6 +402,42 @@ function App() {
     setWing('all'); setEnteredWing(true); setCategory('All'); setSearch('');
     setBookPanel(null);
   }
+  function downloadPassport() {
+    try {
+      const content = JSON.stringify(makePassportBackup(visitedChapters), null, 2);
+      const blob = new Blob([content], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = 'field-atlas-visitor-passport.json';
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setPassportNotice('Visitor passport backup prepared locally. Keep the file private if your reading history matters to you.');
+    } catch {
+      setPassportNotice('The visitor passport could not be downloaded in this browser.');
+    }
+  }
+
+  async function importPassportFile(event) {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    try {
+      if (file.size > PASSPORT_TRANSFER_MAX_BYTES) {
+        throw new Error('Passport file is too large. The limit is 64 KiB.');
+      }
+      const imported = readPassportBackup(await file.text());
+      const result = importVisitedChapters(imported, catalog);
+      setPassportNotice('Merged ' + result.added + ' new passport stamps. ' +
+        (result.skipped ? result.skipped + ' unavailable chapter IDs were skipped. ' : '') +
+        'Your existing visits, bookmarks, and custom chapters remain unchanged.');
+    } catch (error) {
+      setPassportNotice(error?.message || 'Could not import that visitor passport.');
+    }
+  }
+
   function downloadCatalogAudit() {
     try {
       const audit = createCatalogAudit(catalog);
@@ -620,7 +659,21 @@ function App() {
           </button>;
         })}
       </div>
-      <p className="visitor-desk-footnote">Your visitor passport stays in this browser. The tours only open already-published public chapters.</p>
+      <div className="visitor-passport-transfer" aria-label="Back up and restore visitor passport">
+        <div className="visitor-passport-transfer-copy">
+          <strong>Keep your explorer's passport</strong>
+          <span>Save a portable copy of your visited chapter IDs, or merge a backup into this browser. No uploads or account required.</span>
+        </div>
+        <div className="visitor-passport-transfer-actions">
+          <button type="button" onClick={downloadPassport}><Bookmark size={14}/> Export passport</button>
+          <button type="button" onClick={() => passportFileInput.current?.click()}><Plus size={14}/> Import passport</button>
+          <input type="file" ref={passportFileInput} accept=".json,application/json"
+            aria-label="Select visitor passport JSON backup" className="visitor-passport-import-file"
+            onChange={event => { void importPassportFile(event); }} />
+        </div>
+        {passportNotice && <p className="visitor-passport-transfer-status" role="status">{passportNotice}</p>}
+      </div>
+      <p className="visitor-desk-footnote">Your passport stays in this browser unless you choose to download a backup. Imports accept only accessible chapter IDs and never overwrite bookmarks or custom chapter labels.</p>
     </details>
 
     <section className={`room-portal ${enteredWing ? 'room-entered' : 'room-at-door'}`} key={wing} aria-label={'Now visiting ' + activeWing.name}>

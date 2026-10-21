@@ -34,3 +34,39 @@ remain available in Focus Mode.
 10. Validate from a GitHub Pages build before marking the PR fully accepted.
 
 Automatic tests can cover wiring and build but cannot replace a real browser pass.
+
+## V2 · Giant living book, side-reading divider tabs
+
+The book now expands on desktops to use more of the window instead of leaving
+large empty left/right margins. The open spread targets a 675–945px desktop
+height (710–1000px in Reader's Sanctuary) while retaining the original left
+story page, right portal page and **one** live preview iframe. Readers may need
+to scroll on short displays rather than squashing the pages.
+
+The six tabs now look like *real, tucked-in index dividers*:
+- **Encyclopedia:** portrait tab strips in a staggered sequence, with
+  vertically rotated side-reading labels, small chapter numbers and glyphs.
+- **Library card:** subtle grain, ivory parchment layers and archival lettering.
+- **Brass:** delicate edge trim, dark binding seam and a stronger active outline.
+
+At widths above 900px the book sits above the inner 10–30px of the tab roots:
+the book's stacking order hides the attachment seam, while the outer part
+remains clickable. The active tab gently slides outward. Panels still open
+from the same accessible index without adding iframes or changing chapter data.
+
+At 900px or narrower the tabs switch to an accessible horizontal scrolling
+strip *beneath* the book, with horizontal text and a panel beneath the strip.
+Reduced-motion preference eliminates tab translations.
+
+### V2 manual acceptance
+- Check a wide desktop (1440–1920px): bigger book, attached staggered tabs,
+  vertically legible labels, clear active and hover state, no sideways scroll.
+- Check short-but-wide desktop (e.g. 1280×720): page content scrolls rather
+  than cropping the portal, tabs remain individually clickable.
+- Check narrow desktop (901–1160px), tablet (900px), mobile (680px, 390px,
+  320px): no side-obscured buttons; mobile labels are horizontal.
+- Confirm the drawer is on top of the book, receives keyboard focus,
+  closes on Escape, and every tab opens its existing destination.
+- Confirm zoom at 200%, focus reading mode, lamplight, and reduced motion.
+- Run `npm test` and `npm run build`. Manual browser acceptance is still
+  necessary before calling the new visual design fully verified.

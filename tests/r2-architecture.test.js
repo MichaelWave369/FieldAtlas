@@ -51,13 +51,15 @@ test('passport keeps the existing storage key and bounded visited-chapter semant
 test('verified manifest parser rejects invalid schema and preserves strict verified-only admissions',()=>{
   assert.throws(()=>parseAtlasManifest({owner:'Other',schema_version:1,pages:[]}));
   assert.throws(()=>parseAtlasManifest({owner:'MichaelWave369',schema_version:2,pages:[]}));
-  const valid=seedPages[0];
+  const valid={...seedPages[0],id:'gh-123',verified:true,title:'Verified book'};
   const accepted=parseAtlasManifest({schema_version:1,owner:'MichaelWave369',pages:[
-    {...valid,verified:true},
-    {...valid,id:'bad',verified:false},
+    valid,
+    {...valid,id:'gh-456',verified:false},
+    {...valid,id:'fake',verified:true},
   ]});
-  assert.ok(accepted.length <= 1);
-  assert.equal(accepted.length ? accepted[0].kicker : 'LIVE FROM THE FIELD','LIVE FROM THE FIELD');
+  assert.equal(accepted.length,1);
+  assert.equal(accepted[0].title,'Verified book');
+  assert.equal(accepted[0].kicker,'LIVE FROM THE FIELD');
 });
 
 test('the real reader composes catalog, passport and manifest through separate hooks',()=>{

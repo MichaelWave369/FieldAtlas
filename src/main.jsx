@@ -18,6 +18,8 @@ import { visitorJourneys, findJourney, availableJourneyStops, readAtlasLink, bui
 import { wrapChapterIndex, canTurnChapters, wrapDestinationLabel } from './navigation';
 import { futureArchivePrintUrl, FUTURE_ARCHIVE_URL } from './future-archive';
 import BookForeEdge from './BookForeEdge';
+import { PREVIEW_SANDBOX } from './preview-policy.js';
+import { activateModalFocus } from './modal-focus.js';
 import './style.css';
 import './book-edge.css';
 
@@ -195,6 +197,16 @@ function App() {
       (!q || [p.title, p.repo, p.desc, p.category].join(' ').toLowerCase().includes(q));
   }).sort((a,b)=>a.title.localeCompare(b.title)), [catalog, directorySearch, directoryWing]);
 
+  // Keep the original book intact while making every application modal keyboard-safe.
+  const activeModal = portalOpen && active ? 'portal' : editorPage ? 'editor' : directoryOpen ? 'directory' : shelfOpen ? 'shelf' : showHelp ? 'help' : null;
+  useEffect(() => {
+    if (!activeModal) return undefined;
+    const dialog = document.querySelector('[data-atlas-modal="' + activeModal + '"]');
+    return activateModalFocus(dialog, {
+      initialSelector: activeModal === 'directory' ? 'input[aria-label="Search the Atlas directory"]' : '[data-atlas-initial-focus]',
+    });
+  }, [activeModal]);
+
   useEffect(() => { localStorage.setItem(STORE_KEY, JSON.stringify(pages)); }, [pages]);
   useEffect(() => { localStorage.setItem(PREF_KEY, JSON.stringify(prefs)); }, [prefs]);
   useEffect(() => { localStorage.setItem(EDITS_KEY, JSON.stringify(localEdits)); }, [localEdits]);
@@ -265,6 +277,8 @@ function App() {
       if (match) {
         setWing('all'); setEnteredWing(true); setCategory('All'); setSearch('');
         setPendingChapterId(match.id);
+      } else {
+        setShareNotice('This shared chapter is unavailable in your current Atlas. Try the complete directory.');
       }
     }
   }, [manifestStatus, catalog]);
@@ -275,12 +289,25 @@ function App() {
       setCurrent(target);
       setPendingChapterId(null);
       scrollToReader();
+    } else if (!catalog.some(p => p.id === pendingChapterId)) {
+      // Never leave an inaccessible or removed shared chapter pending forever.
+      setPendingChapterId(null);
+      setShareNotice('That chapter is no longer in this browser\'s accessible catalog.');
+    } else if (wing !== 'all' || category !== 'All' || search) {
+      // Resolve the chapter by ID after clearing incompatible local filters.
+      setWing('all');
+      setCategory('All');
+      setSearch('');
     }
-  }, [pendingChapterId, filtered, scrollToReader]);
+  }, [pendingChapterId, filtered, catalog, wing, category, search, scrollToReader]);
 
   const goTo = useCallback((target, direction = '') => {
     if (flipping || target < 0 || target >= filtered.length || target === index) return;
     if (activeTour && filtered[target]?.id !== journeyStops[tourStep]?.id) setActiveTour(null);
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+      setCurrent(target);
+      return;
+    }
     setFlipping(direction || (target > index ? 'next' : 'prev'));
     pendingTimers.current.push(setTimeout(() => setCurrent(target), 260));
     pendingTimers.current.push(setTimeout(() => setFlipping(''), 640));
@@ -585,7 +612,7 @@ function App() {
                       onSurface={() => setMirrorDepth(d => nextMirrorDepth(d, -1))} />
                   : publication
                     ? <PublicationLeaf page={active}/>
-                    : <iframe key={active.id + active.url} title={`Live website: ${active.title}`} loading="lazy" src={active.url} referrerPolicy="strict-origin-when-cross-origin" allow="fullscreen; clipboard-read; clipboard-write" />}
+                    : <iframe key={active.id + active.url} title={`Live website: ${active.title}`} loading="lazy" src={active.url} referrerPolicy="strict-origin-when-cross-origin" sandbox={PREVIEW_SANDBOX} allow="fullscreen" allowFullScreen />}
               </div>
               <div className="preview-footnote"><span className="live-dot" /> {fieldception ? 'SAFE MIRROR CHAMBER' : publication ? 'CURATED ARCHIVE REFERENCE' : 'LIVE WEBSITE PREVIEW'} <span className="preview-hint">{fieldception ? 'Five illustrated reflections, zero recursive iframes.' : publication ? 'Zenodo is authoritative. No remote PDF is embedded.' : 'Some sites block embedding. Open the portal instead.'}</span></div>
             </div>
@@ -694,15 +721,15 @@ function App() {
 
     <footer className="bottom-bar"><span>MADE WITH CURIOSITY · BUILT TO BE SHARED</span><button onClick={()=>setShowHelp(true)}><Info size={15}/> About the atlas</button><span>ENTER THE FIELD <span className="bottom-flower">✻</span> 2026</span></footer>
 
-    {portalOpen && active && <div className="portal-modal" role="dialog" aria-modal="true" aria-label={`${active.title} fullscreen reader`}>
-      <div className="portal-modal-header"><span><BookOpen size={19}/> {active.title} <small>{publication ? 'ZENODO RECORD' : 'LIVE SITE'}</small></span><div><a href={active.url} target="_blank" rel="noopener noreferrer"><ExternalLink size={16}/> Open outside atlas</a><button aria-label="Close fullscreen reader" onClick={()=>setPortalOpen(false)}><X size={20}/></button></div></div>
+    {portalOpen && active && <div className="portal-modal" data-atlas-modal="portal" role="dialog" aria-modal="true" aria-label={`${active.title} fullscreen reader`}>
+      <div className="portal-modal-header"><span><BookOpen size={19}/> {active.title} <small>{publication ? 'ZENODO RECORD' : 'LIVE SITE'}</small></span><div><a href={active.url} target="_blank" rel="noopener noreferrer"><ExternalLink size={16}/> Open outside atlas</a><button data-atlas-initial-focus aria-label="Close fullscreen reader" onClick={()=>setPortalOpen(false)}><X size={20}/></button></div></div>
       {fieldception
         ? <MirrorChamber depth={mirrorDepth}
             onDeeper={() => setMirrorDepth(d => nextMirrorDepth(d, 1))}
             onSurface={() => setMirrorDepth(d => nextMirrorDepth(d, -1))}/>
         : publication
           ? <PublicationLeaf page={active} fullscreen/>
-          : <iframe key={'full-'+active.id} title={`Fullscreen website ${active.title}`} src={active.url} allow="fullscreen; clipboard-read; clipboard-write" />}
+          : <iframe key={'full-'+active.id} title={`Fullscreen website ${active.title}`} src={active.url} referrerPolicy="strict-origin-when-cross-origin" sandbox={PREVIEW_SANDBOX} allow="fullscreen" allowFullScreen />}
       <p className="modal-embed-hint">{fieldception ? 'The Infinite Atlas is a bounded illustration. Open outside the Atlas to view the actual site.' : publication ? 'This is an index reference, not a live PDF preview. Open Zenodo for the original record and files.' : 'If a page is blank, its host may prevent iframe embedding. Use “Open outside atlas.”'}</p>
     </div>}
 
@@ -711,10 +738,10 @@ function App() {
       journeys={visitorJourneys} activeTour={activeTour} onStartTour={(id, repo) => {setMapOpen(false);selectJourney(id, repo);}}/>}
 
     {directoryOpen && <div className="directory-overlay" role="presentation" onMouseDown={() => setDirectoryOpen(false)}>
-      <section className="directory-panel" role="dialog" aria-modal="true" aria-labelledby="directory-title" onMouseDown={e=>e.stopPropagation()}>
+      <section className="directory-panel" data-atlas-modal="directory" role="dialog" aria-modal="true" aria-labelledby="directory-title" onMouseDown={e=>e.stopPropagation()}>
         <header className="directory-head">
           <div><span className="eyebrow">THE GREAT CATALOG · VOLUME ONE</span><h2 id="directory-title">The Atlas Directory</h2><p>{catalog.length} unique chapters collected in one searchable place.</p></div>
-          <button type="button" className="directory-close" aria-label="Close directory" onClick={()=>setDirectoryOpen(false)}><X size={21}/></button>
+          <button type="button" data-atlas-initial-focus className="directory-close" aria-label="Close directory" onClick={()=>setDirectoryOpen(false)}><X size={21}/></button>
         </header>
         <div className="directory-tools">
           <label className="directory-search"><Search size={16}/><input value={directorySearch} onChange={e => setDirectorySearch(e.target.value)} placeholder="Search every world, tool, and experiment..." aria-label="Search the Atlas directory" autoFocus /></label>
@@ -739,8 +766,8 @@ function App() {
     </div>}
 
     {editorPage && <div className="directory-overlay" role="presentation" onMouseDown={() => setEditorPage(null)}>
-      <section className="entry-edit-panel" role="dialog" aria-modal="true" aria-labelledby="edit-entry-title" onMouseDown={e=>e.stopPropagation()}>
-        <button className="directory-close edit-close" onClick={() => setEditorPage(null)} aria-label="Close editor"><X size={20}/></button>
+      <section className="entry-edit-panel" data-atlas-modal="editor" role="dialog" aria-modal="true" aria-labelledby="edit-entry-title" onMouseDown={e=>e.stopPropagation()}>
+        <button data-atlas-initial-focus className="directory-close edit-close" onClick={() => setEditorPage(null)} aria-label="Close editor"><X size={20}/></button>
         <span className="eyebrow">LOCAL CURATOR DESK</span><h2 id="edit-entry-title">Edit this book's label</h2>
         <p>Personalizing this label does not change GitHub or anyone else's Atlas.</p>
         <form onSubmit={saveEditedChapter} className="directory-edit-form">
@@ -752,10 +779,10 @@ function App() {
       </section>
     </div>}
 
-    {showHelp && <div className="modal-cover" onMouseDown={()=>setShowHelp(false)}><section className="small-modal" role="dialog" aria-modal="true" aria-labelledby="help-title" onMouseDown={e=>e.stopPropagation()}><button className="modal-x" aria-label="Close" onClick={()=>setShowHelp(false)}><X/></button><span className="eyebrow">A NOTE FROM THE LIBRARY</span><h2 id="help-title">A book made of doorways.</h2><p>The Field Atlas is a real React app, wrapped in a warm study. Each chapter previews a GitHub Pages website in an iframe and offers a direct link. Some browsers and projects refuse embedded frames, so the direct link is always available.</p><p>Turn chapters with the arrows or keyboard, choose a library wing, bookmark favorites, or add sites by URL. A daily public-site manifest automatically adds verified live GitHub Pages to the shared book. Unverified suggestions remain in the private-to-this-browser approval inbox. Personal bookmarks and changes stay in this browser.</p><div className="modal-notice"><Star size={18}/> The book is a guide, never a permission grant. Embedded sites keep their own functionality and safety rules.</div></section></div>}
+    {showHelp && <div className="modal-cover" onMouseDown={()=>setShowHelp(false)}><section className="small-modal" data-atlas-modal="help" role="dialog" aria-modal="true" aria-labelledby="help-title" onMouseDown={e=>e.stopPropagation()}><button data-atlas-initial-focus className="modal-x" aria-label="Close" onClick={()=>setShowHelp(false)}><X/></button><span className="eyebrow">A NOTE FROM THE LIBRARY</span><h2 id="help-title">A book made of doorways.</h2><p>The Field Atlas is a real React app, wrapped in a warm study. Each chapter previews a GitHub Pages website in an iframe and offers a direct link. Some browsers and projects refuse embedded frames, so the direct link is always available.</p><p>Turn chapters with the arrows or keyboard, choose a library wing, bookmark favorites, or add sites by URL. A daily public-site manifest automatically adds verified live GitHub Pages to the shared book. Unverified suggestions remain in the private-to-this-browser approval inbox. Personal bookmarks and changes stay in this browser.</p><div className="modal-notice"><Star size={18}/> The book is a guide, never a permission grant. Embedded sites keep their own functionality and safety rules.</div></section></div>}
 
-    {shelfOpen && <div className="modal-cover" onMouseDown={()=>setShelfOpen(false)}><section className="curate-modal" role="dialog" aria-modal="true" aria-labelledby="curate-title" onMouseDown={e=>e.stopPropagation()}>
-      <button type="button" className="modal-x" aria-label="Close shelf editor" onClick={()=>setShelfOpen(false)}><X size={23}/></button>
+    {shelfOpen && <div className="modal-cover" onMouseDown={()=>setShelfOpen(false)}><section className="curate-modal" data-atlas-modal="shelf" role="dialog" aria-modal="true" aria-labelledby="curate-title" onMouseDown={e=>e.stopPropagation()}>
+      <button type="button" data-atlas-initial-focus className="modal-x" aria-label="Close shelf editor" onClick={()=>setShelfOpen(false)}><X size={23}/></button>
       <span className="eyebrow"><WandSparkles size={15}/> YOUR LIBRARY, YOUR CHAPTERS</span>
       <h2 id="curate-title">Curate the Atlas</h2>
       <p className="modal-lede">Verified public GitHub Pages are added to the shared book during daily deployment. Other Pages-enabled repositories remain in the review inbox until you approve them locally. No private repository is scanned.</p>
@@ -779,7 +806,7 @@ function App() {
           </form>
           <p className="tiny-note">Public discoveries await review in the arrivals inbox above. Only this browser sees approved custom chapters until the repository catalog is updated.</p>
         </div>
-        <div className="curate-right"><div className="shelf-heading"><h3>Current chapters <small>{catalog.length}</small></h3><button title="Reset to curated nine" onClick={resetCatalog}><RotateCcw size={15}/> Reset</button></div>
+        <div className="curate-right"><div className="shelf-heading"><h3>Current chapters <small>{catalog.length}</small></h3><button title="Reset to curated ten" onClick={resetCatalog}><RotateCcw size={15}/> Reset</button></div>
           <div className="curate-list">{catalog.map((p,i)=><div key={p.id} className="curate-entry"><span className="curate-index">{String(i+1).padStart(2,'0')}</span><span className="curate-entry-main"><strong>{p.title}</strong><small>{p.url}</small></span><button className="curate-remove" title={`Remove ${p.title} from this browser's book`} aria-label={`Remove ${p.title}`} onClick={()=>removePage(p.id)}><X size={17}/></button></div>)}</div>
         </div>
       </div>

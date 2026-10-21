@@ -129,7 +129,7 @@ Update the public-safe metadata overrides in `src/curation.js`, review the chang
 4. Writes `public/pages-discovered.json` with verification counts and published URL.
 5. Builds and deploys that catalog so *all visitors* see confirmed public sites automatically when opening the Atlas.
 
-The original nine curated chapters remain as a fallback. New additions are de-duplicated by repository and URL. Local user additions and hidden chapters stay private to each browser. The manual new-arrivals inbox remains available for Pages-enabled projects that cannot be confirmed automatically.
+The original ten curated chapters remain as a fallback. New additions are de-duplicated by repository and URL. Local user additions and hidden chapters stay private to each browser. The manual new-arrivals inbox remains available for Pages-enabled projects that cannot be confirmed automatically.
 
 **Limits:** A valid HTML response does not guarantee iframe permission, full app functionality, or that the site is appropriate for every audience. Some domains and network edges may fail a temporary verification and can be reviewed manually. Re-checks occur during deployment, not continuously. GitHub Pages embedding restrictions still require the `Open this world` link.
 
@@ -211,7 +211,7 @@ The Vite config uses relative asset paths so no repo-specific base pathname is r
 
 ## Pages and permissions
 
-The canonical publicly visible starter book is in [`src/catalog.js`](src/catalog.js). Nine examples are seeded. Some URLs were taken directly from the GitHub repository's declared homepage; others follow the GitHub Pages convention. The repository's `has_pages` flag does not guarantee that a deployed URL currently returns a functioning website. Edit or remove any inaccurate entry in the browser.
+The canonical publicly visible starter book is in [`src/catalog.js`](src/catalog.js). Ten examples are seeded. Some URLs were taken directly from the GitHub repository's declared homepage; others follow the GitHub Pages convention. The repository's `has_pages` flag does not guarantee that a deployed URL currently returns a functioning website. Edit or remove any inaccurate entry in the browser.
 
 **No private repositories are scanned or exposed.** GitHub's unauthenticated public API is used for discovery, so the `has_pages` results only cover publicly accessible repositories. GitHub imposes unauthenticated API rate limits. Discovery checks the public repository list, not individual websites' iframe permissions.
 

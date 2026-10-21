@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0",
     "test": "node --test tests/*.test.js",
-    "catalog:sync": "node scripts/sync-public-pages.mjs"
+    "catalog:sync": "node scripts/sync-public-pages.mjs",
+    "launch:preflight": "node scripts/launch-preflight.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",

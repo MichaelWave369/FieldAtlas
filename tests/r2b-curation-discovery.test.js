@@ -24,7 +24,7 @@ test('local curator labels remain bound by repository and limited in length',()=
 test('discovery preserves opt-out, current hidden IDs and existing v2 key',()=>{
   assert.equal(DISCOVERY_KEY,'field-atlas-discovery-v2');
   const state=normalizeDiscovery({autoEnabled:false,hiddenIds:['hidden'],lastCheckedAt:11,
-    dismissedIds:['a'],candidates:[page('good'),page('bad','http://localhost')]});
+    dismissedIds:['a'],candidates:[page('good'),page('bad','javascript:alert(1)')]});
   assert.equal(state.autoEnabled,false);
   assert.deepEqual(state.hiddenIds,['hidden']);
   assert.deepEqual(state.dismissedIds,['a']);

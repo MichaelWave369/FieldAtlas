@@ -840,3 +840,9 @@ a { color:inherit; }
 .visitor-passport-import-file{display:none;}
 .visitor-passport-transfer-status{flex:1 0 100%;margin:0;font:500 11px/1.4 'DM Sans',sans-serif;color:#e5f4c7;}
 @media(max-width:630px){.visitor-passport-transfer{margin:0 8px 10px;padding:11px;}.visitor-passport-transfer-actions{width:100%;}.visitor-passport-transfer-actions button{flex:1;min-width:122px;}}
+
+/* R5C · Visible-on-focus shortcut into the single, original living book. */
+.skip-to-reader{position:fixed;top:8px;left:12px;z-index:300;transform:translateY(-140%);padding:10px 15px;border:2px solid #edc989;border-radius:9px;background:#211914;color:#fff2d7;font:700 13px 'DM Sans',sans-serif;text-decoration:none;box-shadow:0 8px 30px rgba(0,0,0,.55);}
+.skip-to-reader:focus,.skip-to-reader:focus-visible{transform:translateY(0);outline:3px solid #fff0b5;outline-offset:3px;}
+#living-book:focus{outline:none;}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}.skip-to-reader{transition:none;}}

@@ -32,14 +32,18 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Test desktop and mobile-emulated browser journeys
         run: npm run test:e2e
+      - name: Capture visitor acceptance packet (automatic checks do not approve a release)
+        if: always()
+        run: npm run acceptance:packet
       - name: Check current public GitHub Pages behavior (baseline, not candidate approval)
         run: npm run test:live
-      - name: Upload browser traces on failure
-        if: failure()
+      - name: Upload browser QA and acceptance packet
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: field-atlas-browser-qa
           path: |
+            release-evidence/
             playwright-report/
             test-results/
           if-no-files-found: ignore

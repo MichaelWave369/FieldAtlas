@@ -62,9 +62,12 @@ test('Discovery Compass only changes the existing reader and keeps the UI access
   const app=readFileSync('src/main.jsx','utf8');
   assert.match(app,/pickSurpriseChapter\(catalog,/);
   assert.match(app,/setPendingChapterId\(discovered.id\)/);
-  assert.match(app,/role="status">\{compassNotice\}/);
-  assert.match(app,/disabled=\{!compassChoices.length\}/);
-  assert.match(app,/aria-label="Discover another library chapter"/);
+  const edge=readFileSync('src/BookForeEdge.jsx','utf8');
+  assert.ok(edge.includes('role="status">{compassNotice}'));
+  assert.ok(edge.includes('disabled={!compassChoicesCount}'));
+  assert.ok(edge.includes("activePanel === 'discover'"));
+  assert.ok(app.includes('onSurprise={surpriseMe}'));
+  assert.ok(app.includes('compassChoicesCount={compassChoices.length}'));
   assert.match(app,/aria-label="Interactive book of GitHub Pages websites"/);
   assert.match(app,/reader-focus-mode/);
   assert.match(app,/wrapChapterIndex\(index, delta, filtered.length\)/);

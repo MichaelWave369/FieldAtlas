@@ -1,0 +1,158 @@
+/* Fore-edge Index · staggered, book-attached navigation (2026-10).
+   Keep the original single preview iframe and chapter model untouched. */
+@media (min-width: 901px) {
+  .study-app .intro { margin-bottom: 12px; }
+  .reading-stage {
+    max-width: 1570px;
+    padding: 6px 178px 32px 28px;
+  }
+  .reading-stage .atlas-book {
+    aspect-ratio: auto;
+    height: clamp(595px, 78vh, 850px);
+    min-height: 595px;
+    max-height: 850px;
+  }
+  .reader-focus-mode .reading-stage {
+    max-width: 1630px;
+    padding: 7px 178px 26px 28px;
+  }
+  .reader-focus-mode .reading-stage .atlas-book {
+    height: clamp(595px, 82vh, 900px);
+    min-height: 595px;
+    max-height: 900px;
+  }
+  .reading-stage .turn-right { right: 163px; }
+  .reading-stage .right-ornament { display: none; }
+}
+.book-edge-index {
+  position: absolute;
+  z-index: 20;
+  right: 6px;
+  top: 7.5%;
+  width: 166px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  filter: drop-shadow(0 8px 10px rgba(15, 7, 4, .35));
+}
+.book-edge-tab {
+  --step: calc(var(--tab-step) * 9px);
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 118px;
+  min-height: 56px;
+  margin-left: var(--step);
+  padding: 8px 9px 8px 10px;
+  border: 1px solid #c69d63;
+  border-left: 4px solid #b78950;
+  border-radius: 3px 12px 13px 3px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 4px, rgba(104,68,33,.04) 5px 6px),
+    linear-gradient(112deg, #e7c995, #bc9365 76%, #8b5736);
+  color: #432a19;
+  font: 700 11px/1.12 'DM Sans', sans-serif;
+  text-align: left;
+  box-shadow: inset 1px 1px rgba(255,247,217,.7), 0 4px 0 #60391f, 0 7px 12px rgba(0,0,0,.45);
+  transform-origin: left center;
+  transition: transform .2s ease, filter .2s ease, background .2s ease;
+}
+.book-edge-tab::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 2px;
+  width: 2px;
+  border-left: 1px dashed rgba(93, 55, 25, .4);
+  pointer-events: none;
+}
+.book-edge-tab:hover, .book-edge-tab-open {
+  background: linear-gradient(110deg, #ffebbc, #e1b980 77%, #ac7645);
+  transform: translateX(5px);
+  filter: brightness(1.05);
+}
+.book-edge-tab:focus-visible { outline: 3px solid #fff2cb; outline-offset: 4px; }
+.book-tab-number { align-self: flex-start; font-size: 8px; color: #785238; opacity: .77; }
+.book-edge-tab svg { flex: 0 0 auto; color: #654124; }
+.book-tab-label { min-width: 0; overflow-wrap: anywhere; }
+.book-tab-glyph { position: absolute; bottom: 4px; right: 6px; font: 13px Georgia, serif; color: rgba(86, 48, 18, .65); }
+.book-edge-tab-open { border-color: #fff0be; box-shadow: inset 1px 1px rgba(255,247,217,.8), 0 4px 0 #84572e, 0 0 0 2px rgba(255,232,165,.3), 0 8px 16px #100806; }
+
+/* Floating parchment drawer. Opening a tab never mounts a second site preview. */
+.book-edge-panel {
+  position: absolute;
+  z-index: 25;
+  top: 17px;
+  right: 184px;
+  width: min(390px, calc(100% - 220px));
+  max-height: min(76vh, 630px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 18px;
+  color: #4c301d;
+  border: 6px double #987044;
+  border-radius: 10px 7px 9px 12px;
+  background: repeating-linear-gradient(45deg, rgba(103,64,31,.025) 0 1px, transparent 1px 5px), linear-gradient(120deg,#fff3d7,#e8c99a);
+  box-shadow: 0 21px 46px rgba(16,8,3,.65), inset 0 0 0 1px rgba(255,255,255,.57);
+  scrollbar-color: #9f774b #eddbb9;
+}
+.book-edge-panel-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; padding-bottom:10px; margin-bottom:11px; border-bottom:1px solid rgba(111,76,36,.25); }
+.book-edge-panel-head h2 { font:600 28px/1 'Cormorant Garamond',Georgia,serif; margin:5px 0 0; color:#4c2e1b; }
+.book-edge-eyebrow {font:700 8px/1.3 'DM Sans',sans-serif;letter-spacing:.14em;color:#9c703e;}
+.book-edge-close {display:grid;place-items:center;flex:0 0 32px;width:32px;height:32px;background:rgba(161,117,65,.12);color:#583820;border:1px solid #bf9864;border-radius:50%;}
+.book-edge-close:hover {background:#ead1a7;}
+.book-edge-lede {font:500 16px/1.28 'Cormorant Garamond',Georgia,serif; margin:0 0 13px;color:#735137;}
+.book-edge-room-grid {display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.book-edge-room {display:flex;align-items:center;gap:8px;min-width:0;padding:10px 8px;border:1px solid #cba77a;border-radius:7px;background:rgba(255,250,231,.5);font-size:10px;font-weight:700;text-align:left;color:#553821;}
+.book-edge-room span:nth-child(2) {flex:1;min-width:0;}
+.book-edge-room-glyph {font:20px Georgia,serif;color:#906038;}
+.book-edge-room:hover,.book-edge-room.is-selected {background:#ead0a3;border-color:#976537;}
+.book-edge-action-stack {display:flex;flex-direction:column;gap:9px;}
+.book-edge-primary,.book-edge-secondary {display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:40px;padding:10px 12px;margin-top:9px;border-radius:7px;font-size:11px;font-weight:700;}
+.book-edge-primary {border:1px solid #8f5d2e;background:linear-gradient(135deg,#9b6c3d,#643e2d);color:#ffedcb;}
+.book-edge-primary:hover:not(:disabled) {filter:brightness(1.15);}
+.book-edge-primary:disabled {opacity:.45;}
+.book-edge-secondary {border:1px solid #bb915e;background:rgba(255,248,224,.43);color:#603e22;}
+.book-edge-secondary:hover {background:#f6dfb6;}
+.book-edge-tip {display:flex;align-items:center;gap:9px;font-size:10px;color:#7a583e;line-height:1.4;margin:14px 0 2px;}
+.book-edge-field {display:flex;flex-direction:column;gap:5px;font-size:10px;font-weight:700;color:#775435;margin-bottom:9px;}
+.book-edge-field select,.book-edge-input {width:100%;min-height:39px;border:1px solid #bb9568;border-radius:6px;background:#fff4db;color:#4d3420;padding:8px;font-size:11px;}
+.book-edge-input {display:flex;align-items:center;gap:7px;}
+.book-edge-input input {width:100%;min-width:0;color:#4d3420;border:0;outline-offset:2px;background:transparent;font-size:12px;}
+.book-edge-discovery-meta {color:#926c45;font-size:10px;margin:6px 0;}
+.book-edge-notice {font-size:11px;line-height:1.45;color:#436040;border-top:1px solid #c7aa83;padding-top:9px;}
+.book-edge-chapter-list {display:flex;flex-direction:column;gap:4px;margin:8px 0;max-height:205px;overflow-y:auto;scrollbar-color:#9f774b #eedfc5;}
+.book-edge-chapter-list button {display:flex;align-items:center;gap:9px;min-height:32px;text-align:left;border:1px solid transparent;border-radius:5px;color:#563923;background:rgba(255,255,255,.25);padding:7px 9px;}
+.book-edge-chapter-list button span {font:700 9px 'DM Sans',sans-serif;color:#996e43;}
+.book-edge-chapter-list button strong {font-size:11px;font-weight:600;}
+.book-edge-chapter-list button:hover,.book-edge-chapter-list button.is-selected {border-color:#bc9362;background:#ead3ac;}
+.book-edge-empty {font-size:11px;color:#805e41;}
+.book-edge-panel button:focus-visible,.book-edge-panel select:focus-visible,.book-edge-panel input:focus-visible {outline:3px solid #654426;outline-offset:2px;}
+
+@media (min-width:901px) and (max-width:1160px) {
+  .reading-stage {padding-right:178px;padding-left:18px;}
+  .book-edge-panel {right:183px;width:min(350px,calc(100% - 205px));}
+}
+@media (max-width:900px) {
+  .reading-stage {display:flex;flex-direction:column;gap:14px;overflow:visible;}
+  .reading-stage .atlas-book, .reader-focus-mode .reading-stage .atlas-book {order:1;height:auto;max-height:none;}
+  .book-edge-index {order:2;position:relative;right:auto;top:auto;width:100%;display:flex;flex-direction:row;align-items:stretch;gap:7px;overflow-x:auto;overflow-y:visible;padding:9px 6px 13px;filter:none;scrollbar-width:thin;scrollbar-color:#bb9767 transparent;}
+  .book-edge-tab {--step:0px;flex:0 0 108px;min-height:49px;width:108px;margin-left:0;box-shadow:0 3px 0 #60391f,0 6px 10px rgba(0,0,0,.4);}
+  .book-edge-tab:hover,.book-edge-tab-open {transform:translateY(-3px);}
+  .book-edge-panel {order:3;position:relative;top:auto;right:auto;width:100%;max-height:460px;padding:15px;}
+  .reader-focus-mode .reading-stage {padding:4px 15px 22px;}
+}
+@media (max-width:680px) {
+  .reading-stage {gap:9px;}
+  .book-edge-index {padding:8px 2px 13px;}
+  .book-edge-tab {flex-basis:100px;width:100px;min-height:45px;font-size:10px;padding:7px 6px;}
+  .book-edge-panel-head h2 {font-size:25px;}
+  .book-edge-room-grid {grid-template-columns:1fr 1fr;}
+  .reader-focus-mode .reading-stage {padding:3px 12px 19px;}
+}
+@media (prefers-reduced-motion:reduce) {
+  .book-edge-tab {transition:none;}
+  .book-edge-tab:hover,.book-edge-tab-open {transform:none;}
+}

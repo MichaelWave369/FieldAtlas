@@ -17,7 +17,9 @@ import { isInfiniteAtlas, MAX_MIRROR_DEPTH, MIN_MIRROR_DEPTH, mirrorLayers, next
 import { visitorJourneys, findJourney, availableJourneyStops, readAtlasLink, buildAtlasLink, locateSharedChapter } from './journeys';
 import { wrapChapterIndex, canTurnChapters, wrapDestinationLabel } from './navigation';
 import { futureArchivePrintUrl, FUTURE_ARCHIVE_URL } from './future-archive';
+import BookForeEdge from './BookForeEdge';
 import './style.css';
+import './book-edge.css';
 
 const STORE_KEY = 'field-atlas-pages-v1';
 const PREF_KEY = 'field-atlas-preferences-v1';
@@ -140,6 +142,7 @@ function App() {
   const [shelfOpen, setShelfOpen] = useState(false);
   const [portalOpen, setPortalOpen] = useState(false);
   const [focusMode, setFocusMode] = useState(false);
+  const [bookPanel, setBookPanel] = useState(null);
   const [mapOpen, setMapOpen] = useState(false);
   const [compassWing, setCompassWing] = useState('all');
   const [compassNotice, setCompassNotice] = useState('');
@@ -293,16 +296,17 @@ function App() {
       if (e.key === 'Escape') {
         if (portalOpen || shelfOpen || showHelp || directoryOpen || editorPage || mapOpen) {
           setPortalOpen(false); setShelfOpen(false); setShowHelp(false); setDirectoryOpen(false); setEditorPage(null); setMapOpen(false);
-        } else if (focusMode) exitFocusMode();
+        } else if (bookPanel) setBookPanel(null);
+        else if (focusMode) exitFocusMode();
         return;
       }
-      if (portalOpen || shelfOpen || showHelp || directoryOpen || editorPage || mapOpen || /input|textarea|select/i.test(e.target?.tagName || '')) return;
+      if (portalOpen || shelfOpen || showHelp || directoryOpen || editorPage || mapOpen || bookPanel || /input|textarea|select/i.test(e.target?.tagName || '')) return;
       if (e.key === 'ArrowRight') { e.preventDefault(); turn(1); }
       if (e.key === 'ArrowLeft') { e.preventDefault(); turn(-1); }
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [portalOpen, shelfOpen, showHelp, directoryOpen, editorPage, mapOpen, focusMode, turn]);
+  }, [portalOpen, shelfOpen, showHelp, directoryOpen, editorPage, mapOpen, bookPanel, focusMode, turn]);
 
   function selectJourney(id, targetRepo = null) {
     const stops = availableJourneyStops(id, catalog);
@@ -511,46 +515,6 @@ function App() {
       <p>Come in, stay awhile. Every chapter opens a living creation.</p>
     </div>
 
-    <nav className="quick-room-rail" aria-label="Quick room selection">
-      <span className="quick-room-label">YOUR LIVING BOOK</span>
-      <div className="quick-room-options">
-        {wings.map(w => <button type="button" key={w.id} className={`quick-room-option ${wing===w.id ? 'quick-room-selected' : ''}`} aria-pressed={wing===w.id}
-          onClick={() => { setActiveTour(null); setWing(w.id); setEnteredWing(w.id==='all'); setCategory('All'); setSearch(''); }}>
-          <span aria-hidden="true">{w.glyph}</span> {w.shortName}
-        </button>)}
-      </div>
-      <button className="quick-room-map" type="button" onClick={() => setMapOpen(true)} aria-haspopup="dialog" aria-label="Open interactive library map"><MapIcon size={15}/> Library Map</button>
-      <a className="quick-room-details" href="#study-rooms">Explore rooms <ChevronRight size={13}/></a>
-    </nav>
-
-    <div className="reader-toolbar" aria-label="Reader display controls">
-      <div className="reader-toolbar-heading"><span className="reader-toolbar-symbol">✧</span><strong>{focusMode ? 'THE READER’S SANCTUARY' : 'THE LIVING BOOK'}</strong>
-        <small>{focusMode ? 'A quiet moment inside the Field.' : 'Turn a page. Visit a world.'}</small></div>
-      <div className="reader-toolbar-actions">
-        {!focusMode && <button type="button" className="reader-locate" onClick={scrollToReader}><BookOpen size={15}/> To the book</button>}
-        <button type="button" className="reader-focus-toggle" aria-pressed={focusMode}
-          onClick={() => focusMode ? exitFocusMode() : setFocusMode(true)}>
-          {focusMode ? <><LibraryBig size={16}/> Return to Library</> : <><Maximize2 size={16}/> Focus Mode</>}
-        </button>
-      </div>
-    </div>
-
-    <section className="discovery-compass" aria-label="Discover another library chapter">
-      <div className="discovery-compass-title"><span aria-hidden="true">✧</span><div><strong>THE DISCOVERY COMPASS</strong>
-        <small>Explore something unexpected from the public library</small></div></div>
-      <div className="discovery-compass-controls">
-        <label htmlFor="compass-room">Explore</label>
-        <select id="compass-room" value={compassWing} onChange={event => {setCompassWing(event.target.value);setCompassNotice('');}}>
-          {compassFilters.map(choice => <option key={choice.id} value={choice.id}>{choice.title}</option>)}
-        </select>
-        <span className="discovery-compass-count">{undiscoveredCount} not yet visited</span>
-        <button className="discovery-surprise" type="button" disabled={!compassChoices.length} onClick={surpriseMe}>
-          <Sparkles size={16}/> Surprise Me <ArrowRight size={15}/>
-        </button>
-      </div>
-      {compassNotice && <p className="discovery-compass-notice" role="status">{compassNotice}</p>}
-    </section>
-
     {journey && journeyStops.length > 0 && <section className="tour-compass" aria-label="Guided visit controls">
       <div className="tour-compass-label"><span>✦ GUIDED WALK</span><strong>{journey.name}</strong>
         <small>Stop {tourStep+1} / {journeyStops.length} · {journeyStops.filter(p=>visitedChapters.includes(p.id)).length} passport stamps</small></div>
@@ -571,6 +535,23 @@ function App() {
       <div className="side-ornament left-ornament" aria-hidden="true"><span className="fancy-star">✧</span><span>EXPLORE</span><i /></div>
       <div className="side-ornament right-ornament" aria-hidden="true"><span className="fancy-star">✧</span><span>IMAGINE</span><i /></div>
       <div className="book-floor" aria-hidden="true" />
+      <BookForeEdge
+        activePanel={bookPanel} onPanelChange={setBookPanel}
+        wings={wings} wing={wing}
+        onChooseWing={id => {setActiveTour(null);setWing(id);setEnteredWing(id === 'all');setCategory('All');setSearch('');}}
+        onOpenMap={() => setMapOpen(true)}
+        onOpenCurate={() => setShelfOpen(true)}
+        focusMode={focusMode} onToggleFocus={() => focusMode ? exitFocusMode() : setFocusMode(true)}
+        onLocate={scrollToReader}
+        compassFilters={compassFilters} compassWing={compassWing}
+        onCompassWing={id => {setCompassWing(id);setCompassNotice('');}}
+        undiscoveredCount={undiscoveredCount} compassChoicesCount={compassChoices.length}
+        onSurprise={surpriseMe} compassNotice={compassNotice}
+        search={search} onSearch={setSearch} category={category} onCategory={setCategory}
+        categories={categories} filtered={filtered} activeIndex={index}
+        onGoToChapter={i => {goTo(i);scrollToReader();}}
+        onOpenDirectory={() => {setDirectoryWing('all');setDirectorySearch('');setDirectoryOpen(true);}}
+      />
       <div className={`atlas-book ${flipping ? `is-flipping flip-${flipping}` : ''}`}>
         <div className="leather-spine" />
         <div className="book-edges edge-left" /><div className="book-edges edge-right" />

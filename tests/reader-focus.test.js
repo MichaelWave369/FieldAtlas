@@ -7,15 +7,18 @@ const styles = readFileSync('src/style.css','utf8');
 
 test('focus toolbar can enter and return from the reading sanctuary', () => {
   assert.match(app,/const \[focusMode, setFocusMode\] = useState\(false\)/);
-  assert.match(app,/aria-pressed=\{focusMode\}/);
-  assert.match(app,/Focus Mode/);
-  assert.match(app,/Return to Library/);
+  const edge=readFileSync('src/BookForeEdge.jsx','utf8');
+  assert.match(edge,/aria-pressed=\{focusMode\}/);
+  assert.match(edge,/Enter Focus Mode/);
+  assert.match(edge,/Return to the library/);
+  assert.match(app,/onToggleFocus=\{\(\) => focusMode \? exitFocusMode\(\) : setFocusMode\(true\)\}/);
   assert.match(app,/function exitFocusMode\(\)/);
   assert.match(app,/setFocusMode\(false\)/);
   assert.match(app,/reader-focus-mode/);
 });
 
 test('Escape leaves reader focus only when other dialogs are not active', () => {
+  assert.match(app,/else if \(bookPanel\) setBookPanel\(null\)/);
   assert.match(app,/else if \(focusMode\) exitFocusMode\(\)/);
   assert.match(app,/if \(portalOpen \|\| shelfOpen \|\| showHelp \|\| directoryOpen \|\| editorPage \|\| mapOpen\)/);
 });

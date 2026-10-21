@@ -25,7 +25,7 @@ test('Escape leaves reader focus only when other dialogs are not active', () => 
 
 test('shelf selection and deferred directory/tour choices return to the actual book', () => {
   assert.match(app,/const readerRef = useRef\(null\)/);
-  assert.match(app,/ref=\{readerRef\} className="reading-stage"/);
+  assert.match(app,/ref=\{readerRef\} tabIndex=\{-1\} className="reading-stage"/);
   assert.match(app,/readerRef\.current\?\.scrollIntoView/);
   assert.match(app,/onClick=\{\(\) => \{ goTo\(i\); scrollToReader\(\); \}\}/);
   assert.match(app,/setCurrent\(target\);\s*setPendingChapterId\(null\);\s*scrollToReader\(\)/);

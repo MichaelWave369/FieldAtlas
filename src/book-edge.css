@@ -1,92 +1,147 @@
-/* Fore-edge Index · staggered, book-attached navigation (2026-10).
-   Keep the original single preview iframe and chapter model untouched. */
+/* Field Atlas · V2 Giant Living Book and vertical fore-edge dividers.
+ * 70% encyclopedia anatomy, 20% library-card parchment, 10% brass.
+ * One existing portal iframe. Everything here is a visual/interaction surface.
+ */
 @media (min-width: 901px) {
-  .study-app .intro { margin-bottom: 12px; }
+  /* Reclaim the unused theater margins without widening the lower-page controls. */
+  .study-app { padding-left: clamp(16px, 2.2vw, 44px); padding-right: clamp(16px, 2.2vw, 44px); }
+  .study-app .intro { margin-top: 10px; margin-bottom: 11px; }
   .reading-stage {
-    max-width: 1570px;
-    padding: 6px 178px 32px 28px;
+    max-width: 1810px;
+    padding: 6px 110px 34px 22px;
   }
   .reading-stage .atlas-book {
+    position: relative;
+    z-index: 21; /* Book paper hides the inner tab roots, like a real fore-edge. */
     aspect-ratio: auto;
-    height: clamp(595px, 78vh, 850px);
-    min-height: 595px;
-    max-height: 850px;
+    height: clamp(675px, 84vh, 945px);
+    min-height: 675px;
+    max-height: 945px;
   }
+  .reading-stage .turn-right { right: 96px; z-index: 26; }
+  .reading-stage .turn-left { z-index: 26; }
+  .reading-stage .right-ornament { display: none; }
   .reader-focus-mode .reading-stage {
-    max-width: 1630px;
-    padding: 7px 178px 26px 28px;
+    max-width: 1870px;
+    padding: 7px 110px 27px 22px;
   }
   .reader-focus-mode .reading-stage .atlas-book {
-    height: clamp(595px, 82vh, 900px);
-    min-height: 595px;
-    max-height: 900px;
+    height: clamp(710px, 88vh, 1000px);
+    min-height: 710px;
+    max-height: 1000px;
   }
-  .reading-stage .turn-right { right: 163px; }
-  .reading-stage .right-ornament { display: none; }
 }
+
+/* The first 10-30px of each tab is concealed behind the book paper. */
 .book-edge-index {
   position: absolute;
   z-index: 20;
-  right: 6px;
-  top: 7.5%;
-  width: 166px;
+  top: 22px;
+  bottom: 45px;
+  right: 12px;
+  width: 128px;
   display: flex;
   flex-direction: column;
-  gap: 7px;
-  filter: drop-shadow(0 8px 10px rgba(15, 7, 4, .35));
+  justify-content: space-between;
+  gap: 5px;
+  filter: drop-shadow(0 10px 12px rgba(15, 7, 4, .36));
 }
 .book-edge-tab {
-  --step: calc(var(--tab-step) * 9px);
+  --step: calc(var(--tab-step) * 4px);
   position: relative;
   display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
   align-items: center;
-  gap: 7px;
-  width: 118px;
-  min-height: 56px;
+  justify-content: space-between;
+  gap: 2px;
+  width: 102px;
+  min-height: 98px;
+  max-height: 150px;
   margin-left: var(--step);
-  padding: 8px 9px 8px 10px;
-  border: 1px solid #c69d63;
-  border-left: 4px solid #b78950;
-  border-radius: 3px 12px 13px 3px;
+  padding: 8px 8px 7px 31px;
+  border: 1px solid #c49b60;
+  border-left: 5px solid #9a713e;
+  border-right: 3px double #896135;
+  border-radius: 3px 11px 12px 3px;
   background:
-    repeating-linear-gradient(0deg, transparent 0 4px, rgba(104,68,33,.04) 5px 6px),
-    linear-gradient(112deg, #e7c995, #bc9365 76%, #8b5736);
-  color: #432a19;
-  font: 700 11px/1.12 'DM Sans', sans-serif;
-  text-align: left;
-  box-shadow: inset 1px 1px rgba(255,247,217,.7), 0 4px 0 #60391f, 0 7px 12px rgba(0,0,0,.45);
+    repeating-linear-gradient(0deg, transparent 0 4px, rgba(100, 67, 33, .045) 5px 6px),
+    radial-gradient(ellipse at 90% 13%, rgba(255, 253, 219, .83), transparent 65%),
+    linear-gradient(105deg, #dbb981 0%, #f2ddad 28%, #d9b684 70%, #a87648 100%);
+  color: #472d1b;
+  font: 700 10px/1 'DM Sans', sans-serif;
+  box-shadow: inset 2px 0 rgba(255, 245, 215, .55), inset -2px 0 rgba(109, 70, 36, .28), 0 5px 0 #653c22, 0 7px 11px rgba(0, 0, 0, .38);
   transform-origin: left center;
-  transition: transform .2s ease, filter .2s ease, background .2s ease;
+  transition: transform .19s ease, filter .19s ease, box-shadow .19s ease;
 }
 .book-edge-tab::before {
+  /* Archival punched-paper seam on the hidden attachment root. */
   content: '';
   position: absolute;
-  top: 4px;
-  bottom: 4px;
-  left: 2px;
-  width: 2px;
-  border-left: 1px dashed rgba(93, 55, 25, .4);
+  top: 5px;
+  bottom: 5px;
+  left: 12px;
+  border-left: 1px dashed rgba(92, 55, 28, .43);
   pointer-events: none;
 }
-.book-edge-tab:hover, .book-edge-tab-open {
-  background: linear-gradient(110deg, #ffebbc, #e1b980 77%, #ac7645);
-  transform: translateX(5px);
-  filter: brightness(1.05);
+.book-edge-tab::after {
+  content: '';
+  position: absolute;
+  inset: 4px 5px 4px 24px;
+  border: 1px solid rgba(130, 84, 36, .21);
+  border-radius: 1px 6px 7px 1px;
+  pointer-events: none;
 }
-.book-edge-tab:focus-visible { outline: 3px solid #fff2cb; outline-offset: 4px; }
-.book-tab-number { align-self: flex-start; font-size: 8px; color: #785238; opacity: .77; }
-.book-edge-tab svg { flex: 0 0 auto; color: #654124; }
-.book-tab-label { min-width: 0; overflow-wrap: anywhere; }
-.book-tab-glyph { position: absolute; bottom: 4px; right: 6px; font: 13px Georgia, serif; color: rgba(86, 48, 18, .65); }
-.book-edge-tab-open { border-color: #fff0be; box-shadow: inset 1px 1px rgba(255,247,217,.8), 0 4px 0 #84572e, 0 0 0 2px rgba(255,232,165,.3), 0 8px 16px #100806; }
+.book-edge-tab:hover,
+.book-edge-tab-open {
+  background:
+    repeating-linear-gradient(0deg, transparent 0 4px, rgba(100, 67, 33, .03) 5px 6px),
+    linear-gradient(105deg, #f6dba1 0%, #fff1c8 48%, #d5a36b 100%);
+  transform: translateX(10px);
+  filter: brightness(1.055);
+}
+.book-edge-tab:focus-visible { outline: 3px solid #fff3cc; outline-offset: 4px; }
+.book-tab-number {
+  display: block;
+  font: 700 9px/1 Georgia, serif;
+  letter-spacing: .06em;
+  color: #83562f;
+  opacity: .9;
+}
+.book-edge-tab svg { display: none; }
+.book-tab-label {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  text-transform: uppercase;
+  white-space: nowrap;
+  font: 700 10px/1 'DM Sans', sans-serif;
+  letter-spacing: .12em;
+  text-shadow: 0 1px rgba(255, 248, 221, .56);
+}
+.book-tab-glyph {
+  display: block;
+  position: static;
+  margin-top: auto;
+  font: 14px/1 Georgia, serif;
+  color: #966532;
+  text-shadow: 0 1px rgba(255, 242, 203, .7);
+}
+.book-edge-tab-open {
+  border-color: #e5c183;
+  border-right-color: #fff0be;
+  box-shadow: inset 2px 0 rgba(255, 252, 227, .8), inset -2px 0 rgba(109, 70, 36, .24), 0 5px 0 #916438, 0 0 0 2px rgba(255, 227, 149, .32), 0 10px 18px rgba(14, 7, 3, .62);
+}
 
 /* Floating parchment drawer. Opening a tab never mounts a second site preview. */
 .book-edge-panel {
   position: absolute;
-  z-index: 25;
+  z-index: 29;
   top: 17px;
-  right: 184px;
-  width: min(390px, calc(100% - 220px));
+  right: 119px;
+  width: min(440px, calc(100% - 140px));
   max-height: min(76vh, 630px);
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -131,28 +186,87 @@
 .book-edge-empty {font-size:11px;color:#805e41;}
 .book-edge-panel button:focus-visible,.book-edge-panel select:focus-visible,.book-edge-panel input:focus-visible {outline:3px solid #654426;outline-offset:2px;}
 
+/* The paper index retains real tap targets, not cramped sideways labels, on small screens. */
 @media (min-width:901px) and (max-width:1160px) {
-  .reading-stage {padding-right:178px;padding-left:18px;}
-  .book-edge-panel {right:183px;width:min(350px,calc(100% - 205px));}
+  .reading-stage { padding-left: 13px; padding-right: 104px; }
+  .reader-focus-mode .reading-stage { padding-left: 13px; padding-right: 104px; }
+  .reading-stage .turn-right { right: 88px; }
+  .book-edge-index { right: 6px; }
+  .book-edge-panel { right: 111px; width: min(375px, calc(100% - 132px)); }
 }
 @media (max-width:900px) {
-  .reading-stage {display:flex;flex-direction:column;gap:14px;overflow:visible;}
-  .reading-stage .atlas-book, .reader-focus-mode .reading-stage .atlas-book {order:1;height:auto;max-height:none;}
-  .book-edge-index {order:2;position:relative;right:auto;top:auto;width:100%;display:flex;flex-direction:row;align-items:stretch;gap:7px;overflow-x:auto;overflow-y:visible;padding:9px 6px 13px;filter:none;scrollbar-width:thin;scrollbar-color:#bb9767 transparent;}
-  .book-edge-tab {--step:0px;flex:0 0 108px;min-height:49px;width:108px;margin-left:0;box-shadow:0 3px 0 #60391f,0 6px 10px rgba(0,0,0,.4);}
-  .book-edge-tab:hover,.book-edge-tab-open {transform:translateY(-3px);}
-  .book-edge-panel {order:3;position:relative;top:auto;right:auto;width:100%;max-height:460px;padding:15px;}
-  .reader-focus-mode .reading-stage {padding:4px 15px 22px;}
+  .reading-stage { display:flex; flex-direction:column; gap:14px; overflow:visible; }
+  .reading-stage .atlas-book, .reader-focus-mode .reading-stage .atlas-book {
+    order:1; height:auto; max-height:none;
+  }
+  .book-edge-index {
+    order:2;
+    position:relative;
+    right:auto; top:auto; bottom:auto;
+    width:100%;
+    display:flex;
+    flex-direction:row;
+    align-items:stretch;
+    justify-content:flex-start;
+    gap:7px;
+    overflow-x:auto;
+    overflow-y:hidden;
+    padding:9px 6px 13px;
+    filter:none;
+    scrollbar-width:thin;
+    scrollbar-color:#bb9767 transparent;
+  }
+  .book-edge-tab {
+    --step:0px;
+    flex:0 0 112px;
+    flex-direction:row;
+    justify-content:flex-start;
+    min-height:49px;
+    max-height:none;
+    width:112px;
+    margin-left:0;
+    padding:7px 8px;
+    gap:6px;
+    border-left-width:4px;
+    border-right-width:1px;
+    border-radius:4px 9px 9px 4px;
+    box-shadow:0 3px 0 #60391f,0 6px 10px rgba(0,0,0,.4);
+  }
+  .book-edge-tab::after { inset:4px; }
+  .book-edge-tab::before { left:2px; }
+  .book-edge-tab svg { display:block; flex:0 0 auto; width:14px; height:14px; }
+  .book-tab-number { font-size:8px; }
+  .book-tab-label {
+    flex:0 1 auto;
+    writing-mode:horizontal-tb;
+    text-orientation:mixed;
+    text-transform:none;
+    white-space:normal;
+    overflow-wrap:normal;
+    font:700 10px/1.1 'DM Sans',sans-serif;
+    letter-spacing:0;
+  }
+  .book-tab-glyph { display:none; }
+  .book-edge-tab:hover,.book-edge-tab-open { transform:translateY(-3px); }
+  .book-edge-panel {
+    order:3;
+    position:relative;
+    top:auto; right:auto;
+    width:100%;
+    max-height:460px;
+    padding:15px;
+  }
+  .reader-focus-mode .reading-stage { padding:4px 15px 22px; }
 }
 @media (max-width:680px) {
-  .reading-stage {gap:9px;}
-  .book-edge-index {padding:8px 2px 13px;}
-  .book-edge-tab {flex-basis:100px;width:100px;min-height:45px;font-size:10px;padding:7px 6px;}
-  .book-edge-panel-head h2 {font-size:25px;}
-  .book-edge-room-grid {grid-template-columns:1fr 1fr;}
-  .reader-focus-mode .reading-stage {padding:3px 12px 19px;}
+  .reading-stage { gap:9px; }
+  .book-edge-index { padding:8px 2px 13px; }
+  .book-edge-tab { flex-basis:105px; width:105px; min-height:46px; }
+  .book-edge-panel-head h2 { font-size:25px; }
+  .book-edge-room-grid { grid-template-columns:1fr 1fr; }
+  .reader-focus-mode .reading-stage { padding:3px 12px 19px; }
 }
 @media (prefers-reduced-motion:reduce) {
-  .book-edge-tab {transition:none;}
-  .book-edge-tab:hover,.book-edge-tab-open {transform:none;}
+  .book-edge-tab { transition:none; }
+  .book-edge-tab:hover,.book-edge-tab-open { transform:none; }
 }

@@ -1,20 +1,20 @@
 import React from 'react';
-import { ArrowRight, BookOpen, Check, GitBranch, Sparkles } from 'lucide-react';
+import { ArrowRight, BookOpen, Check, ExternalLink, GitBranch, Sparkles, FileCheck2 } from 'lucide-react';
 import { categoryPalette } from './curation.js';
 
 /**
  * A small optional constellation panel, not a second book or navigation modal.
  * Suggestions are computed from catalog metadata, not asserted integrations.
  */
-export default function FieldThreads({ active, threads, visitedIds = [], onFollow }) {
-  if (!active || !threads?.length) return null;
+export default function FieldThreads({ active, threads, documentedConnections = [], visitedIds = [], onFollow }) {
+  if (!active || (!threads?.length && !documentedConnections.length)) return null;
   const visited = new Set(visitedIds);
   return <details className="field-threads" key={active.id}>
     <summary className="field-threads-toggle">
       <span className="field-threads-toggle-glyph" aria-hidden="true">✧</span>
       <span className="field-threads-toggle-copy">
         <strong>THE FIELD CONSTELLATION</strong>
-        <small>{threads.length} neighboring chapters · Find the threads between worlds</small>
+        <small>{threads.length} suggested neighbors{documentedConnections.length ? ' · ' + documentedConnections.length + ' sourced connections' : ''}</small>
       </span>
       <span className="field-threads-action">Explore connections <ArrowRight size={15}/></span>
     </summary>
@@ -24,7 +24,7 @@ export default function FieldThreads({ active, threads, visitedIds = [], onFollo
         <h3>One world leads to another.</h3>
         <p>Explore related corners of the same library. These are suggested paths based on chapter labels and descriptions, not verified technical integrations.</p>
       </header>
-      <div className="field-threads-network" aria-label={'Chapter constellation around ' + active.title}>
+      {threads.length > 0 && <div className="field-threads-network" aria-label={'Chapter constellation around ' + active.title}>
         <div className="field-threads-center" aria-label={'Current chapter: ' + active.title}>
           <span className="field-threads-center-mark" aria-hidden="true">Φ</span>
           <span>CURRENT CHAPTER</span>
@@ -48,8 +48,28 @@ export default function FieldThreads({ active, threads, visitedIds = [], onFollo
             </button>;
           })}
         </div>
-      </div>
-      <p className="field-threads-note">The constellation is built entirely from chapters already available in this Atlas. Opening a suggested chapter uses the original reader and visitor passport.</p>
+      </div>}
+      {documentedConnections.length > 0 && <section className="field-threads-evidence" aria-label="Documented project connections">
+        <div className="field-threads-evidence-heading">
+          <span><FileCheck2 size={16}/> DOCUMENTED CONNECTIONS</span>
+          <p>These records cite commit-pinned public source documentation. Documented, not live-tested.</p>
+        </div>
+        <div className="field-threads-evidence-grid">
+          {documentedConnections.map(connection => <article className="field-threads-evidence-card" key={connection.id}>
+            <span className="field-threads-evidence-kind">{connection.label} · {connection.direction === 'outbound' ? 'From this chapter' : 'To this chapter'}</span>
+            <h4>{connection.page.title}</h4>
+            <p>{connection.summary}</p>
+            <small>{connection.scope}</small>
+            <div className="field-threads-evidence-actions">
+              <button type="button" onClick={() => onFollow(connection.page)}><BookOpen size={14}/> Read chapter</button>
+              <a href={connection.evidenceUrl} target="_blank" rel="noopener noreferrer">
+                <ExternalLink size={14}/> Evidence: public README
+              </a>
+            </div>
+          </article>)}
+        </div>
+      </section>}
+      <p className="field-threads-note">Connections and suggestions only reference chapters already available in this Atlas. Opening a chapter uses the original reader and visitor passport.</p>
     </div>
   </details>;
 }

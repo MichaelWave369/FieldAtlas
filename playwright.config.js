@@ -8,7 +8,9 @@ export default defineConfig({
   expect: { timeout: 10_000 },
   retries: process.env.CI ? 1 : 0,
   workers: process.env.CI ? 2 : undefined,
-  reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
+  reporter: process.env.CI
+    ? [['list'], ['html', { open: 'never' }], ['json', { outputFile: 'test-results/atlas-playwright.json' }]]
+    : [['list'], ['json', { outputFile: 'test-results/atlas-playwright.json' }]],
   use: {
     baseURL: 'http://127.0.0.1:4173',
     trace: 'retain-on-failure',

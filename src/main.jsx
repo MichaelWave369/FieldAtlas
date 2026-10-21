@@ -6,7 +6,7 @@ import {
   Search, Settings2, Sparkles, Sun, WandSparkles, X, RefreshCw,
   Globe2, Link2, Info, RotateCcw, Menu, Star, Keyboard, Map as MapIcon,
 } from 'lucide-react';
-import { seedPages, categories, wings, wingForCategory, safeUrl, uniqueMerge, newArrivals, shouldAutoDiscover, discoverGithubPages } from './catalog';
+import { categories, wings, wingForCategory } from './catalog';
 import { categoryPalette } from './curation';
 import { createCatalogAudit, isZenodoEntry } from './catalog-audit.js';
 import { publicationChapters, isPublicationChapter } from './publications.js';
@@ -23,13 +23,12 @@ import { activateModalFocus } from './modal-focus.js';
 import useAtlasCatalog from './hooks/useAtlasCatalog.js';
 import useAtlasPassport from './hooks/useAtlasPassport.js';
 import useAtlasManifest from './hooks/useAtlasManifest.js';
+import useAtlasCuration from './hooks/useAtlasCuration.js';
+import useAtlasDiscovery from './hooks/useAtlasDiscovery.js';
 import './style.css';
 import './book-edge.css';
 
-const STORE_KEY = 'field-atlas-pages-v1';
 const PREF_KEY = 'field-atlas-preferences-v1';
-const DISCOVERY_KEY = 'field-atlas-discovery-v2';
-const EDITS_KEY = 'field-atlas-curation-edits-v4';
 const specialRoman = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
 
 function readLocal(key, fallback) {
@@ -113,10 +112,13 @@ function PublicationLeaf({ page, fullscreen = false }) {
 }
 
 function App() {
-  const [pages, setPages] = useState(() => {
-    const loaded = readLocal(STORE_KEY, seedPages);
-    return Array.isArray(loaded) && loaded.length ? loaded.filter(p => p && p.id && safeUrl(p.url)) : seedPages;
-  });
+  const {
+    pages, setPages, localEdits,
+    editorPage, setEditorPage, editForm, setEditForm,
+    form, setForm, formError,
+    beginEdit: beginCurationEdit, saveEditedChapter,
+    addPage: addLocalPage, removePage: removeLocalPage, resetCatalog: resetLocalCatalog,
+  } = useAtlasCuration();
   const [prefs, setPrefs] = useState(() => readLocal(PREF_KEY, { night: false, favoriteIds: [], hintDismissed: false }));
   const [category, setCategory] = useState('All');
   const [wing, setWing] = useState('all');
@@ -124,20 +126,12 @@ function App() {
   const [directoryOpen, setDirectoryOpen] = useState(false);
   const [directorySearch, setDirectorySearch] = useState('');
   const [directoryWing, setDirectoryWing] = useState('all');
-  const [localEdits, setLocalEdits] = useState(() => readLocal(EDITS_KEY, {}));
-  const [editorPage, setEditorPage] = useState(null);
-  const [editForm, setEditForm] = useState({ title: '', desc: '', category: 'Other' });
   const [pendingChapterId, setPendingChapterId] = useState(null);
-  const [discovery, setDiscovery] = useState(() => {
-    const value = readLocal(DISCOVERY_KEY, {});
-    return {
-      candidates: Array.isArray(value.candidates) ? value.candidates.filter(p => p && p.id && safeUrl(p.url)) : [],
-      dismissedIds: Array.isArray(value.dismissedIds) ? value.dismissedIds : [],
-      lastCheckedAt: Number(value.lastCheckedAt) || 0,
-      autoEnabled: value.autoEnabled !== false,
-      hiddenIds: Array.isArray(value.hiddenIds) ? value.hiddenIds : [],
-    };
-  });
+  const catalogRef = useRef([]);
+  const {
+    discovery, setDiscovery, syncStatus, syncing, scanLibrary,
+    approveCandidate: admitCandidate, dismissCandidate,
+  } = useAtlasDiscovery({ catalogRef, setPages });
   const { publishedPages, manifestStatus } = useAtlasManifest({
     pages, setDiscovery, baseUrl: import.meta.env.BASE_URL,
   });
@@ -155,11 +149,7 @@ function App() {
   const [activeTour, setActiveTour] = useState(null);
   const [shareNotice, setShareNotice] = useState('');
   const [showHelp, setShowHelp] = useState(false);
-  const [form, setForm] = useState({ title: '', url: '', category: 'Other', desc: '' });
-  const [formError, setFormError] = useState('');
-  const [syncStatus, setSyncStatus] = useState('');
   const [auditNotice, setAuditNotice] = useState('');
-  const [syncing, setSyncing] = useState(false);
   const pendingTimers = useRef([]);
   const readerRef = useRef(null);
   const handledDeepLink = useRef(false);
@@ -170,6 +160,7 @@ function App() {
     pages, publishedPages, discovery, localEdits, category, search, favoriteIds,
     wing, directorySearch, directoryWing,
   });
+  catalogRef.current = catalog;
   const index = Math.min(Math.max(current, 0), Math.max(0, filtered.length - 1));
   const active = filtered[index];
   const visitedChapters = useAtlasPassport(active?.id);
@@ -192,11 +183,8 @@ function App() {
     });
   }, [activeModal]);
 
-  useEffect(() => { localStorage.setItem(STORE_KEY, JSON.stringify(pages)); }, [pages]);
   useEffect(() => { localStorage.setItem(PREF_KEY, JSON.stringify(prefs)); }, [prefs]);
-  useEffect(() => { localStorage.setItem(EDITS_KEY, JSON.stringify(localEdits)); }, [localEdits]);
   useEffect(() => { setShareNotice(''); }, [active?.id]);
-  useEffect(() => { localStorage.setItem(DISCOVERY_KEY, JSON.stringify(discovery)); }, [discovery]);
   useEffect(() => () => pendingTimers.current.forEach(clearTimeout), []);
   useEffect(() => { setCurrent(0); }, [category, search, wing]);
   const scrollToReader = useCallback(() => {
@@ -387,81 +375,22 @@ function App() {
   }
   function beginEdit(page) {
     setDirectoryOpen(false);
-    setEditorPage(page);
-    setEditForm({ title: page.title || '', desc: page.desc || '', category: page.category || 'Other' });
-  }
-  function saveEditedChapter(event) {
-    event.preventDefault();
-    if (!editorPage || !editForm.title.trim()) return;
-    const key = String(editorPage.repo || editorPage.id).toLowerCase();
-    setLocalEdits(prev => ({ ...prev, [key]: {
-      title: editForm.title.trim().slice(0, 80),
-      desc: editForm.desc.trim().slice(0, 300),
-      category: editForm.category,
-    } }));
-    setEditorPage(null);
+    beginCurationEdit(page);
   }
   function toggleFavorite(id) {
     setPrefs(p => ({ ...p, favoriteIds: (p.favoriteIds || []).includes(id) ? p.favoriteIds.filter(x => x !== id) : [...(p.favoriteIds || []), id] }));
   }
-  function addPage(e) {
-    e.preventDefault();
-    const url = safeUrl(form.url);
-    if (!url) { setFormError('Please use a valid https:// URL.'); return; }
-    if (!form.title.trim()) { setFormError('Every chapter needs a name.'); return; }
-    if (catalog.some(p => p.url.replace(/\/$/, '').toLowerCase() === url.replace(/\/$/, '').toLowerCase())) {
-      setFormError('That doorway is already in the book.'); return;
-    }
-    const item = {
-      id: `custom-${Date.now()}`, repo: '', title: form.title.trim().slice(0, 80),
-      kicker: 'A NEW CHAPTER', category: form.category,
-      url, desc: form.desc.trim().slice(0, 300) || 'Another little universe in the Field.',
-      pullquote: 'Every great story has another page.', accent: '#e6c893', index: '✦',
-    };
-    setPages(old => [...old, item]);
+  function addPage(event) {
+    if (!addLocalPage(event, catalog)) return;
     setCategory('All'); setWing('all'); setSearch(''); setCurrent(catalog.length);
-    setForm({ title: '', url: '', category: 'Other', desc: '' });
-    setFormError(''); setShelfOpen(false);
-  }
-  async function scanLibrary(background = false) {
-    setSyncing(true);
-    if (!background) setSyncStatus('Checking public GitHub Pages for new arrivals…');
-    try {
-      const discovered = await discoverGithubPages();
-      const candidates = newArrivals(discovered, catalog, discovery.dismissedIds);
-      setDiscovery(prev => ({
-        ...prev,
-        candidates: newArrivals(discovered, catalog, prev.dismissedIds),
-        lastCheckedAt: Date.now(),
-      }));
-      setSyncStatus('Found ' + discovered.length + ' Pages-enabled public repositories; ' + candidates.length + ' await approval. GitHub Pages status does not guarantee a working live site.');
-    } catch (e) {
-      setSyncStatus(e?.message || 'Could not reach GitHub right now.');
-    } finally {
-      setSyncing(false);
-    }
+    setShelfOpen(false);
   }
   function approveCandidate(id) {
-    const selected = discovery.candidates.find(p => p.id === id);
-    if (!selected) return;
-    setPages(old => uniqueMerge(old, [selected]));
-    setDiscovery(prev => ({ ...prev, candidates: prev.candidates.filter(p => p.id !== id) }));
+    if (!admitCandidate(id)) return;
     setCategory('All'); setWing('all'); setSearch('');
   }
-  function dismissCandidate(id) {
-    setDiscovery(prev => ({
-      ...prev,
-      dismissedIds: [...new Set([...prev.dismissedIds, id])],
-      candidates: prev.candidates.filter(p => p.id !== id),
-    }));
-  }
-  useEffect(() => {
-    if (discovery.autoEnabled && shouldAutoDiscover(discovery.lastCheckedAt)) void scanLibrary(true);
-    // One read-only scan at most daily, when this browser opens the site.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
   function removePage(id) {
-    setPages(old => old.filter(x => x.id !== id));
+    removeLocalPage(id);
     if (publishedPages.some(p => p.id === id) || publicationChapters.some(p => p.id === id)) {
       setDiscovery(prev => ({ ...prev, hiddenIds: [...new Set([...prev.hiddenIds, id])] }));
     }
@@ -469,7 +398,9 @@ function App() {
   }
   function resetCatalog() {
     if (!window.confirm('Restore the original ten curated chapters? Custom chapters and edits will be removed from this browser.')) return;
-    setPages(seedPages); setDiscovery(prev => ({...prev, hiddenIds: []})); setLocalEdits({}); setActiveTour(null); setCategory('All'); setWing('all'); setSearch(''); setCurrent(0);
+    resetLocalCatalog();
+    setDiscovery(prev => ({ ...prev, hiddenIds: [] }));
+    setActiveTour(null); setCategory('All'); setWing('all'); setSearch(''); setCurrent(0);
   }
 
   const fav = active && favoriteIds.includes(active.id);

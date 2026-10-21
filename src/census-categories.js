@@ -1,8 +1,9 @@
 /**
- * Editorial shelf proposals from the 2026-10-17 browser export (105 chapters).
+ * Editorial shelf proposals from the 2026-10-17 browser export (105 chapters),
+ * plus an October 20 public-repository README review of new games and tools.
  * Changes are explicitly identified by repository, never inferred from arbitrary URLs.
  * The six original library rooms remain unchanged. Browser-local edits override these.
- * See docs/CATALOG_CENSUS_2026-10-17.md for census caveats and review notes.
+ * See docs/CATALOG_CENSUS_2026-10-17.md and docs/CATEGORY_REVIEW_2026-10-20.md.
  */
 export const censusCategoryOverrides = Object.freeze({
   'axiomforge-ledger': 'Tools',
@@ -55,6 +56,36 @@ export const censusCategoryOverrides = Object.freeze({
   'pain-joy-continuum': 'People & Practice',
   'personamirror369': 'People & Practice',
   'parallax-369-public-primer': 'Learning',
+  // Oct 20 additions: playable collections and game runtimes, not generic app guesses.
+  'commontable': 'Games',
+  'puzzlepen': 'Games',
+  'codedex': 'Games',
+  'phicade': 'Games',
+  'proofarcade': 'Games',
+  'nightcircuit': 'Games',
+  'oakstreetrumble': 'Games',
+
+  // Creative applications: coloring, animation and printable artwork.
+  'huehatch': 'Creative',
+  'framefieldstudio': 'Creative',
+  'rastaphi': 'Creative',
+
+  // Engineering tools, including a Fallout mod-making studio, not a playable Fallout game.
+  'wastelandworkshopstudio': 'Tools',
+  'reelcommons': 'Tools',
+  'pockerec': 'Tools',
+  'loopcatch': 'Tools',
+  'repoready': 'Tools',
+  'fieldshield': 'Tools',
+
+  // Research / education and system infrastructure.
+  'mriphi': 'Research',
+  'regenerationatlas': 'Research',
+  'aquaphi': 'Research',
+  'gitporch': 'Systems',
+  'tmc': 'Systems',
+  'fieldcloudworker': 'Systems',
+  'lau': 'Learning',
 });
 
 export function censusCategoryForRepo(repo) {

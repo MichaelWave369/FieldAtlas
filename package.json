@@ -14,7 +14,8 @@
     "release:status": "node scripts/release-readiness.mjs --check",
     "release:gate": "node scripts/release-readiness.mjs --gate",
     "live:verify": "node scripts/live-site-audit.mjs",
-    "test:live": "playwright test --config playwright.live.config.js"
+    "test:live": "playwright test --config playwright.live.config.js",
+    "acceptance:packet": "node scripts/acceptance-packet.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",

@@ -827,3 +827,16 @@ a { color:inherit; }
 .field-threads-evidence-actions button:focus-visible,.field-threads-evidence-actions a:focus-visible{outline:3px solid #b8ffe7;outline-offset:2px;}
 @media(max-width:760px){.field-threads-evidence-grid{grid-template-columns:1fr;}}
 @media(max-width:620px){.field-threads-evidence{padding:12px 10px;}.field-threads-evidence-card{padding:11px;}.field-threads-evidence-heading p{font-size:10px;}}
+
+/* R5A: Visitor passport transfer lives in the local-only desk. */
+.visitor-passport-transfer{margin:0 13px 12px;padding:12px 14px;border:1px solid rgba(235,190,129,.32);border-radius:9px;background:linear-gradient(110deg,rgba(44,33,35,.9),rgba(68,45,35,.8));display:flex;flex-wrap:wrap;align-items:center;gap:12px;color:#f5dcbb;}
+.visitor-passport-transfer-copy{flex:1 1 260px;display:flex;flex-direction:column;gap:5px;}
+.visitor-passport-transfer-copy strong{font:700 11px 'DM Sans',sans-serif;letter-spacing:.07em;color:#ffe4b5;}
+.visitor-passport-transfer-copy span{font:400 10px/1.5 'DM Sans',sans-serif;color:#dac1a7;}
+.visitor-passport-transfer-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.visitor-passport-transfer-actions button{display:inline-flex;align-items:center;gap:7px;justify-content:center;min-height:36px;padding:7px 11px;background:rgba(101,68,45,.76);color:#ffe3c4;border:1px solid rgba(238,199,145,.56);border-radius:8px;font:700 11px 'DM Sans',sans-serif;cursor:pointer;}
+.visitor-passport-transfer-actions button:hover{background:#86603a;}
+.visitor-passport-transfer-actions button:focus-visible{outline:3px solid #ffdfae;outline-offset:3px;}
+.visitor-passport-import-file{display:none;}
+.visitor-passport-transfer-status{flex:1 0 100%;margin:0;font:500 11px/1.4 'DM Sans',sans-serif;color:#e5f4c7;}
+@media(max-width:630px){.visitor-passport-transfer{margin:0 8px 10px;padding:11px;}.visitor-passport-transfer-actions{width:100%;}.visitor-passport-transfer-actions button{flex:1;min-width:122px;}}

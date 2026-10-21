@@ -4,7 +4,7 @@ import { CURRENT_PUBLISHED_ORIGIN } from './scripts/launch-preflight.mjs';
 /** Production is read-only: no webServer, no local builds, no DNS changes. */
 export default defineConfig({
   testDir: './e2e',
-  testMatch: '**/live-site.spec.js',
+  testMatch: ['**/live-site.spec.js', '**/live-portals.spec.js'],
   timeout: 35_000,
   expect: { timeout: 15_000 },
   retries: 2,

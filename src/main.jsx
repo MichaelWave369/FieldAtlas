@@ -57,7 +57,7 @@ function BookCover({ page, onOpen, compact = false }) {
   const palette = categoryPalette[page.category] || categoryPalette.Other;
   return <button type="button" className={`atlas-cover ${compact ? 'atlas-cover-compact' : ''}`}
     style={{ '--cover-accent': page.accent || palette.color }}
-    onClick={onOpen} title={'Open ' + page.title} aria-label={'Open chapter: ' + page.title}>
+    onClick={onOpen} title={'Open ' + page.title}>
     <span className="cover-inner-frame" aria-hidden="true" />
     <span className="cover-crest" aria-hidden="true">{page.coverGlyph || palette.glyph}</span>
     <span className="cover-title">{page.title}</span>
@@ -509,7 +509,7 @@ function App() {
         </button>
         {discovery.candidates.length > 0 && <button className="arrival-alert" type="button" onClick={() => setShelfOpen(true)} aria-label={discovery.candidates.length + ' arrivals awaiting review'}><Sparkles size={15}/> {discovery.candidates.length} arrivals</button>}
         <a className="soft-btn" href={FUTURE_ARCHIVE_URL} target="_blank" rel="noopener noreferrer" aria-label="Visit the Future Archive poster gallery"><Sparkles size={17}/> <span>Future Archive</span></a>
-        <button className="soft-btn" type="button" onClick={() => setShelfOpen(true)}><LibraryBig size={17}/> <span>Curate the book</span></button>
+        <button className="soft-btn" type="button" aria-label="Curate the book" onClick={() => setShelfOpen(true)}><LibraryBig size={17}/> <span>Curate the book</span></button>
       </div>
     </header>
 

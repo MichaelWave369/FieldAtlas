@@ -5,7 +5,7 @@ import { censusCategoryOverrides, censusCategoryForRepo } from '../src/census-ca
 import { curateProject, applyLocalEdits } from '../src/curation.js';
 
 test('105-chapter census candidates are explicit and stable', () => {
-  assert.equal(Object.keys(censusCategoryOverrides).length, 50);
+  assert.equal(Object.keys(censusCategoryOverrides).length, 73);
   assert.equal(censusCategoryForRepo('  CHIPpydip  '), 'Music');
   assert.equal(censusCategoryForRepo('unknown-repo'), null);
   assert.equal(censusCategoryForRepo(null), null);
@@ -58,4 +58,56 @@ test('underdescribed chapters are left for manual investigation', () => {
   }
   assert.equal(censusCategoryForRepo('FieldAtlas'),null);
   assert.equal(curateProject(seedPages.find(x=>x.repo==='SuperPhiVessel')).category,'Intelligence');
+});
+
+test('newly reviewed playable games enter the Game Room without any new wing', () => {
+  for (const repo of [
+    'CommonTable', 'PuzzlePen', 'Codedex',
+    'PhiCade', 'ProofArcade', 'NightCircuit', 'OakStreetRumble',
+    'MythSplicer', 'PorchQuest369', 'parallax-gran-prix',
+  ]) {
+    const page = curateProject({
+      id: 'gh-example', repo, title: repo, category: 'Other',
+      url: 'https://michaelwave369.github.io/' + repo + '/',
+      desc: 'Public repository metadata',
+    });
+    assert.equal(page.category, 'Games', repo);
+    assert.equal(wingForCategory(page.category), 'games', repo);
+  }
+});
+
+test('creative studios, engineering tools and scientific atlases are not mislabeled as games', () => {
+  const group = {
+    Creative: ['HueHatch', 'FramefieldStudio', 'RastaPhi'],
+    Tools: ['WastelandWorkshopStudio', 'ReelCommons', 'PockeRec', 'LoopCatch', 'RepoReady', 'FieldShield'],
+    Research: ['MRIPHI', 'RegenerationAtlas', 'AquaPhi'],
+    Systems: ['GitPorch', 'TMC', 'FieldCloudWorker'],
+    Learning: ['LAU'],
+    Music: ['ChippyDip'],
+  };
+  for (const [category, repos] of Object.entries(group)) {
+    for (const repo of repos) {
+      const page = curateProject({
+        id: 'gh-example', repo, title: repo, category: 'Other',
+        url: 'https://example.org/', desc: 'Original repository',
+      });
+      assert.equal(page.category, category, repo);
+    }
+  }
+});
+
+test('the new explicit classifications do not override personal choices or catalog identity', () => {
+  const project = curateProject({
+    id: 'gh-314', repo: 'CommonTable', title: 'The Common Table',
+    category: 'Other', url: 'https://example.org/commontable',
+    desc: 'Original two-player game',
+  });
+  assert.equal(project.category, 'Games');
+  const personalized = applyLocalEdits(project, {
+    commontable: { category: 'Creative', title: 'Our Table' },
+  });
+  assert.equal(personalized.category, 'Creative');
+  assert.equal(personalized.title, 'Our Table');
+  assert.equal(personalized.id, 'gh-314');
+  assert.equal(personalized.url, 'https://example.org/commontable');
 });

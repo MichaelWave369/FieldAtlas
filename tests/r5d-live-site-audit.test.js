@@ -46,6 +46,8 @@ test('deployment checks run AFTER successful Pages deployment and upload receipt
   assert.ok(workflow.includes('npm run live:verify'));
   assert.ok(workflow.includes('npm run test:live'));
   assert.ok(workflow.includes('live-http-evidence.json'));
+  assert.ok(workflow.includes('Verify actual public GitHub Pages deployment'));
+  assert.ok(workflow.includes('Retain read-only post-deploy evidence and traces'));
   assert.ok(config.includes('public-desktop'));
   assert.ok(config.includes('public-mobile'));
 });

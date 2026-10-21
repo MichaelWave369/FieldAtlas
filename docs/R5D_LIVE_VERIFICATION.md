@@ -9,8 +9,10 @@ alter canonical URLs or change visitor data.
 1. `npm run live:verify` makes read-only HTTP requests against
    `https://michaelwave369.github.io/FieldAtlas/`. It checks the live
    homepage response and metadata, published JS/CSS bundles, social image,
-   robots and sitemap. It rejects unexpected redirects outside the currently
-   approved GitHub Pages origin and writes a timestamped JSON receipt.
+   robots and sitemap, plus `release-info.json`, which **must match the exact
+   Git commit SHA of the workflow**. It rejects stale/cached deployments and
+   unexpected redirects outside the currently approved GitHub Pages origin;
+   the result is a timestamped JSON receipt.
 2. `npm run test:live` runs **six Chromium journeys** in desktop and
    mobile emulation against that same public URL, verifying that the
    original book loads, directory chapter navigation works, and an existing
@@ -40,3 +42,17 @@ not assume GitHub has undone the deployment.
 Manual browser/physical-device tests and all twelve release-ledger
 signatures remain required before the controlled
 `enterthefield.org` migration.
+
+## Exact-build identity and rollback clarity
+
+`npm run build` writes `dist/release-info.json` with the GitHub Actions
+source SHA and build date. It explicitly labels itself
+`NOT_MANUALLY_APPROVED`. The post-deploy workflow refuses to certify an
+older cached deployment because its identity differs from `GITHUB_SHA`.
+
+To rerun the audit from a local checkout:
+```sh
+FIELD_ATLAS_EXPECTED_SHA=<40-character-exact-main-commit> npm run live:verify
+```
+
+A passing deployment job does not change the twelve human-led approval gates.

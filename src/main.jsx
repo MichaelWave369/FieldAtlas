@@ -18,6 +18,7 @@ import { visitorJourneys, findJourney, availableJourneyStops, readAtlasLink, bui
 import { wrapChapterIndex, canTurnChapters, wrapDestinationLabel } from './navigation';
 import { futureArchivePrintUrl, FUTURE_ARCHIVE_URL } from './future-archive';
 import BookForeEdge from './BookForeEdge';
+import DirectoryPeek from './DirectoryPeek';
 import { PREVIEW_SANDBOX } from './preview-policy.js';
 import { activateModalFocus } from './modal-focus.js';
 import useAtlasCatalog from './hooks/useAtlasCatalog.js';
@@ -128,6 +129,7 @@ function App() {
   const [directorySearch, setDirectorySearch] = useState('');
   const [directoryWing, setDirectoryWing] = useState('all');
   const [directoryCollection, setDirectoryCollection] = useState('all');
+  const [directoryPreview, setDirectoryPreview] = useState(null);
   const [pendingChapterId, setPendingChapterId] = useState(null);
   const catalogRef = useRef([]);
   const {
@@ -172,6 +174,7 @@ function App() {
   const visibleDirectoryResults = useMemo(() => selectDirectoryCollection(directoryResults, {
     collection: directoryCollection, visitedIds: visitedChapters, favoriteIds,
   }), [directoryResults, directoryCollection, visitedChapters, favoriteIds]);
+  useEffect(() => { setDirectoryPreview(null); }, [directorySearch, directoryWing, directoryCollection]);
   const journey = activeTour ? findJourney(activeTour.id) : null;
   const journeyStops = useMemo(() => availableJourneyStops(journey, catalog), [journey, catalog]);
   const tourStep = Math.min(activeTour?.step ?? 0, Math.max(0, journeyStops.length - 1));
@@ -193,7 +196,10 @@ function App() {
 
   // Opening the directory starts in the full collection. Filter changes never
   // alter the chapter displayed by the book until a chapter is explicitly opened.
-  useEffect(() => { if (directoryOpen) setDirectoryCollection('all'); }, [directoryOpen]);
+  useEffect(() => {
+    if (directoryOpen) setDirectoryCollection('all');
+    setDirectoryPreview(null);
+  }, [directoryOpen]);
   useEffect(() => { localStorage.setItem(PREF_KEY, JSON.stringify(prefs)); }, [prefs]);
   useEffect(() => { setShareNotice(''); }, [active?.id]);
   useEffect(() => () => pendingTimers.current.forEach(clearTimeout), []);
@@ -530,7 +536,7 @@ function App() {
                       onSurface={() => setMirrorDepth(d => nextMirrorDepth(d, -1))} />
                   : publication
                     ? <PublicationLeaf page={active}/>
-                    : <iframe key={active.id + active.url} title={`Live website: ${active.title}`} loading="lazy" src={active.url} referrerPolicy="strict-origin-when-cross-origin" sandbox={PREVIEW_SANDBOX} allow="fullscreen" allowFullScreen />}
+                    : !directoryOpen && <iframe key={active.id + active.url} title={`Live website: ${active.title}`} loading="lazy" src={active.url} referrerPolicy="strict-origin-when-cross-origin" sandbox={PREVIEW_SANDBOX} allow="fullscreen" allowFullScreen />}
               </div>
               <div className="preview-footnote"><span className="live-dot" /> {fieldception ? 'SAFE MIRROR CHAMBER' : publication ? 'CURATED ARCHIVE REFERENCE' : 'LIVE WEBSITE PREVIEW'} <span className="preview-hint">{fieldception ? 'Five illustrated reflections, zero recursive iframes.' : publication ? 'Zenodo is authoritative. No remote PDF is embedded.' : 'Some sites block embedding. Open the portal instead.'}</span></div>
             </div>
@@ -678,7 +684,7 @@ function App() {
           <span className="directory-collections-hint">Tip: Ctrl / ⌘ + K to find a chapter</span>
         </div>
         <div className="directory-results" key={directoryCollection + directoryWing + directorySearch}>
-          {visibleDirectoryResults.map(p => <article key={p.id} className="directory-entry">
+          {visibleDirectoryResults.map(p => <article key={p.id} className={`directory-entry ${directoryPreview?.id === p.id ? 'directory-entry-peeking' : ''}`}>
             <BookCover page={p} onOpen={() => openChapterFromDirectory(p)} compact />
             <div className="directory-entry-copy"><h3>{p.title}</h3><span>{p.category} · {p.repo || 'Personal chapter'}</span>
               {(visitedChapters.includes(p.id) || favoriteIds.includes(p.id)) && <div className="directory-chapter-status">
@@ -686,10 +692,23 @@ function App() {
                 {favoriteIds.includes(p.id) && <span><Bookmark size={12}/> Bookmarked</span>}
               </div>}
               <p>{p.desc || 'An open door to another project.'}</p>
-              <div className="directory-entry-actions"><button type="button" onClick={() => openChapterFromDirectory(p)}><BookOpen size={14}/> Read chapter</button>
+              <div className="directory-entry-actions">
+              <button type="button" aria-expanded={directoryPreview?.id === p.id}
+                aria-controls={directoryPreview?.id === p.id ? `directory-peek-${p.id}` : undefined}
+                onClick={() => setDirectoryPreview(previous => previous?.id === p.id ? null : { id: p.id, live: false })}>
+                <Eye size={14}/> {directoryPreview?.id === p.id ? 'Close preview' : 'Peek inside'}
+              </button>
+              <button type="button" onClick={() => openChapterFromDirectory(p)}><BookOpen size={14}/> Read chapter</button>
               <button type="button" onClick={() => beginEdit(p)}><Settings2 size={14}/> Edit label</button>
               <a href={p.url} target="_blank" rel="noopener noreferrer"><ExternalLink size={14}/> Visit site</a></div>
             </div>
+            {directoryPreview?.id === p.id && <div className="directory-peek-slot" id={`directory-peek-${p.id}`}>
+              <DirectoryPeek page={p} live={directoryPreview.live}
+                onToggleLive={() => setDirectoryPreview(previous =>
+                  previous?.id === p.id ? { ...previous, live: !previous.live } : previous)}
+                onRead={() => openChapterFromDirectory(p)}
+                onClose={() => setDirectoryPreview(null)} />
+            </div>}
           </article>)}
           {!visibleDirectoryResults.length && <div className="directory-empty" role="status">
             {directoryCollection === 'visited' ? 'No explored chapters match this search. Open a book to add it to your visitor passport.' :

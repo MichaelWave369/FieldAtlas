@@ -51,7 +51,8 @@ test('bad or forged record objects do not activate publication display', () => {
 });
 test('rendering and library wiring avoid recursive publication iframes', () => {
   const main=readFileSync(new URL('../src/main.jsx',import.meta.url),'utf8');
-  assert.match(main,/publicationChapters\.filter\(p => !discovery\.hiddenIds\.includes\(p\.id\)\)/);
+  const catalogSource=readFileSync(new URL('../src/atlas-catalog.js',import.meta.url),'utf8');
+  assert.ok(catalogSource.includes('publicationChapters.filter(page => !hidden.has(page.id))'));
   assert.match(main,/publishedPages\.some\(p => p\.id === id\) \|\| publicationChapters\.some\(p => p\.id === id\)/);
   assert.match(main,/<PublicationLeaf page=\{active\}\/>/);
   assert.match(main,/<PublicationLeaf page=\{active\} fullscreen\/>/);

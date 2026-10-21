@@ -26,3 +26,19 @@ jobs:
       - run: npm run build
       - name: Static Grand Opening preflight (not manual acceptance)
         run: npm run launch:preflight
+      - name: Report manual release gate (pending is not a failure of PR checks)
+        run: npm run release:status
+      - name: Install Chromium for browser acceptance tests
+        run: npx playwright install --with-deps chromium
+      - name: Test desktop and mobile-emulated browser journeys
+        run: npm run test:e2e
+      - name: Upload browser traces on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: field-atlas-browser-qa
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 7

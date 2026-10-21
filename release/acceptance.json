@@ -1,0 +1,84 @@
+{
+  "schema": "field-atlas-manual-release-acceptance-v1",
+  "candidate": "R5B",
+  "canonicalOrigin": "https://michaelwave369.github.io/FieldAtlas/",
+  "proposedFutureOrigin": "https://enterthefield.org/",
+  "disposition": "NOT_APPROVED",
+  "reviewedCommit": "",
+  "reviewer": "",
+  "signedAt": "",
+  "checks": [
+    {
+      "id": "desktop-chromium",
+      "status": "PENDING",
+      "evidence": "",
+      "note": "Desktop wide/narrow, book tabs and interactive previews"
+    },
+    {
+      "id": "mobile-touch",
+      "status": "PENDING",
+      "evidence": "",
+      "note": "Physical phone touch, portrait and landscape, no clipping"
+    },
+    {
+      "id": "keyboard-focus",
+      "status": "PENDING",
+      "evidence": "",
+      "note": "Tab/Escape focus traps, Find a chapter and modal return"
+    },
+    {
+      "id": "screen-reader",
+      "status": "PENDING",
+      "evidence": "",
+      "note": "NVDA/VoiceOver navigation, dialog labeling and results"
+    },
+    {
+      "id": "reduced-motion",
+      "status": "PENDING",
+      "evidence": "",
+      "note": "Operating system reduced-motion transitions and scrolling"
+    },
+    {
+      "id": "project-embedding",
+      "status": "PENDING",
+      "evidence": "",
+      "note": "Live games, creative editors, iframe restrictions and direct links"
+    },
+    {
+      "id": "live-catalog",
+      "status": "PENDING",
+      "evidence": "",
+      "note": "Latest Pages inventory and three+ representative active project links"
+    },
+    {
+      "id": "passport-transfer",
+      "status": "PENDING",
+      "evidence": "",
+      "note": "Export/import on fresh and saved profiles, invalid file rejection"
+    },
+    {
+      "id": "share-seo",
+      "status": "PENDING",
+      "evidence": "",
+      "note": "Social card, homepage canonical, link sharing/deep links"
+    },
+    {
+      "id": "performance",
+      "status": "PENDING",
+      "evidence": "",
+      "note": "Long directory, memory/network, responsive viewport"
+    },
+    {
+      "id": "domain-control",
+      "status": "PENDING",
+      "evidence": "",
+      "note": "Registrar access, authoritative DNS records, rollback snapshot"
+    },
+    {
+      "id": "domain-rollout-plan",
+      "status": "PENDING",
+      "evidence": "",
+      "note": "HTTPS validation, apex/www, old Pages deep-link continuity and rollback"
+    }
+  ]
+}

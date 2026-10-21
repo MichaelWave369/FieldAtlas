@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import {
   ArrowLeft, ArrowRight, BookOpen, Bookmark, Check, ChevronLeft, ChevronRight,
   ExternalLink, Heart, LampDesk, LibraryBig, Maximize2, Moon, Plus,
-  Search, Settings2, Sparkles, Sun, WandSparkles, X, RefreshCw,
+  Search, Settings2, Sparkles, Sun, WandSparkles, X, RefreshCw, Eye,
   Globe2, Link2, Info, RotateCcw, Menu, Star, Keyboard, Map as MapIcon,
 } from 'lucide-react';
 import { categories, wings, wingForCategory } from './catalog';

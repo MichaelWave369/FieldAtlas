@@ -42,3 +42,35 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+
+  verify-live:
+    name: Verify actual public GitHub Pages deployment
+    needs: deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - name: Confirm HTTP resources and exact deployed commit
+        run: npm run live:verify -- --output=live-http-evidence.json
+      - name: Install Chromium for post-deploy visitor checks
+        if: success()
+        run: npx playwright install --with-deps chromium
+      - name: Test the actual public book in desktop and mobile emulation
+        if: success()
+        run: npm run test:live
+      - name: Retain read-only post-deploy evidence and traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: field-atlas-live-deployment-evidence
+          path: |
+            live-http-evidence.json
+            playwright-report/
+            test-results/
+          retention-days: 14
+          if-no-files-found: ignore

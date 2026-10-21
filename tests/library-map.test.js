@@ -68,7 +68,10 @@ test('map is a dialog with native buttons and Escape/Tab handling', () => {
 
 test('UI provides an easy map launcher while preserving the reader and focus mode', () => {
   const jsx=readFileSync('src/main.jsx','utf8');
-  assert.match(jsx,/onClick=\{\(\) => setMapOpen\(true\)\}/);
+  const edge=readFileSync('src/BookForeEdge.jsx','utf8');
+  assert.ok(jsx.includes('onOpenMap={() => setMapOpen(true)}'));
+  assert.ok(edge.includes("if (id === 'map')"));
+  assert.ok(edge.includes('onOpenMap()'));
   assert.match(jsx,/<LibraryMap wings=\{wings\} catalog=\{catalog\}/);
   assert.match(jsx,/setPendingChapterId\(page.id\)/);
   assert.match(jsx,/setWing\(getMapChapterWing\(page\)\)/);

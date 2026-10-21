@@ -57,7 +57,9 @@ test('visitor UI has deep-link hydration, readable passport and explicit share f
   const jsx=readFileSync('src/main.jsx','utf8');
   assert.match(jsx,/readAtlasLink\(window\.location\.search\)/);
   assert.match(jsx,/availableJourneyStops\(link\.tour, catalog\)/);
-  assert.match(jsx,/PASSPORT_KEY/);
+  const passport = readFileSync('src/hooks/useAtlasPassport.js','utf8');
+  assert.match(passport,/PASSPORT_KEY/);
+  assert.match(jsx,/useAtlasPassport\(active\?\.id\)/);
   assert.match(jsx,/VISITOR'S DESK/);
   assert.match(jsx,/Share chapter/);
   assert.match(jsx,/Clipboard unavailable/);

@@ -2,6 +2,7 @@ import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { CURRENT_PUBLISHED_ORIGIN } from './launch-preflight.mjs';
+import { COMMIT_PATTERN, RELEASE_STAMP_SCHEMA } from './release-stamp.mjs';
 
 /**
  * Read-only production HTTP checks. Never updates the deployed site, registrar,
@@ -32,6 +33,19 @@ export function inspectLiveTextResources({ robots = '', sitemap = '', origin = C
   ];
 }
 
+export function inspectBuildIdentity(stamp, expectedSha) {
+  const expected = COMMIT_PATTERN.test(expectedSha || '') ? expectedSha.toLowerCase() : '';
+  const matched=Boolean(expected &&
+    stamp?.schema===RELEASE_STAMP_SCHEMA &&
+    stamp?.releaseStatus==='NOT_MANUALLY_APPROVED' &&
+    stamp?.commit===expected);
+  return {
+    id:'exact-deployed-commit', pass:matched,
+    detail:matched ? 'Production serves expected Git commit '+expected :
+      'Production does not prove this exact Git commit is deployed (or expected SHA missing)',
+  };
+}
+
 export async function fetchResource(url, fetchFn = fetch) {
   const response = await fetchFn(url, {
     redirect: 'follow',
@@ -46,7 +60,7 @@ export async function fetchResource(url, fetchFn = fetch) {
   return response;
 }
 
-export async function auditLiveSite(fetchFn = fetch) {
+export async function auditLiveSite(fetchFn = fetch, expectedSha = process.env.FIELD_ATLAS_EXPECTED_SHA || process.env.GITHUB_SHA) {
   const checkedAt = new Date().toISOString();
   const checks = [];
   const add = (id, pass, detail) => checks.push({ id, pass: Boolean(pass), detail });
@@ -83,6 +97,13 @@ export async function auditLiveSite(fetchFn = fetch) {
     }
   }
   checks.push(...inspectLiveTextResources({ robots, sitemap }));
+  try {
+    const response=await fetchResource(new URL('release-info.json', CURRENT_PUBLISHED_ORIGIN), fetchFn);
+    const stamp=await response.json();
+    checks.push(inspectBuildIdentity(stamp,expectedSha));
+  } catch(error) {
+    add('exact-deployed-commit',false,'Unable to read deployed build identity: '+String(error?.message||error));
+  }
   for (const asset of assets) {
     try {
       const url = new URL(asset, CURRENT_PUBLISHED_ORIGIN);

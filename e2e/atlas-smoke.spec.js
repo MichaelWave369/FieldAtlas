@@ -28,9 +28,9 @@ test('book opens, directory searches, preview opts in only on demand', async ({ 
   await expect(page.locator('article.story-page h2')).toHaveText('Domistika');
 });
 
-test('quick-find keyboard and collection toggles preserve catalog access', async ({ page, isMobile }) => {
+test('quick-find keyboard and collection toggles preserve catalog access', async ({ page }) => {
   await page.goto('/');
-  if (isMobile) {
+  if (test.info().project.name === 'mobile-chromium') {
     await page.getByRole('button', { name: /Find a chapter/i }).click();
   } else {
     await page.keyboard.press('Control+k');

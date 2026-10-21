@@ -21,6 +21,7 @@ import BookForeEdge from './BookForeEdge';
 import DirectoryPeek from './DirectoryPeek';
 import FieldThreads from './FieldThreads';
 import { findFieldThreads } from './field-threads.js';
+import { resolveDocumentedConnections } from './provenance-connections.js';
 import { PREVIEW_SANDBOX } from './preview-policy.js';
 import { activateModalFocus } from './modal-focus.js';
 import useAtlasCatalog from './hooks/useAtlasCatalog.js';
@@ -170,6 +171,7 @@ function App() {
   const index = Math.min(Math.max(current, 0), Math.max(0, filtered.length - 1));
   const active = filtered[index];
   const relatedThreads = useMemo(() => findFieldThreads(active, catalog, 5), [active, catalog]);
+  const documentedConnections = useMemo(() => resolveDocumentedConnections(active, catalog), [active, catalog]);
   const visitedChapters = useAtlasPassport(active?.id);
   const directoryCounts = useMemo(() => directoryCollectionCounts(catalog, {
     wing: directoryWing, visitedIds: visitedChapters, favoriteIds,
@@ -577,6 +579,7 @@ function App() {
     </section>
 
     <FieldThreads active={active} threads={relatedThreads}
+      documentedConnections={documentedConnections}
       visitedIds={visitedChapters} onFollow={followFieldThread} />
 
     <nav className="chapter-shelf" aria-label="Book chapter index">

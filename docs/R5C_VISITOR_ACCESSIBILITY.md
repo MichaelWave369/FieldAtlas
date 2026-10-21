@@ -9,8 +9,11 @@ chapter taxonomy, embeds or authored website metadata.
 - **Skip to living book** is the first keyboard focus stop. The link stays
   visually tucked away until keyboard focus and goes straight to the
   single original book, which is programmatically focusable.
-- The existing directory should trap Tab within the active modal and restore
-  focus to its opener on Escape. The new tests make that behavior explicit.
+- The directory traps Tab within the active modal and restores focus to its
+  opener on Escape. We removed premature HTML autofocus, which previously
+  captured the dialog input as the opener before the focus manager ran.
+- Book covers use their visible title/category as the accessible button name.
+  The mobile icon-only curator action now has a matching spoken name.
 - Reduced-motion chapter turns navigate without the page-flip transition.
 - Invalid passport JSON is rejected without changing saved visit IDs.
 - Desktop and emulated-mobile Playwright suites include WCAG 2.0/2.1 A/AA

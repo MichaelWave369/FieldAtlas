@@ -25,6 +25,7 @@ import useAtlasPassport from './hooks/useAtlasPassport.js';
 import useAtlasManifest from './hooks/useAtlasManifest.js';
 import useAtlasCuration from './hooks/useAtlasCuration.js';
 import useAtlasDiscovery from './hooks/useAtlasDiscovery.js';
+import { directoryCollections, directoryCollectionCounts, selectDirectoryCollection, isAtlasFindShortcut } from './directory-explorer.js';
 import './style.css';
 import './book-edge.css';
 
@@ -126,6 +127,7 @@ function App() {
   const [directoryOpen, setDirectoryOpen] = useState(false);
   const [directorySearch, setDirectorySearch] = useState('');
   const [directoryWing, setDirectoryWing] = useState('all');
+  const [directoryCollection, setDirectoryCollection] = useState('all');
   const [pendingChapterId, setPendingChapterId] = useState(null);
   const catalogRef = useRef([]);
   const {
@@ -164,6 +166,12 @@ function App() {
   const index = Math.min(Math.max(current, 0), Math.max(0, filtered.length - 1));
   const active = filtered[index];
   const visitedChapters = useAtlasPassport(active?.id);
+  const directoryCounts = useMemo(() => directoryCollectionCounts(catalog, {
+    wing: directoryWing, visitedIds: visitedChapters, favoriteIds,
+  }), [catalog, directoryWing, visitedChapters, favoriteIds]);
+  const visibleDirectoryResults = useMemo(() => selectDirectoryCollection(directoryResults, {
+    collection: directoryCollection, visitedIds: visitedChapters, favoriteIds,
+  }), [directoryResults, directoryCollection, visitedChapters, favoriteIds]);
   const journey = activeTour ? findJourney(activeTour.id) : null;
   const journeyStops = useMemo(() => availableJourneyStops(journey, catalog), [journey, catalog]);
   const tourStep = Math.min(activeTour?.step ?? 0, Math.max(0, journeyStops.length - 1));
@@ -183,6 +191,9 @@ function App() {
     });
   }, [activeModal]);
 
+  // Opening the directory starts in the full collection. Filter changes never
+  // alter the chapter displayed by the book until a chapter is explicitly opened.
+  useEffect(() => { if (directoryOpen) setDirectoryCollection('all'); }, [directoryOpen]);
   useEffect(() => { localStorage.setItem(PREF_KEY, JSON.stringify(prefs)); }, [prefs]);
   useEffect(() => { setShareNotice(''); }, [active?.id]);
   useEffect(() => () => pendingTimers.current.forEach(clearTimeout), []);
@@ -267,6 +278,19 @@ function App() {
   }, [goTo, index, filtered.length]);
   useEffect(() => {
     const onKeyDown = e => {
+      if (isAtlasFindShortcut(e)) {
+        if (!(portalOpen || shelfOpen || showHelp || editorPage || mapOpen)) {
+          e.preventDefault();
+          if (directoryOpen) {
+            document.querySelector('input[aria-label="Search the Atlas directory"]')?.focus();
+          } else {
+            setDirectoryWing('all'); setDirectorySearch(''); setDirectoryCollection('all');
+            setBookPanel(null);
+            setDirectoryOpen(true);
+          }
+        }
+        return;
+      }
       if (e.key === 'Escape') {
         if (portalOpen || shelfOpen || showHelp || directoryOpen || editorPage || mapOpen) {
           setPortalOpen(false); setShelfOpen(false); setShowHelp(false); setDirectoryOpen(false); setEditorPage(null); setMapOpen(false);
@@ -420,6 +444,10 @@ function App() {
       <div className="topbar-actions">
         <span className="room-status"><span className="status-glow" /> THE STUDY IS OPEN</span>
         <button className="icon-btn" type="button" title="Change lamplight" aria-label="Toggle lamplight" onClick={() => setPrefs(p => ({...p, night: !p.night}))}>{prefs.night ? <Moon size={19}/> : <Sun size={19}/>}</button>
+        <button className="soft-btn atlas-find-button" type="button" title="Find a chapter (Ctrl or Command + K)"
+          onClick={() => {setDirectoryWing('all');setDirectorySearch('');setDirectoryCollection('all');setBookPanel(null);setDirectoryOpen(true);}}>
+          <Search size={17}/><span>Find a chapter</span><kbd>⌘ / Ctrl K</kbd>
+        </button>
         {discovery.candidates.length > 0 && <button className="arrival-alert" type="button" onClick={() => setShelfOpen(true)} aria-label={discovery.candidates.length + ' new arrivals awaiting review'}><Sparkles size={15}/> {discovery.candidates.length} arrivals</button>}
         <a className="soft-btn" href={FUTURE_ARCHIVE_URL} target="_blank" rel="noopener noreferrer" aria-label="Visit the Future Archive poster gallery"><Sparkles size={17}/> <span>Future Archive</span></a>
         <button className="soft-btn" type="button" onClick={() => setShelfOpen(true)}><LibraryBig size={17}/> <span>Curate the book</span></button>
@@ -630,7 +658,7 @@ function App() {
     {directoryOpen && <div className="directory-overlay" role="presentation" onMouseDown={() => setDirectoryOpen(false)}>
       <section className="directory-panel" data-atlas-modal="directory" role="dialog" aria-modal="true" aria-labelledby="directory-title" onMouseDown={e=>e.stopPropagation()}>
         <header className="directory-head">
-          <div><span className="eyebrow">THE GREAT CATALOG · VOLUME ONE</span><h2 id="directory-title">The Atlas Directory</h2><p>{catalog.length} unique chapters collected in one searchable place.</p></div>
+          <div><span className="eyebrow">THE GREAT CATALOG · VOLUME ONE</span><h2 id="directory-title">The Atlas Directory</h2><p>{catalog.length} unique chapters collected in one searchable place. Find a doorway, or return to a book you loved.</p></div>
           <button type="button" data-atlas-initial-focus className="directory-close" aria-label="Close directory" onClick={()=>setDirectoryOpen(false)}><X size={21}/></button>
         </header>
         <div className="directory-tools">
@@ -638,18 +666,37 @@ function App() {
           <select aria-label="Filter directory by wing" value={directoryWing} onChange={e=>setDirectoryWing(e.target.value)}>
             {wings.map(w=><option key={w.id} value={w.id}>{w.name}</option>)}
           </select>
-          <span>{directoryResults.length} results</span>
+          <output className="directory-result-count" aria-live="polite">{visibleDirectoryResults.length} of {directoryCounts[directoryCollection]} chapters</output>
         </div>
-        <div className="directory-results">
-          {directoryResults.map(p => <article key={p.id} className="directory-entry">
+        <div className="directory-collections" role="group" aria-label="Directory collections">
+          {directoryCollections.map(collection => <button type="button" key={collection.id}
+            className={directoryCollection === collection.id ? 'directory-collection-active' : ''}
+            aria-pressed={directoryCollection === collection.id}
+            onClick={() => setDirectoryCollection(collection.id)}>
+            {collection.label}<span aria-hidden="true">{directoryCounts[collection.id]}</span>
+          </button>)}
+          <span className="directory-collections-hint">Tip: Ctrl / ⌘ + K to find a chapter</span>
+        </div>
+        <div className="directory-results" key={directoryCollection + directoryWing + directorySearch}>
+          {visibleDirectoryResults.map(p => <article key={p.id} className="directory-entry">
             <BookCover page={p} onOpen={() => openChapterFromDirectory(p)} compact />
-            <div className="directory-entry-copy"><h3>{p.title}</h3><span>{p.category} · {p.repo || 'Personal chapter'}</span><p>{p.desc || 'An open door to another project.'}</p>
+            <div className="directory-entry-copy"><h3>{p.title}</h3><span>{p.category} · {p.repo || 'Personal chapter'}</span>
+              {(visitedChapters.includes(p.id) || favoriteIds.includes(p.id)) && <div className="directory-chapter-status">
+                {visitedChapters.includes(p.id) && <span><Check size={12}/> Explored</span>}
+                {favoriteIds.includes(p.id) && <span><Bookmark size={12}/> Bookmarked</span>}
+              </div>}
+              <p>{p.desc || 'An open door to another project.'}</p>
               <div className="directory-entry-actions"><button type="button" onClick={() => openChapterFromDirectory(p)}><BookOpen size={14}/> Read chapter</button>
               <button type="button" onClick={() => beginEdit(p)}><Settings2 size={14}/> Edit label</button>
               <a href={p.url} target="_blank" rel="noopener noreferrer"><ExternalLink size={14}/> Visit site</a></div>
             </div>
           </article>)}
-          {!directoryResults.length && <div className="directory-empty">No chapters match your search. Try a different phrase or room.</div>}
+          {!visibleDirectoryResults.length && <div className="directory-empty" role="status">
+            {directoryCollection === 'visited' ? 'No explored chapters match this search. Open a book to add it to your visitor passport.' :
+              directoryCollection === 'favorites' ? 'No bookmarked chapters match. Bookmark a chapter in the reader to see it here.' :
+              directoryCollection === 'unexplored' ? 'No unexplored chapters match. Try a different room or clear your search.' :
+              'No chapters match your search. Try a different phrase or room.'}
+          </div>}
         </div>
         <p className="directory-note">Editorial category and title changes are saved only in this browser. The shared published catalog is updated through reviewed repository changes.</p>
       </section>

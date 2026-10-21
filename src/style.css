@@ -722,3 +722,22 @@ a { color:inherit; }
 @media(max-width:760px){.discovery-compass{padding:9px 10px;}.discovery-compass-title strong{font-size:9px;}.discovery-compass-controls{gap:6px;}.discovery-compass-controls label{display:none;}.discovery-compass-controls select{max-width:125px;padding:8px 4px;}.discovery-surprise{padding:8px;gap:5px;}.atlas-trails-grid{grid-template-columns:1fr;}}
 @media(max-width:460px){.discovery-compass{align-items:stretch;}.discovery-compass-title>span{font-size:21px;}.discovery-compass-controls{justify-content:space-between;width:100%;}.discovery-compass-controls select{flex:1;max-width:190px;}.discovery-surprise{flex:1;max-width:170px;}.atlas-explorer-trails{padding:10px 8px;}.atlas-trail-stop{flex-basis:102px;}}
 @media(prefers-reduced-motion:reduce){.discovery-surprise{transition:none;}.discovery-surprise:hover:not(:disabled){transform:none;}}
+
+/* R3A Grand Catalog: fast chapter search and visitor-local collections. */
+.atlas-find-button{gap:7px;}
+.atlas-find-button kbd{padding:3px 5px;border:1px solid rgba(232,195,136,.42);border-radius:5px;color:#eed2a9;font:600 9px 'DM Sans',sans-serif;white-space:nowrap;background:rgba(30,24,23,.35);}
+.directory-result-count{font:600 11px 'DM Sans',sans-serif;color:#efcea0;white-space:nowrap;}
+.directory-collections{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 24px;border-bottom:1px solid rgba(224,181,114,.23);background:rgba(21,17,22,.64);}
+.directory-collections button{display:inline-flex;align-items:center;gap:7px;min-height:33px;border:1px solid rgba(219,176,120,.34);border-radius:20px;padding:5px 11px;color:#e8d0b1;background:rgba(83,56,39,.4);font:700 10px 'DM Sans',sans-serif;cursor:pointer;transition:background .15s,border-color .15s;}
+.directory-collections button>span{font:700 10px 'DM Sans',sans-serif;color:#e5c79e;opacity:.87;}
+.directory-collections button:hover{background:#66452f;border-color:rgba(245,207,157,.75);}
+.directory-collections button.directory-collection-active{color:#2e2018;background:linear-gradient(120deg,#edd4a6,#cda471);border-color:#f4dfb8;}
+.directory-collections button.directory-collection-active>span{color:#48301d;}
+.directory-collections-hint{margin-left:auto;color:#c9a986;font-size:9px;letter-spacing:.02em;}
+.directory-chapter-status{display:flex;align-items:center;flex-wrap:wrap;gap:5px;margin-top:7px;}
+.directory-chapter-status>span{display:inline-flex;gap:4px;align-items:center;padding:3px 6px;border:1px solid rgba(218,184,133,.32);border-radius:5px;background:rgba(113,86,55,.25);color:#e6cba7;font-size:9px;font-weight:600;}
+.directory-overlay button:focus-visible,.atlas-find-button:focus-visible,.directory-tools input:focus-visible,.directory-tools select:focus-visible{outline:3px solid #ffe4a0;outline-offset:3px;}
+@media(max-width:1050px){.atlas-find-button kbd{display:none;}}
+@media(max-width:620px){.directory-collections{padding:9px 12px;gap:6px;}.directory-collections button{padding:7px 9px;font-size:9px;}.directory-collections-hint{display:none;}.directory-result-count{width:100%;text-align:right;}.atlas-find-button{padding-inline:10px;}}
+@media(max-width:380px){.atlas-find-button span{display:none;}}
+@media(prefers-reduced-motion:reduce){.directory-collections button{transition:none;}}

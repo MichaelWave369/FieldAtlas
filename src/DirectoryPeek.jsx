@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen, ExternalLink, Eye, Play, Square, X } from 'lucide-react';
+import { BookOpen, ExternalLink, Play, Square, X } from 'lucide-react';
 import { categoryPalette } from './curation.js';
 import { directoryPreviewHost, directoryPreviewKind } from './directory-preview.js';
 import { PREVIEW_SANDBOX } from './preview-policy.js';

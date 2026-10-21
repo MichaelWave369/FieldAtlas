@@ -18,7 +18,9 @@ test('embedded applications use an opaque-origin sandbox without extra privilege
 });
 
 test('application dialogs use a shared keyboard/focus manager', () => {
-  assert.equal(source.split('data-atlas-modal="').length - 1, 5);
+  for (const id of ['portal', 'directory', 'editor', 'help', 'shelf']) {
+    assert.ok(source.includes('data-atlas-modal="' + id + '"'), id);
+  }
   assert.ok(source.includes('activateModalFocus(dialog'));
   assert.ok(source.includes('setPendingChapterId(null)'));
 });

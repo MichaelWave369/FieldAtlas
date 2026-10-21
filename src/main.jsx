@@ -57,7 +57,7 @@ function BookCover({ page, onOpen, compact = false }) {
   const palette = categoryPalette[page.category] || categoryPalette.Other;
   return <button type="button" className={`atlas-cover ${compact ? 'atlas-cover-compact' : ''}`}
     style={{ '--cover-accent': page.accent || palette.color }}
-    onClick={onOpen} title={'Open ' + page.title} aria-label={'Open chapter: ' + page.title}>
+    onClick={onOpen} title={'Open ' + page.title}>
     <span className="cover-inner-frame" aria-hidden="true" />
     <span className="cover-crest" aria-hidden="true">{page.coverGlyph || palette.glyph}</span>
     <span className="cover-title">{page.title}</span>
@@ -490,12 +490,13 @@ function App() {
 
   const activeWing = wings.find(w => w.id === wing) || wings[0];
   return <main className={`study-app ${prefs.night ? 'night-mode' : ''} wing-scene-${wing} ${focusMode ? 'reader-focus-mode' : ''}`}>
+    <a href="#living-book" className="skip-to-reader">Skip to living book</a>
     <div className="room-art" role="presentation" />
     <div className="room-tint" role="presentation" />
     <div className="ambient-lights" role="presentation"><i /><i /><i /><i /><i /><i /></div>
 
     <header className="topbar">
-      <a href="#top" className="wordmark" aria-label="The Field Atlas, home" onClick={e => { e.preventDefault(); setCategory('All'); setSearch(''); setCurrent(0); }}>
+      <a href="#top" className="wordmark" onClick={e => { e.preventDefault(); setCategory('All'); setSearch(''); setCurrent(0); }}>
         <span className="wordmark-emblem"><BookOpen size={22} strokeWidth={1.35}/></span>
         <span><strong>THE FIELD ATLAS</strong><small>A LIVING LIBRARY OF CREATION</small></span>
       </a>
@@ -506,9 +507,9 @@ function App() {
           onClick={() => {setDirectoryWing('all');setDirectorySearch('');setDirectoryCollection('all');setBookPanel(null);setDirectoryOpen(true);}}>
           <Search size={17}/><span>Find a chapter</span><kbd>⌘ / Ctrl K</kbd>
         </button>
-        {discovery.candidates.length > 0 && <button className="arrival-alert" type="button" onClick={() => setShelfOpen(true)} aria-label={discovery.candidates.length + ' new arrivals awaiting review'}><Sparkles size={15}/> {discovery.candidates.length} arrivals</button>}
+        {discovery.candidates.length > 0 && <button className="arrival-alert" type="button" onClick={() => setShelfOpen(true)} aria-label={discovery.candidates.length + ' arrivals awaiting review'}><Sparkles size={15}/> {discovery.candidates.length} arrivals</button>}
         <a className="soft-btn" href={FUTURE_ARCHIVE_URL} target="_blank" rel="noopener noreferrer" aria-label="Visit the Future Archive poster gallery"><Sparkles size={17}/> <span>Future Archive</span></a>
-        <button className="soft-btn" type="button" onClick={() => setShelfOpen(true)}><LibraryBig size={17}/> <span>Curate the book</span></button>
+        <button className="soft-btn" type="button" aria-label="Curate the book" onClick={() => setShelfOpen(true)}><LibraryBig size={17}/> <span>Curate the book</span></button>
       </div>
     </header>
 
@@ -534,7 +535,7 @@ function App() {
       </div>
     </section>}
 
-    <section id="living-book" ref={readerRef} className="reading-stage" aria-label="Interactive book of GitHub Pages websites">
+    <section id="living-book" ref={readerRef} tabIndex={-1} className="reading-stage" aria-label="Interactive book of GitHub Pages websites">
       <div className="side-ornament left-ornament" aria-hidden="true"><span className="fancy-star">✧</span><span>EXPLORE</span><i /></div>
       <div className="side-ornament right-ornament" aria-hidden="true"><span className="fancy-star">✧</span><span>IMAGINE</span><i /></div>
       <div className="book-floor" aria-hidden="true" />
@@ -738,7 +739,7 @@ function App() {
           <button type="button" data-atlas-initial-focus className="directory-close" aria-label="Close directory" onClick={()=>setDirectoryOpen(false)}><X size={21}/></button>
         </header>
         <div className="directory-tools">
-          <label className="directory-search"><Search size={16}/><input value={directorySearch} onChange={e => setDirectorySearch(e.target.value)} placeholder="Search every world, tool, and experiment..." aria-label="Search the Atlas directory" autoFocus /></label>
+          <label className="directory-search"><Search size={16}/><input value={directorySearch} onChange={e => setDirectorySearch(e.target.value)} placeholder="Search every world, tool, and experiment..." aria-label="Search the Atlas directory" /></label>
           <select aria-label="Filter directory by wing" value={directoryWing} onChange={e=>setDirectoryWing(e.target.value)}>
             {wings.map(w=><option key={w.id} value={w.id}>{w.name}</option>)}
           </select>

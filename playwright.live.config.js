@@ -9,7 +9,7 @@ export default defineConfig({
   expect: { timeout: 15_000 },
   retries: 2,
   workers: 2,
-  reporter: [['list'], ['html', { open: 'never' }]],
+  reporter: [['list'], ['html', { open: 'never' }], ['json', { outputFile: 'test-results/atlas-live-playwright.json' }]],
   use: {
     baseURL: CURRENT_PUBLISHED_ORIGIN,
     trace: 'retain-on-failure',

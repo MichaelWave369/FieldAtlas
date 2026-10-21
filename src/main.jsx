@@ -6,8 +6,8 @@ import {
   Search, Settings2, Sparkles, Sun, WandSparkles, X, RefreshCw,
   Globe2, Link2, Info, RotateCcw, Menu, Star, Keyboard, Map as MapIcon,
 } from 'lucide-react';
-import { seedPages, categories, wings, wingForCategory, safeUrl, uniqueMerge, newArrivals, shouldAutoDiscover, discoverGithubPages, isVerifiedPublishedPage } from './catalog';
-import { curateProject, applyLocalEdits, categoryPalette } from './curation';
+import { seedPages, categories, wings, wingForCategory, safeUrl, uniqueMerge, newArrivals, shouldAutoDiscover, discoverGithubPages } from './catalog';
+import { categoryPalette } from './curation';
 import { createCatalogAudit, isZenodoEntry } from './catalog-audit.js';
 import { publicationChapters, isPublicationChapter } from './publications.js';
 import LibraryMap from './LibraryMap';
@@ -20,6 +20,9 @@ import { futureArchivePrintUrl, FUTURE_ARCHIVE_URL } from './future-archive';
 import BookForeEdge from './BookForeEdge';
 import { PREVIEW_SANDBOX } from './preview-policy.js';
 import { activateModalFocus } from './modal-focus.js';
+import useAtlasCatalog from './hooks/useAtlasCatalog.js';
+import useAtlasPassport from './hooks/useAtlasPassport.js';
+import useAtlasManifest from './hooks/useAtlasManifest.js';
 import './style.css';
 import './book-edge.css';
 
@@ -27,7 +30,6 @@ const STORE_KEY = 'field-atlas-pages-v1';
 const PREF_KEY = 'field-atlas-preferences-v1';
 const DISCOVERY_KEY = 'field-atlas-discovery-v2';
 const EDITS_KEY = 'field-atlas-curation-edits-v4';
-const PASSPORT_KEY = 'field-atlas-visitor-passport-v6';
 const specialRoman = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
 
 function readLocal(key, fallback) {
@@ -136,8 +138,9 @@ function App() {
       hiddenIds: Array.isArray(value.hiddenIds) ? value.hiddenIds : [],
     };
   });
-  const [publishedPages, setPublishedPages] = useState([]);
-  const [manifestStatus, setManifestStatus] = useState('');
+  const { publishedPages, manifestStatus } = useAtlasManifest({
+    pages, setDiscovery, baseUrl: import.meta.env.BASE_URL,
+  });
   const [search, setSearch] = useState('');
   const [current, setCurrent] = useState(0);
   const [flipping, setFlipping] = useState('');
@@ -150,10 +153,6 @@ function App() {
   const [compassNotice, setCompassNotice] = useState('');
   const [mirrorDepth, setMirrorDepth] = useState(MIN_MIRROR_DEPTH);
   const [activeTour, setActiveTour] = useState(null);
-  const [visitedChapters, setVisitedChapters] = useState(() => {
-    const ids = readLocal(PASSPORT_KEY, []);
-    return Array.isArray(ids) ? ids.filter(x => typeof x === 'string').slice(0, 1000) : [];
-  });
   const [shareNotice, setShareNotice] = useState('');
   const [showHelp, setShowHelp] = useState(false);
   const [form, setForm] = useState({ title: '', url: '', category: 'Other', desc: '' });
@@ -166,23 +165,14 @@ function App() {
   const handledDeepLink = useRef(false);
 
   const favoriteIds = prefs.favoriteIds || [];
-  // Canonical base + verified public sites from the daily deployment manifest.
-  // Hiding a site only affects the current browser, not its public repository.
-  const catalog = useMemo(() => uniqueMerge(
-    uniqueMerge(pages, publishedPages.filter(p => !discovery.hiddenIds.includes(p.id))),
-    publicationChapters.filter(p => !discovery.hiddenIds.includes(p.id))
-  ).map(p => {
-    const curated = curateProject(p);
-    return applyLocalEdits(curated, localEdits);
-  }), [pages, publishedPages, discovery.hiddenIds, localEdits]);
-  const filtered = useMemo(() => catalog.filter(p => {
-    const matchesWing = wing === 'all' || wingForCategory(p.category) === wing;
-    const matchesCategory = category === 'All' || (category === 'Favorites' ? favoriteIds.includes(p.id) : p.category === category);
-    const needle = search.trim().toLowerCase();
-    return matchesWing && matchesCategory && (!needle || [p.title, p.repo, p.desc, p.category].join(' ').toLowerCase().includes(needle));
-  }), [catalog, category, search, favoriteIds, wing]);
+  // One shared catalog, filtered reader and directory; same source data and order.
+  const { catalog, filtered, directoryResults } = useAtlasCatalog({
+    pages, publishedPages, discovery, localEdits, category, search, favoriteIds,
+    wing, directorySearch, directoryWing,
+  });
   const index = Math.min(Math.max(current, 0), Math.max(0, filtered.length - 1));
   const active = filtered[index];
+  const visitedChapters = useAtlasPassport(active?.id);
   const journey = activeTour ? findJourney(activeTour.id) : null;
   const journeyStops = useMemo(() => availableJourneyStops(journey, catalog), [journey, catalog]);
   const tourStep = Math.min(activeTour?.step ?? 0, Math.max(0, journeyStops.length - 1));
@@ -191,11 +181,6 @@ function App() {
   const compassChoices = useMemo(() => availableSurprises(catalog, compassWing), [catalog, compassWing]);
   const undiscoveredCount = useMemo(() => remainingSurpriseCount(catalog, compassWing, visitedChapters), [catalog, compassWing, visitedChapters]);
   useEffect(() => { setMirrorDepth(MIN_MIRROR_DEPTH); }, [active?.id]);
-  const directoryResults = useMemo(() => catalog.filter(p => {
-    const q = directorySearch.trim().toLowerCase();
-    return (directoryWing === 'all' || wingForCategory(p.category) === directoryWing) &&
-      (!q || [p.title, p.repo, p.desc, p.category].join(' ').toLowerCase().includes(q));
-  }).sort((a,b)=>a.title.localeCompare(b.title)), [catalog, directorySearch, directoryWing]);
 
   // Keep the original book intact while making every application modal keyboard-safe.
   const activeModal = portalOpen && active ? 'portal' : editorPage ? 'editor' : directoryOpen ? 'directory' : shelfOpen ? 'shelf' : showHelp ? 'help' : null;
@@ -210,34 +195,8 @@ function App() {
   useEffect(() => { localStorage.setItem(STORE_KEY, JSON.stringify(pages)); }, [pages]);
   useEffect(() => { localStorage.setItem(PREF_KEY, JSON.stringify(prefs)); }, [prefs]);
   useEffect(() => { localStorage.setItem(EDITS_KEY, JSON.stringify(localEdits)); }, [localEdits]);
-  useEffect(() => { localStorage.setItem(PASSPORT_KEY, JSON.stringify(visitedChapters)); }, [visitedChapters]);
-  useEffect(() => { if (active?.id) setVisitedChapters(old => old.includes(active.id) ? old : [...old, active.id].slice(-1000)); }, [active?.id]);
   useEffect(() => { setShareNotice(''); }, [active?.id]);
   useEffect(() => { localStorage.setItem(DISCOVERY_KEY, JSON.stringify(discovery)); }, [discovery]);
-  useEffect(() => {
-    let cancelled = false;
-    fetch(import.meta.env.BASE_URL + 'pages-discovered.json', { cache: 'no-store' }).then(async response => {
-      if (!response.ok) throw new Error('No refreshed public catalog yet');
-      const manifest = await response.json();
-      if (manifest.schema_version !== 1 || manifest.owner !== 'MichaelWave369' || !Array.isArray(manifest.pages)) {
-        throw new Error('Unexpected public catalog format');
-      }
-      const valid = manifest.pages.filter(isVerifiedPublishedPage).map(item => ({
-          ...item, title: String(item.title || item.repo).slice(0, 80),
-          desc: String(item.desc || '').slice(0, 300),
-          kicker: 'LIVE FROM THE FIELD',
-          pullquote: 'Every world deserves its own doorway.',
-          accent: '#e5bf87',
-        }));
-      if (cancelled) return;
-      setPublishedPages(valid);
-      setManifestStatus(valid.length + ' verified public websites in the latest atlas inventory.');
-      setDiscovery(prev => ({ ...prev, candidates: newArrivals(prev.candidates, uniqueMerge(pages, valid), prev.dismissedIds) }));
-    }).catch(() => { if (!cancelled) setManifestStatus('Showing the curated collection. Live inventory will refresh when the next deployment completes.'); });
-    return () => { cancelled = true; };
-    // The deployed manifest is fetched on first page load; local curation remains separate.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
   useEffect(() => () => pendingTimers.current.forEach(clearTimeout), []);
   useEffect(() => { setCurrent(0); }, [category, search, wing]);
   const scrollToReader = useCallback(() => {

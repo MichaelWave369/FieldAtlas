@@ -44,10 +44,10 @@ test('buttons and keyboard use the shared circular turn, and the book precedes d
   assert.match(app,/if \(e.key === 'ArrowRight'\) \{ e.preventDefault\(\); turn\(1\); \}/);
   assert.match(app,/disabled=\{!canTurnChapters\(filtered.length\) \|\| !!flipping \|\| !active\}/);
   const book=app.indexOf('id="living-book"');
-  const rail=app.indexOf('className="quick-room-rail"');
+  const rail=app.indexOf('<BookForeEdge');
   const fullWings=app.indexOf('id="study-rooms"');
   const desk=app.indexOf('className="visitor-desk"');
-  assert.ok(rail > 0 && rail < book, 'compact room rail must be above living book');
+  assert.ok(rail > book && rail < fullWings, 'fore-edge tab index must be attached inside the book stage');
   assert.ok(book > 0 && book < fullWings, 'the central book must come before full rooms');
   assert.ok(fullWings < desk, 'the visitor desk remains in the expanded area below the book');
 });
@@ -56,5 +56,7 @@ test('responsive styling allows a larger book while keeping mobile vertical page
   const css=readFileSync('src/style.css','utf8');
   assert.match(css,/\.reading-stage\{max-width:1410px/);
   assert.match(css,/@media\(max-width:680px\)/);
-  assert.match(css,/\.quick-room-rail/);
+  const edgeCss=readFileSync('src/book-edge.css','utf8');
+  assert.match(edgeCss,/\.book-edge-index/);
+  assert.match(edgeCss,/@media \(max-width:900px\)/);
 });

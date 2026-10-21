@@ -36,3 +36,35 @@ test('index remains accessible at smaller sizes and with reduced motion', () => 
   assert.match(css, /prefers-reduced-motion:reduce/);
   assert.match(app, /else if \(bookPanel\) setBookPanel\(null\)/);
 });
+
+
+test('v2 makes the desktop book grander while leaving its single portal intact', () => {
+  assert.match(css, /max-width: 1810px/);
+  assert.match(css, /height: clamp\(675px, 84vh, 945px\)/);
+  assert.match(css, /grid-template-columns|\.reading-stage \.atlas-book/);
+  assert.match(css, /z-index: 21;[^\n]*Book paper/);
+});
+
+test('v2 tabs are portrait dividers with rotated-side reading and archival brass details', () => {
+  assert.match(css, /\.book-edge-index\s*\{[\s\S]*?flex-direction: column/);
+  assert.match(css, /\.book-edge-tab\s*\{[\s\S]*?flex-direction: column/);
+  assert.match(css, /writing-mode: vertical-rl/);
+  assert.match(css, /text-orientation: mixed/);
+  assert.match(css, /margin-left: var\(--step\)/);
+  assert.match(css, /--step: calc\(var\(--tab-step\) \* 4px\)/);
+  assert.match(css, /border-right: 3px double/);
+  assert.match(css, /repeating-linear-gradient/);
+  assert.match(css, /\.book-edge-tab-open/);
+  assert.match(index, /'--tab-step': step/);
+});
+
+test('tablet and mobile return index labels to horizontal tap-friendly orientation', () => {
+  const mobile = css.slice(css.indexOf('@media (max-width:900px)'));
+  assert.match(mobile, /flex-direction:row/);
+  assert.match(mobile, /writing-mode:horizontal-tb/);
+  assert.match(mobile, /min-height:49px/);
+  assert.match(mobile, /order:2/);
+  assert.match(mobile, /order:3/);
+  assert.match(mobile, /overflow-x:auto/);
+  assert.match(mobile, /@media \(prefers-reduced-motion:reduce\)/);
+});

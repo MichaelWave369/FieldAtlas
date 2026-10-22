@@ -15,6 +15,7 @@ import { getMapChapterWing } from './library-map';
 import { compassFilters, pickSurpriseChapter, remainingSurpriseCount, availableSurprises } from './discovery-compass';
 import { isInfiniteAtlas, MAX_MIRROR_DEPTH, MIN_MIRROR_DEPTH, mirrorLayers, nextMirrorDepth } from './fieldception';
 import { visitorJourneys, findJourney, availableJourneyStops, readAtlasLink, buildAtlasLink, locateSharedChapter } from './journeys';
+import { constellationChapterUrl, readConstellationProject, locateConstellationChapter } from './constellation-bridge.js';
 import { wrapChapterIndex, canTurnChapters, wrapDestinationLabel } from './navigation';
 import { futureArchivePrintUrl, FUTURE_ARCHIVE_URL } from './future-archive';
 import BookForeEdge from './BookForeEdge';
@@ -173,6 +174,7 @@ function App() {
   catalogRef.current = catalog;
   const index = Math.min(Math.max(current, 0), Math.max(0, filtered.length - 1));
   const active = filtered[index];
+  const constellationUrl = constellationChapterUrl(active,publishedPages);
   const relatedThreads = useMemo(() => findFieldThreads(active, catalog, 5), [active, catalog]);
   const documentedConnections = useMemo(() => resolveDocumentedConnections(active, catalog), [active, catalog]);
   const { visitedChapters, importVisitedChapters } = useAtlasPassport(active?.id);
@@ -233,6 +235,23 @@ function App() {
     if (!manifestStatus || handledDeepLink.current) return;
     handledDeepLink.current = true;
     const link = readAtlasLink(window.location.search);
+    // Existing chapter and tour deep links retain precedence over the new alias.
+    // Resolve a numeric identity only against the fetched verified public manifest
+    // and a chapter already in the visitor's accessible Atlas catalog.
+    if (!link.tour && !link.chapter) {
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('project')) {
+        const identity = readConstellationProject(window.location.search);
+        const matching = identity ? locateConstellationChapter(catalog,publishedPages,identity) : null;
+        if (matching) {
+          setWing('all'); setEnteredWing(true); setCategory('All'); setSearch('');
+          setPendingChapterId(matching.id);
+        } else {
+          setShareNotice('This Constellation project is not a verified public chapter in your current Atlas. Explore the directory instead.');
+        }
+        return;
+      }
+    }
     if (link.tour) {
       const stops = availableJourneyStops(link.tour, catalog);
       if (stops.length) {
@@ -253,7 +272,7 @@ function App() {
         setShareNotice('This shared chapter is unavailable in your current Atlas. Try the complete directory.');
       }
     }
-  }, [manifestStatus, catalog]);
+  }, [manifestStatus, catalog, publishedPages]);
   useEffect(() => {
     if (!pendingChapterId) return;
     const target = filtered.findIndex(p => p.id === pendingChapterId);
@@ -597,6 +616,7 @@ function App() {
               <a className="gold-btn" href={active.url} target="_blank" rel="noopener noreferrer"><ExternalLink size={15}/> {publication ? 'Open Zenodo record' : 'Open this world'}</a>
               {futureArchivePrintUrl(active.repo) && <a className="outline-btn" href={futureArchivePrintUrl(active.repo)} target="_blank" rel="noopener noreferrer"><ExternalLink size={15}/> View the art print</a>}
               {active.repo && <button type="button" className="outline-btn share-chapter" onClick={shareChapter}><Link2 size={15}/> Share chapter</button>}
+              {constellationUrl && <a className="outline-btn constellation-chapter-link" href={constellationUrl} target="_blank" rel="noopener noreferrer" aria-label={'Locate '+active.title+' in Field Constellation'}><MapIcon size={15}/> View in Constellation</a>}
               <button type="button" className="outline-btn" onClick={() => setPortalOpen(true)}><Maximize2 size={15}/> Fullscreen reader</button>
             </div>
             {shareNotice && <div className="share-status" role="status">{shareNotice.startsWith('https://') ? <><span>Copy this chapter link:</span><input aria-label="Chapter link to copy" readOnly value={shareNotice} onFocus={e=>e.target.select()}/></> : shareNotice}</div>}

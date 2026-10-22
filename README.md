@@ -1,5 +1,16 @@
 # The Field Atlas ✦
 
+## Atlas ↔ Constellation: the public identity return bridge
+
+Field Atlas can now show **View in Constellation** beside **Share chapter** when the current chapter has exactly one matching row in the already-fetched, **verified public** `pages-discovered.json` manifest. The outgoing link opens `https://michaelwave369.github.io/FieldConstellation/?repo=github:<numeric-id>` in a new tab, focusing that public project in the existing 3D observatory.
+
+The Atlas also accepts a bounded, optional `?project=github:<numeric-id>` alias. It can select only a chapter already in the visitor's accessible catalog whose **repository name and HTTPS URL** match the verified published manifest. Unknown, stale, duplicate, unreviewed, custom or private project IDs are not looked up; they fall back to a friendly notice and the unchanged directory. The existing `?chapter=<RepoName>` and `?tour=<known-id>` links retain precedence and behavior.
+
+The apps do **not** share passports, browser storage, visitor identities or authentication. Technical relationship claims remain in Constellation's evidence-backed ledger; Atlas's nearby-chapter suggestions remain editorial. The published-site manifest is a dated observation, not a permanent guarantee that a destination still works.
+
+See [Bridge design and tests](docs/ATLAS_CONSTELLATION_BRIDGE.md). No changes were made to Field Constellation in this PR.
+
+
 ## The Future Archive bridge
 
 The Atlas has a permanent doorway to the independent [Future Archive art gallery](https://michaelwave369.github.io/FutureArchive/). Matching public projects in the living book expose their original art print, and new visitors get a curated Future Archive chapter in the Creative wing and the Artist's Lantern route. Nothing embeds or copies the poster files into this repository; visitors open the original hosted gallery.

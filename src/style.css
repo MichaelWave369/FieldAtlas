@@ -846,3 +846,12 @@ a { color:inherit; }
 .skip-to-reader:focus,.skip-to-reader:focus-visible{transform:translateY(0);outline:3px solid #fff0b5;outline-offset:3px;}
 #living-book:focus{outline:none;}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}.skip-to-reader{transition:none;}}
+
+
+/* Verified public-ID doorway into Field Constellation. */
+.portal-actions .constellation-chapter-link{border-color:#8e9e86;background:rgba(88,127,108,.1);color:#476554;}
+.portal-actions .constellation-chapter-link:hover{border-color:#42765e;background:rgba(88,127,108,.2);}
+.portal-actions .constellation-chapter-link:focus-visible{outline:3px solid #467a5d;outline-offset:3px;}
+.night-mode .portal-actions .constellation-chapter-link{color:#c4e0cb;border-color:#718c75;}
+@media(max-width:680px){.portal-actions .constellation-chapter-link{min-height:40px;flex:1 1 150px;text-align:center;}}
+@media(prefers-reduced-motion:reduce){.portal-actions .constellation-chapter-link{transition:none;}}

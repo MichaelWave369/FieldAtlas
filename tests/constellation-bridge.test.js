@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
 import { seedPages } from '../src/catalog.js';
 import {
   CONSTELLATION_URL, constellationProjectId, constellationChapterUrl,
@@ -68,4 +69,17 @@ test('Atlas reader can keep an existing chapter while protecting its public iden
   assert.equal(constellationChapterUrl(renamed,verified),constellationChapterUrl(chapter,verified));
   const removed=verified.filter(r=>r.id!==matching.id);
   assert.equal(locateConstellationChapter(catalog,removed,'github:123'),null);
+});
+
+
+test('original Atlas reader and visitor passport keep their own navigation and state',()=>{
+  const jsx=readFileSync(new URL('../src/main.jsx',import.meta.url),'utf8');
+  assert.match(jsx,/readAtlasLink\(window\.location\.search\)/);
+  assert.match(jsx,/readConstellationProject\(window\.location\.search\)/);
+  assert.match(jsx,/locateConstellationChapter\(catalog,publishedPages,identity\)/);
+  assert.match(jsx,/constellationChapterUrl\(active,publishedPages\)/);
+  assert.match(jsx,/View in Constellation/);
+  assert.match(jsx,/useAtlasPassport\(active\?\.id\)/);
+  assert.match(jsx,/Share chapter/);
+  assert.match(jsx,/if \(!link\.tour && !link\.chapter\)/);
 });

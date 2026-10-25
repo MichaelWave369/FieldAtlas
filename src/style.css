@@ -865,3 +865,8 @@ a { color:inherit; }
 .xi-atlas-source-door a{flex-shrink:0;display:inline-block;padding:11px 14px;border:1px solid #e2d3a4;border-radius:10px;color:#fff0bd;text-decoration:none;font-size:12px;font-weight:750}
 .xi-atlas-source-door a:hover,.xi-atlas-source-door a:focus-visible{background:#43615c}
 @media(max-width:700px){.xi-atlas-source-door{display:grid;margin:0 16px 18px}.xi-atlas-source-door a{justify-self:start}}
+
+/* R17.6: keep the verified public doorway and source fallback visually distinct. */
+.xi-atlas-links{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end}
+.xi-atlas-links a{display:inline-block}
+@media(max-width:700px){.xi-atlas-links{justify-content:flex-start}}

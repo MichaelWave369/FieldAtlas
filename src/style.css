@@ -855,3 +855,13 @@ a { color:inherit; }
 .night-mode .portal-actions .constellation-chapter-link{color:#c4e0cb;border-color:#718c75;}
 @media(max-width:680px){.portal-actions .constellation-chapter-link{min-height:40px;flex:1 1 150px;text-align:center;}}
 @media(prefers-reduced-motion:reduce){.portal-actions .constellation-chapter-link{transition:none;}}
+
+
+/* R17.4 Xi-Phi Commons source-only pointer, not a discovered GitHub Pages chapter. */
+.xi-atlas-source-door{display:flex;align-items:center;justify-content:space-between;gap:18px;margin:5px auto 26px;max-width:1050px;padding:18px 20px;background:linear-gradient(120deg,#1b2d37e8,#273248d9);border:1px solid #9db5a5;border-radius:15px;color:#f6e9c8}
+.xi-atlas-source-door>div{max-width:760px}.xi-atlas-source-door small{display:block;font-size:10px;letter-spacing:.15em;color:#d1eecb;font-weight:750}
+.xi-atlas-source-door strong{display:block;font:500 clamp(19px,3vw,27px)/1.25 Georgia,serif;margin:6px 0}
+.xi-atlas-source-door p{font-size:12px;line-height:1.6;color:#e0decf;margin:0}
+.xi-atlas-source-door a{flex-shrink:0;display:inline-block;padding:11px 14px;border:1px solid #e2d3a4;border-radius:10px;color:#fff0bd;text-decoration:none;font-size:12px;font-weight:750}
+.xi-atlas-source-door a:hover,.xi-atlas-source-door a:focus-visible{background:#43615c}
+@media(max-width:700px){.xi-atlas-source-door{display:grid;margin:0 16px 18px}.xi-atlas-source-door a{justify-self:start}}

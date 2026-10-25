@@ -18,6 +18,7 @@ import { visitorJourneys, findJourney, availableJourneyStops, readAtlasLink, bui
 import { constellationChapterUrl, readConstellationProject, locateConstellationChapter } from './constellation-bridge.js';
 import { wrapChapterIndex, canTurnChapters, wrapDestinationLabel } from './navigation';
 import { futureArchivePrintUrl, FUTURE_ARCHIVE_URL } from './future-archive';
+import { reviewedXiCommonsSourceEntry } from './xi-commons-source.js';
 import BookForeEdge from './BookForeEdge';
 import DirectoryPeek from './DirectoryPeek';
 import FieldThreads from './FieldThreads';
@@ -537,6 +538,19 @@ function App() {
       <h1>A thousand worlds. <em>One book.</em></h1>
       <p>Come in, stay awhile. Every chapter opens a living creation.</p>
     </div>
+
+    <aside className="xi-atlas-source-door" aria-label="Xi Phi Commons public source entry">
+      <div>
+        <small>DOCUMENTED CONNECTION · PUBLIC SOURCE ONLY</small>
+        <strong>{reviewedXiCommonsSourceEntry().title}</strong>
+        <p>Independent Xi ⇄ Φ369 research collaboration. R15/R16 are local fixtures,
+          R17 external crossing is blocked, and the real R18 two-host test has not run.
+          This is a source link, not a confirmed live website or iframe chapter.</p>
+      </div>
+      <a href={reviewedXiCommonsSourceEntry().sourceUrl}
+        target="_blank" rel="noopener noreferrer"
+        aria-label="Open Xi Phi Commons source repository">View public bridge source ↗</a>
+    </aside>
 
     {journey && journeyStops.length > 0 && <section className="tour-compass" aria-label="Guided visit controls">
       <div className="tour-compass-label"><span>✦ GUIDED WALK</span><strong>{journey.name}</strong>

@@ -539,17 +539,23 @@ function App() {
       <p>Come in, stay awhile. Every chapter opens a living creation.</p>
     </div>
 
-    <aside className="xi-atlas-source-door" aria-label="Xi Phi Commons public source entry">
+    <aside className="xi-atlas-source-door" aria-label="Xi Phi Commons verified public website">
       <div>
-        <small>DOCUMENTED CONNECTION · PUBLIC SOURCE ONLY</small>
+        <small>DOCUMENTED CONNECTION · VERIFIED PUBLIC STATIC WEBSITE</small>
         <strong>{reviewedXiCommonsSourceEntry().title}</strong>
-        <p>Independent Xi ⇄ Φ369 research collaboration. R15/R16 are local fixtures,
+        <p>Independent Xi ⇄ Φ369 research collaboration. Public Gateway deployment was
+          verified against source-linked hashes. R15/R16 remain local fixtures,
           R17 external crossing is blocked, and the real R18 two-host test has not run.
-          This is a source link, not a confirmed live website or iframe chapter.</p>
+          This is a website doorway, not an authorized Xi protocol or installed application.</p>
       </div>
-      <a href={reviewedXiCommonsSourceEntry().sourceUrl}
-        target="_blank" rel="noopener noreferrer"
-        aria-label="Open Xi Phi Commons source repository">View public bridge source ↗</a>
+      <div className="xi-atlas-links">
+        <a href={reviewedXiCommonsSourceEntry().websiteUrl}
+          target="_blank" rel="noopener noreferrer"
+          aria-label="Open verified live Xi Phi Commons website">Visit Commons Gateway ↗</a>
+        <a href={reviewedXiCommonsSourceEntry().sourceUrl}
+          target="_blank" rel="noopener noreferrer"
+          aria-label="Open Xi Phi Commons source repository">GitHub source ↗</a>
+      </div>
     </aside>
 
     {journey && journeyStops.length > 0 && <section className="tour-compass" aria-label="Guided visit controls">

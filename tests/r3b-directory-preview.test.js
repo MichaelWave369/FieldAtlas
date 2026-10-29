@@ -32,7 +32,10 @@ test('previews are isolated and only mount after a deliberate launch',()=>{
   assert.ok(component.includes('sandbox={PREVIEW_SANDBOX}'));
   assert.ok(component.includes('referrerPolicy="strict-origin-when-cross-origin"'));
   assert.ok(component.includes('This illustration is not a screenshot'));
-  assert.ok(main.includes('!directoryOpen && <iframe'));
+  // Main reader is now direct-first; only a user-requested preview loads an iframe.
+  assert.ok(main.includes('!directoryOpen && (showInBookPreview'));
+  assert.ok(main.includes('<PreviewGateway page={active}'));
+  assert.ok(main.includes('sandbox={PREVIEW_SANDBOX}'));
   assert.ok(main.includes('<DirectoryPeek page={p}'));
   assert.ok(main.includes('onClick={() => setDirectoryPreview'));
   assert.ok(main.includes('onRead={() => openChapterFromDirectory(p)}'));

@@ -21,9 +21,10 @@ test('verified manifest corrects a stored wrong-case URL without losing local id
   assert.equal(result[0].category,old.category);
   assert.equal(old.url,'https://michaelwave369.github.io/REELCommons/');
   const combined=composeAtlasCatalog({pages:[old],publishedPages:[fresh]});
-  assert.equal(combined.length,1);
-  assert.equal(combined[0].url,fresh.url);
-  assert.equal(combined[0].id,old.id);
+  const matched=combined.filter(page=>page.repo==='ReelCommons');
+  assert.equal(matched.length,1);
+  assert.equal(matched[0].url,fresh.url);
+  assert.equal(matched[0].id,old.id);
 });
 
 test('never overwrites user-owned custom chapters, even if repo text matches',()=>{

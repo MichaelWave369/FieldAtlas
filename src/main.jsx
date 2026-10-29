@@ -19,6 +19,7 @@ import { constellationChapterUrl, readConstellationProject, locateConstellationC
 import { wrapChapterIndex, canTurnChapters, wrapDestinationLabel } from './navigation';
 import { futureArchivePrintUrl, FUTURE_ARCHIVE_URL } from './future-archive';
 import { reviewedXiCommonsSourceEntry } from './xi-commons-source.js';
+import { RECENT_FIELD_PROJECTS, selectRecentFieldProjects } from './new-horizons.js';
 import BookForeEdge from './BookForeEdge';
 import DirectoryPeek from './DirectoryPeek';
 import FieldThreads from './FieldThreads';
@@ -178,6 +179,7 @@ function App() {
   const constellationUrl = constellationChapterUrl(active,publishedPages);
   const relatedThreads = useMemo(() => findFieldThreads(active, catalog, 5), [active, catalog]);
   const documentedConnections = useMemo(() => resolveDocumentedConnections(active, catalog), [active, catalog]);
+  const recentFieldProjects = useMemo(() => selectRecentFieldProjects(catalog), [catalog]);
   const { visitedChapters, importVisitedChapters } = useAtlasPassport(active?.id);
   const directoryCounts = useMemo(() => directoryCollectionCounts(catalog, {
     wing: directoryWing, visitedIds: visitedChapters, favoriteIds,
@@ -539,24 +541,6 @@ function App() {
       <p>Come in, stay awhile. Every chapter opens a living creation.</p>
     </div>
 
-    <aside className="xi-atlas-source-door" aria-label="Xi Phi Commons verified public website">
-      <div>
-        <small>DOCUMENTED CONNECTION · VERIFIED PUBLIC STATIC WEBSITE</small>
-        <strong>{reviewedXiCommonsSourceEntry().title}</strong>
-        <p>Independent Xi ⇄ Φ369 research collaboration. Public Gateway deployment was
-          verified against source-linked hashes. R15/R16 remain local fixtures,
-          R17 external crossing is blocked, and the real R18 two-host test has not run.
-          This is a website doorway, not an authorized Xi protocol or installed application.</p>
-      </div>
-      <div className="xi-atlas-links">
-        <a href={reviewedXiCommonsSourceEntry().websiteUrl}
-          target="_blank" rel="noopener noreferrer"
-          aria-label="Open verified live Xi Phi Commons website">Visit Commons Gateway ↗</a>
-        <a href={reviewedXiCommonsSourceEntry().sourceUrl}
-          target="_blank" rel="noopener noreferrer"
-          aria-label="Open Xi Phi Commons source repository">GitHub source ↗</a>
-      </div>
-    </aside>
 
     {journey && journeyStops.length > 0 && <section className="tour-compass" aria-label="Guided visit controls">
       <div className="tour-compass-label"><span>✦ GUIDED WALK</span><strong>{journey.name}</strong>
@@ -753,6 +737,45 @@ function App() {
         )}</div>
       </div>}
     </section>
+
+    <section className="new-horizons" aria-labelledby="new-horizons-title">
+      <div className="new-horizons-heading">
+        <span className="eyebrow"><Sparkles size={15}/> FRESHLY FORGED · OCTOBER 2026</span>
+        <h2 id="new-horizons-title">New horizons in the Field</h2>
+        <p>Games, worlds, and creative tools that joined the collection recently. An <strong>Open chapter</strong> button appears only when that project is in your accessible Atlas; every card also links to its public source.</p>
+      </div>
+      <div className="new-horizons-grid">
+        {recentFieldProjects.map(({ project, chapter }) => <article className="new-horizons-card" key={project.repo}>
+          <small>{project.label}</small>
+          <h3>{project.title}</h3>
+          <p>{project.summary}</p>
+          <div className="new-horizons-actions">
+            {chapter && <button type="button" onClick={() => {openChapterFromDirectory(chapter);scrollToReader();}} aria-label={'Open '+chapter.title+' chapter in the Atlas'}><BookOpen size={14}/> Open chapter</button>}
+            <a href={project.sourceUrl} target="_blank" rel="noopener noreferrer" aria-label={'View '+project.title+' public GitHub repository'}><ExternalLink size={14}/> GitHub source</a>
+          </div>
+        </article>)}
+      </div>
+      <p className="new-horizons-note">{RECENT_FIELD_PROJECTS.length} reviewed public repository spotlights · Live chapters are limited to the catalog available in this browser, never guessed from a repository URL.</p>
+    </section>
+
+    <aside className="xi-atlas-source-door" aria-label="Xi Phi Commons verified public website">
+      <div>
+        <small>DOCUMENTED CONNECTION · VERIFIED PUBLIC STATIC WEBSITE</small>
+        <strong>{reviewedXiCommonsSourceEntry().title}</strong>
+        <p>Independent Xi ⇄ Φ369 research collaboration. Public Gateway deployment was
+          verified against source-linked hashes. R15/R16 remain local fixtures,
+          R17 external crossing is blocked, and the real R18 two-host test has not run.
+          This is a website doorway, not an authorized Xi protocol or installed application.</p>
+      </div>
+      <div className="xi-atlas-links">
+        <a href={reviewedXiCommonsSourceEntry().websiteUrl}
+          target="_blank" rel="noopener noreferrer"
+          aria-label="Open verified live Xi Phi Commons website">Visit Commons Gateway ↗</a>
+        <a href={reviewedXiCommonsSourceEntry().sourceUrl}
+          target="_blank" rel="noopener noreferrer"
+          aria-label="Open Xi Phi Commons source repository">GitHub source ↗</a>
+      </div>
+    </aside>
 
     <footer className="bottom-bar"><span>MADE WITH CURIOSITY · BUILT TO BE SHARED</span><button onClick={()=>setShowHelp(true)}><Info size={15}/> About the atlas</button><span>ENTER THE FIELD <span className="bottom-flower">✻</span> 2026</span></footer>
 

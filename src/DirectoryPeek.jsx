@@ -51,7 +51,7 @@ export default function DirectoryPeek({ page, live, onToggleLive, onRead, onClos
       {kind === 'research' ? 'Research records are referenced, not embedded. Zenodo hosts the authoritative files.' :
         kind === 'mirror' ? 'The Atlas mirror is a bounded illustration. Open its chapter to explore the reflections.' :
         kind === 'unavailable' ? 'No safe website URL is available for this chapter.' :
-        live ? 'This is an isolated website preview. Some apps need storage, permissions or a full tab to work. Use Open original site for full functionality.' :
+        live ? 'This is a restricted embedded preview. Blank content does not prove the site is offline. Open original site for storage, audio, VR and other full-tab features.' :
         'This illustration is not a screenshot. Launching a preview loads one external website with limited permissions.'}
     </p>
   </section>;

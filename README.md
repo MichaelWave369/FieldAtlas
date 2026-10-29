@@ -1,5 +1,15 @@
 # The Field Atlas ✦
 
+## October 29: Chapter link and preview resilience
+
+The Atlas distinguishes **verified live destination** from **embeddable/runnable in a sandbox**. The central book and fullscreen reader now start with an illustrated, accessible direct-website gateway. Visitors may explicitly **Try safe in-book preview**; the existing sandbox remains unchanged and never gains same-origin or device permissions to make a game appear playable. Direct full-tab links remain prominent. Directory previews remain opt-in with clearer sandbox explanations.
+
+The canonical catalog now reconciles the URLs of ordinary seeded or locally saved repository chapters against the **already-verified public manifest**, even when an old browser snapshot has a stale path or wrong letter case. It preserves existing chapter IDs, user titles/edits, passport, bookmarks, custom chapter URLs, filters and tours. Unverified candidate URLs do not override locally saved links, and custom records are never silently changed.
+
+A verified HTTP HTML page is not proof that all JavaScript/CSS dependencies execute correctly. The next production acceptance pass should record broken direct URLs separately from browser sandbox limitations; the Atlas cannot introspect a cross-origin iframe to reliably identify its internal 404.
+
+
+
 ## October 29: New Horizons and Xi gateway placement
 
 **New Horizons** is a reviewed public-repository showcase near the bottom of the living library, featuring Break the Matrix (BTM), Spark: The Substrate, Echoes of the Nine, TweedleVerse, LENZ, FieldStoryForge, Gen.E.Wrist, Backyard Production Company and REEL Commons. Cards offer public GitHub source links; **Open chapter** only appears when the associated chapter is already present in the visitor's accessible catalog. A public repository is not automatically a verified live Pages website. No source card is injected into the canonical chapter catalog or given iframe access.

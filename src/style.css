@@ -889,3 +889,18 @@ a { color:inherit; }
 .reader-focus-mode .new-horizons,.reader-focus-mode .xi-atlas-source-door{display:none}
 @media(max-width:900px){.new-horizons-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:620px){.new-horizons{margin:20px 12px 18px;padding:17px 13px}.new-horizons-grid{grid-template-columns:1fr}.new-horizons-card h3{font-size:23px}}
+
+/* A deliberate, readable fallback for websites that cannot run in iframe sandboxes. */
+.atlas-preview-gateway{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;min-height:100%;padding:23px 21px;background:radial-gradient(circle at 50% 20%,rgba(162,126,91,.21),transparent 55%),linear-gradient(145deg,#1c2532,#23222c);color:#f3e7d2}
+.atlas-preview-gateway-mark{display:block;font:500 46px/1 Georgia,serif;color:#e0bc86}
+.atlas-preview-gateway-label{font:700 9px/1.4 'DM Sans',sans-serif;letter-spacing:.15em;color:#c5ddcf}
+.atlas-preview-gateway h3{font:500 clamp(21px,3vw,31px)/1.13 'Cormorant Garamond',Georgia,serif;margin:0;color:#ffe5bb}
+.atlas-preview-gateway p{font:400 11px/1.55 'DM Sans',sans-serif;max-width:410px;margin:0;color:#eee3d2}
+.atlas-preview-gateway-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:8px}
+.atlas-preview-gateway-actions a,.atlas-preview-gateway-actions button{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:38px;padding:8px 11px;border:1px solid #d9b986;border-radius:8px;background:#715039;color:#fff4da;cursor:pointer;text-decoration:none;font:700 10px 'DM Sans',sans-serif}
+.atlas-preview-gateway-actions button{background:rgba(87,103,96,.4);border-color:#a7b8ae}
+.atlas-preview-gateway-actions a:hover,.atlas-preview-gateway-actions button:hover{background:#886443}
+.atlas-preview-gateway-actions a:focus-visible,.atlas-preview-gateway-actions button:focus-visible{outline:3px solid #ffe4a8;outline-offset:3px}
+.atlas-preview-gateway small{font:400 10px/1.45 'DM Sans',sans-serif;color:#cfcec7;max-width:450px}
+.portal-modal .atlas-preview-gateway{flex:1;min-height:220px}
+@media(max-width:650px){.atlas-preview-gateway{padding:13px 9px;gap:7px}.atlas-preview-gateway-mark{font-size:28px}.atlas-preview-gateway h3{font-size:23px}.atlas-preview-gateway p,.atlas-preview-gateway small{font-size:9px}.atlas-preview-gateway-actions a,.atlas-preview-gateway-actions button{min-height:36px;font-size:9px;padding:7px 9px}}

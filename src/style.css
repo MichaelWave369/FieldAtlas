@@ -870,3 +870,22 @@ a { color:inherit; }
 .xi-atlas-links{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end}
 .xi-atlas-links a{display:inline-block}
 @media(max-width:700px){.xi-atlas-links{justify-content:flex-start}}
+
+/* October 2026: reviewed new-project showcase, preserving the living book as the main event. */
+.new-horizons{max-width:1120px;margin:34px auto 22px;padding:24px 22px 22px;border:1px solid rgba(224,190,137,.47);border-radius:17px;background:linear-gradient(145deg,rgba(31,26,33,.94),rgba(28,43,45,.93));color:#f8ead2;box-shadow:0 15px 36px rgba(0,0,0,.2)}
+.new-horizons-heading .eyebrow{display:inline-flex;align-items:center;gap:7px;color:#cde9d4;font-size:10px;letter-spacing:.13em}
+.new-horizons-heading h2{font:500 clamp(30px,4vw,43px)/1.1 'Cormorant Garamond',Georgia,serif;margin:8px 0}
+.new-horizons-heading p{font-size:12px;line-height:1.65;color:#e4d6c0;max-width:780px;margin:0 0 19px}
+.new-horizons-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.new-horizons-card{display:flex;flex-direction:column;align-items:flex-start;min-width:0;padding:15px 15px 14px;border:1px solid rgba(220,190,148,.32);border-radius:12px;background:rgba(16,25,30,.58)}
+.new-horizons-card small{color:#b7dfcc;font:750 10px/1.4 'DM Sans',sans-serif;letter-spacing:.1em;text-transform:uppercase}
+.new-horizons-card h3{font:500 24px/1.1 'Cormorant Garamond',Georgia,serif;margin:7px 0;color:#fff0d5}
+.new-horizons-card p{font-size:11px;line-height:1.6;color:#e7d9c8;margin:0 0 14px;flex:1}
+.new-horizons-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.new-horizons-actions button,.new-horizons-actions a{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:8px 10px;border:1px solid rgba(232,206,163,.6);border-radius:8px;color:#fff1d2;background:rgba(104,79,54,.5);text-decoration:none;cursor:pointer;font:700 10px 'DM Sans',sans-serif}
+.new-horizons-actions button:hover,.new-horizons-actions a:hover{background:rgba(125,94,61,.8)}
+.new-horizons-actions button:focus-visible,.new-horizons-actions a:focus-visible{outline:3px solid #f8ddaa;outline-offset:3px}
+.new-horizons-note{margin:14px 0 0;color:#c7c3b8;font:500 10px/1.5 'DM Sans',sans-serif}
+.reader-focus-mode .new-horizons,.reader-focus-mode .xi-atlas-source-door{display:none}
+@media(max-width:900px){.new-horizons-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.new-horizons{margin:20px 12px 18px;padding:17px 13px}.new-horizons-grid{grid-template-columns:1fr}.new-horizons-card h3{font-size:23px}}

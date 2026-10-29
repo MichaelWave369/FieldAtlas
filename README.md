@@ -1,5 +1,14 @@
 # The Field Atlas ✦
 
+## October 29: New Horizons and Xi gateway placement
+
+**New Horizons** is a reviewed public-repository showcase near the bottom of the living library, featuring Break the Matrix (BTM), Spark: The Substrate, Echoes of the Nine, TweedleVerse, LENZ, FieldStoryForge, Gen.E.Wrist, Backyard Production Company and REEL Commons. Cards offer public GitHub source links; **Open chapter** only appears when the associated chapter is already present in the visitor's accessible catalog. A public repository is not automatically a verified live Pages website. No source card is injected into the canonical chapter catalog or given iframe access.
+
+The existing **After Hours** guided route now visits newer games ahead of the earlier arcade chapters, skipping stops not in the visitor's catalog. Public-safe titles, descriptions and categories for those projects are curated without overriding personal browser edits.
+
+The existing **Ξ ⇄ Φ Sovereign Commons Gateway** doorway has been moved from directly below the introduction to the bottom of the page, after New Horizons and immediately before the footer. Both verified static-website and source links remain unchanged. This is not a claim of a live Xi peer, an authorized protocol, or a completed two-host test. Reader Focus Mode hides both promotional sections to preserve the original book-first experience.
+
+
 ## Atlas ↔ Constellation: the public identity return bridge
 
 Field Atlas can now show **View in Constellation** beside **Share chapter** when the current chapter has exactly one matching row in the already-fetched, **verified public** `pages-discovered.json` manifest. The outgoing link opens `https://michaelwave369.github.io/FieldConstellation/?repo=github:<numeric-id>` in a new tab, focusing that public project in the existing 3D observatory.

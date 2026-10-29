@@ -21,8 +21,8 @@ export const visitorJourneys = Object.freeze([
   },
   {
     id: 'after-hours', name: 'After Hours', glyph: '♠', accent: '#e6b578',
-    kicker: 'PLAY & EXPLORE', description: 'An arcade-flavored walk through games and playful projects.',
-    repos: ['GiltHouse', 'PhiCade', 'PorchQuest369', 'parallax-arc', 'NightCircuit'],
+    kicker: 'PLAY & EXPLORE', description: 'Travel from retro VR action and fantasy RPGs into our arcade worlds.',
+    repos: ['BTM', 'SparkTheSubstrate', 'EchoesOfTheNine', 'TweedleVerse', 'LENZ', 'GiltHouse', 'PhiCade', 'PorchQuest369', 'parallax-arc', 'NightCircuit'],
   },
 ]);
 

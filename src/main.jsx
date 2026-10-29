@@ -120,6 +120,24 @@ function PublicationLeaf({ page, fullscreen = false }) {
   </section>;
 }
 
+/**
+ * A hosted web app may need first-party storage, OAuth or WebXR permissions.
+ * Atlas never silently relaxes iframe sandboxing to make an embed work.
+ */
+function PreviewGateway({ page, onTryPreview }) {
+  return <div className="atlas-preview-gateway" role="group" aria-label={'Open '+page.title+' website'}>
+    <span className="atlas-preview-gateway-mark" aria-hidden="true">✧</span>
+    <span className="atlas-preview-gateway-label">THE WORLD IS ONE CLICK AWAY</span>
+    <h3>{page.title}</h3>
+    <p>Games and creative apps may need a full browser tab for storage, controls, audio or VR. Open the original site for the complete experience.</p>
+    <div className="atlas-preview-gateway-actions">
+      <a href={page.url} target="_blank" rel="noopener noreferrer"><ExternalLink size={15}/> Open full website</a>
+      <button type="button" onClick={onTryPreview}><Eye size={15}/> Try safe in-book preview</button>
+    </div>
+    <small>The optional preview uses a restricted frame. A blank frame does not prove the website is offline.</small>
+  </div>;
+}
+
 function App() {
   const {
     pages, setPages, localEdits,
@@ -151,6 +169,7 @@ function App() {
   const [flipping, setFlipping] = useState('');
   const [shelfOpen, setShelfOpen] = useState(false);
   const [portalOpen, setPortalOpen] = useState(false);
+  const [previewKey, setPreviewKey] = useState(null);
   const [focusMode, setFocusMode] = useState(false);
   const [bookPanel, setBookPanel] = useState(null);
   const [mapOpen, setMapOpen] = useState(false);
@@ -176,6 +195,8 @@ function App() {
   catalogRef.current = catalog;
   const index = Math.min(Math.max(current, 0), Math.max(0, filtered.length - 1));
   const active = filtered[index];
+  const activePreviewKey = active ? String(active.id) + '|' + active.url : null;
+  const showInBookPreview = Boolean(active && previewKey === activePreviewKey);
   const constellationUrl = constellationChapterUrl(active,publishedPages);
   const relatedThreads = useMemo(() => findFieldThreads(active, catalog, 5), [active, catalog]);
   const documentedConnections = useMemo(() => resolveDocumentedConnections(active, catalog), [active, catalog]);
@@ -612,9 +633,11 @@ function App() {
                       onSurface={() => setMirrorDepth(d => nextMirrorDepth(d, -1))} />
                   : publication
                     ? <PublicationLeaf page={active}/>
-                    : !directoryOpen && <iframe key={active.id + active.url} title={`Live website: ${active.title}`} loading="lazy" src={active.url} referrerPolicy="strict-origin-when-cross-origin" sandbox={PREVIEW_SANDBOX} allow="fullscreen" allowFullScreen />}
+                    : !directoryOpen && (showInBookPreview
+                       ? <iframe key={active.id + active.url} title={`Optional sandboxed website: ${active.title}`} loading="lazy" src={active.url} referrerPolicy="strict-origin-when-cross-origin" sandbox={PREVIEW_SANDBOX} allow="fullscreen" allowFullScreen />
+                       : <PreviewGateway page={active} onTryPreview={() => setPreviewKey(activePreviewKey)} />)}
               </div>
-              <div className="preview-footnote"><span className="live-dot" /> {fieldception ? 'SAFE MIRROR CHAMBER' : publication ? 'CURATED ARCHIVE REFERENCE' : 'LIVE WEBSITE PREVIEW'} <span className="preview-hint">{fieldception ? 'Five illustrated reflections, zero recursive iframes.' : publication ? 'Zenodo is authoritative. No remote PDF is embedded.' : 'Some sites block embedding. Open the portal instead.'}</span></div>
+              <div className="preview-footnote"><span className="live-dot" /> {fieldception ? 'SAFE MIRROR CHAMBER' : publication ? 'CURATED ARCHIVE REFERENCE' : showInBookPreview ? 'SANDBOXED LIVE PREVIEW' : 'DIRECT WEBSITE GATEWAY'} <span className="preview-hint">{fieldception ? 'Five illustrated reflections, zero recursive iframes.' : publication ? 'Zenodo is authoritative. No remote PDF is embedded.' : showInBookPreview ? 'Blank or unresponsive? Use Open this world for the full app.' : 'Open the original site for full features; optional preview remains restricted.'}</span></div>
             </div>
             <div className="portal-actions">
               <a className="gold-btn" href={active.url} target="_blank" rel="noopener noreferrer"><ExternalLink size={15}/> {publication ? 'Open Zenodo record' : 'Open this world'}</a>
@@ -787,8 +810,10 @@ function App() {
             onSurface={() => setMirrorDepth(d => nextMirrorDepth(d, -1))}/>
         : publication
           ? <PublicationLeaf page={active} fullscreen/>
-          : <iframe key={'full-'+active.id} title={`Fullscreen website ${active.title}`} src={active.url} referrerPolicy="strict-origin-when-cross-origin" sandbox={PREVIEW_SANDBOX} allow="fullscreen" allowFullScreen />}
-      <p className="modal-embed-hint">{fieldception ? 'The Infinite Atlas is a bounded illustration. Open outside the Atlas to view the actual site.' : publication ? 'This is an index reference, not a live PDF preview. Open Zenodo for the original record and files.' : 'If a page is blank, its host may prevent iframe embedding. Use “Open outside atlas.”'}</p>
+          : showInBookPreview
+            ? <iframe key={'full-'+active.id} title={`Optional fullscreen sandboxed website ${active.title}`} src={active.url} referrerPolicy="strict-origin-when-cross-origin" sandbox={PREVIEW_SANDBOX} allow="fullscreen" allowFullScreen />
+            : <PreviewGateway page={active} onTryPreview={() => setPreviewKey(activePreviewKey)} />}
+      <p className="modal-embed-hint">{fieldception ? 'The Infinite Atlas is a bounded illustration. Open outside the Atlas to view the actual site.' : publication ? 'This is an index reference, not a live PDF preview. Open Zenodo for the original record and files.' : 'If a sandbox preview is blank or restricted, use “Open outside atlas” for the original full-featured app.'}</p>
     </div>}
 
     {mapOpen && <LibraryMap wings={wings} catalog={catalog} currentWing={wing} visitedIds={visitedChapters}

@@ -7,6 +7,15 @@ import { censusCategoryForRepo } from './census-categories.js';
  * A descriptive fallback is used for new releases until reviewed.
  */
 export const projectOverrides = Object.freeze({
+  'BTM': { title:'Break the Matrix', category:'Games', desc:'A retro sci-fi raycasting shooter with a playable browser campaign and immersive Quest 3 WebXR mode.' },
+  'SparkTheSubstrate': { title:'Spark: The Substrate', category:'Games', desc:'A free fantasy adventure with branching choices, elemental combat, and a browser-based immersive VR Descent.' },
+  'EchoesOfTheNine': { title:'Echoes of the Nine', category:'Games', desc:'An original science-fantasy JRPG with choices, party combat and an experimental immersive battle view.' },
+  'TweedleVerse': { title:'TweedleVerse', category:'Games', desc:'A surreal comedy world of Stemside stories, arcade adventures and TweedlePD detective mysteries.' },
+  'LENZ': { title:'LENZ', category:'Games', desc:'A genre-shifting adventure prototype connecting exploration, horror, dungeons and platforming through alternate realities.' },
+  'FieldStoryForge': { title:'FieldStoryForge', category:'Creative', desc:'A local-first studio for creating branching illustrated comic adventures, story maps and portable offline readers.' },
+  'GenEWrist': { title:'Gen.E.Wrist', category:'Systems', desc:'A reusable local-first wrist console with a universal 3–6–9 home and contextual WORLD mode for connected experiences.' },
+  'BackyardProductionCompany': { title:'Backyard Production Company', category:'Creative', desc:'A creative studio lot and production ledger connecting independently maintained art, sound, animation and XR projects.' },
+  'ReelCommons': { title:'REEL Commons', category:'Tools', desc:'A developing open media and production toolkit within the Field creative ecosystem.' },
   '12fold': { title:'Twelvefold Earth Compact', category:'Research' },
   'PocketBrain': { title:'PocketBrain', category:'Intelligence' },
   'Vibe': { title:'Vibe Language', category:'Systems' },

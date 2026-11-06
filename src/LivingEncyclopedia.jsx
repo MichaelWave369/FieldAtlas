@@ -6,6 +6,7 @@ import {
   dossierConstellationUrl, dossierShareUrl,
 } from './encyclopedia-data.js';
 import { constellationProjectId } from './constellation-bridge.js';
+import { chronicleShareUrl } from './chronicle-data.js';
 
 const CHUNK_SIZE = 16;
 function dateLabel(value) {
@@ -99,6 +100,7 @@ export default function LivingEncyclopedia({
               <a href={selected.sourceUrl} target="_blank" rel="noopener noreferrer"><ExternalLink size={15}/> Open source</a>
               {chapter && <button type="button" onClick={() => onReadChapter(chapter)}><BookOpen size={15}/> Read live chapter</button>}
               {constellation && <a href={constellation} target="_blank" rel="noopener noreferrer"><Network size={15}/> Locate in Constellation</a>}
+              {typeof window !== 'undefined' && <a href={chronicleShareUrl(window.location.href,{repo:selected.repo})}><GitMerge size={15}/> View in Chronicle</a>}
               {share && <a href={share}><Share2 size={15}/> Share dossier link</a>}
             </div>
             {!chapter && <p className="atlas-encyclopedia-source-only">Source-only dossier. No verified, accessible live chapter is implied.</p>}

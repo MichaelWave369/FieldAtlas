@@ -1,5 +1,14 @@
 # The Field Atlas ✦
 
+## R8 · The Field Chronicle (evidence-first timeline candidate)
+
+The **Field Chronicle** is a new, collapsible, responsive history lens below the Living Encyclopedia. It combines every dated event in the current **public R7 source snapshot** into one searchable, filterable timeline: GitHub repository creation, up to four recent **actually merged** PRs per source dossier, and the repository's last observed push. A month-by-month **Temporal Pulse** reveals recorded activity clusters without pretending to measure deploys or commits. Visitors can filter by repository, year, month, event kind or text, reverse chronological direction, inspect source links, and open R7 dossiers or numeric-ID Constellation locators. Shareable links like `?chronicle=GMED&chronicleKind=merged#field-chronicle` work without accounts.
+
+**Evidence limits matter:** project ideas can predate repository creation; a merged PR is not a production deployment; a push is not a launch. Older PRs are absent from R7's bounded recent sample, and unavailable history is never treated as zero activity. The cross-project **Crossroads** section displays *undated, citation-pinned* R4B documentary relationships separately, not as invented milestone dates.
+
+R8 reuses the exact static source inventory already refreshed in R7's deployment workflow. No extra browser APIs, private scans, guessed live websites, new dependencies or changes to the original book, bookmarks, passport, Pages verification, domain/DNS or manual launch ledger. See [R8 Chronicle design and verification](docs/R8_FIELD_CHRONICLE.md). Issue #32's 12 manual gates remain **NOT APPROVED**.
+
+
 ## R7 · The Living Encyclopedia (source-dossier candidate)
 
 A collapsible **Living Encyclopedia** now sits beside the existing living book. Each public owner repository can have an automatically refreshed **source dossier**, including GitHub creation and latest-push observations, up to four actually **merged** PR milestones with evidence links, documented R4B relationships, and a numeric-ID locator into Field Constellation. Browse, search, and share via `?dossier=GMED#living-encyclopedia`. The **New Horizons** source cards link to their dossier when present.

@@ -30,7 +30,7 @@ test('R8 filters source events, then restores the full timeline without losing t
   await chronicle.getByRole('button',{name:'Merged PRs'}).click();
   await expect(chronicle.locator('.field-chronicle-event').first()).toContainText('Merged PR #2');
   await chronicle.getByRole('button',{name:'All recorded events'}).click();
-  await expect(chronicle.locator('.field-chronicle-event').count()).resolves.toBeGreaterThan(1);
+  expect(await chronicle.locator('.field-chronicle-event').count()).toBeGreaterThan(1);
   await expect(page.locator('.atlas-book')).toBeAttached();
 });
 

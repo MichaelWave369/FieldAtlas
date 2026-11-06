@@ -24,6 +24,7 @@ import BookForeEdge from './BookForeEdge';
 import DirectoryPeek from './DirectoryPeek';
 import FieldThreads from './FieldThreads';
 import LivingEncyclopedia from './LivingEncyclopedia';
+import FieldChronicle from './FieldChronicle';
 import { findDossier } from './encyclopedia-data.js';
 import { findFieldThreads } from './field-threads.js';
 import { resolveDocumentedConnections } from './provenance-connections.js';
@@ -769,6 +770,9 @@ function App() {
       generatedAt={encyclopedia.generatedAt} complete={encyclopedia.complete}
       status={encyclopedia.status} catalog={catalog} publishedPages={publishedPages}
       onReadChapter={page => { openChapterFromDirectory(page); scrollToReader(); }} />
+
+    <FieldChronicle dossiers={encyclopedia.repositories} generatedAt={encyclopedia.generatedAt}
+      complete={encyclopedia.complete} status={encyclopedia.status} />
 
     <section className="new-horizons" aria-labelledby="new-horizons-title">
       <div className="new-horizons-heading">

@@ -23,6 +23,8 @@ import { RECENT_FIELD_PROJECTS, selectRecentFieldProjects } from './new-horizons
 import BookForeEdge from './BookForeEdge';
 import DirectoryPeek from './DirectoryPeek';
 import FieldThreads from './FieldThreads';
+import LivingEncyclopedia from './LivingEncyclopedia';
+import { findDossier } from './encyclopedia-data.js';
 import { findFieldThreads } from './field-threads.js';
 import { resolveDocumentedConnections } from './provenance-connections.js';
 import { PREVIEW_SANDBOX } from './preview-policy.js';
@@ -31,6 +33,7 @@ import useAtlasCatalog from './hooks/useAtlasCatalog.js';
 import useAtlasPassport from './hooks/useAtlasPassport.js';
 import { makePassportBackup, readPassportBackup, PASSPORT_TRANSFER_MAX_BYTES } from './passport-transfer.js';
 import useAtlasManifest from './hooks/useAtlasManifest.js';
+import useEncyclopediaSnapshot from './hooks/useEncyclopediaSnapshot.js';
 import useAtlasCuration from './hooks/useAtlasCuration.js';
 import useAtlasDiscovery from './hooks/useAtlasDiscovery.js';
 import { directoryCollections, directoryCollectionCounts, selectDirectoryCollection, isAtlasFindShortcut } from './directory-explorer.js';
@@ -164,6 +167,7 @@ function App() {
   const { publishedPages, manifestStatus } = useAtlasManifest({
     pages, setDiscovery, baseUrl: import.meta.env.BASE_URL,
   });
+  const encyclopedia = useEncyclopediaSnapshot(import.meta.env.BASE_URL);
   const [search, setSearch] = useState('');
   const [current, setCurrent] = useState(0);
   const [flipping, setFlipping] = useState('');
@@ -761,6 +765,11 @@ function App() {
       </div>}
     </section>
 
+    <LivingEncyclopedia active={active} dossiers={encyclopedia.repositories}
+      generatedAt={encyclopedia.generatedAt} complete={encyclopedia.complete}
+      status={encyclopedia.status} catalog={catalog} publishedPages={publishedPages}
+      onReadChapter={page => { openChapterFromDirectory(page); scrollToReader(); }} />
+
     <section className="new-horizons" aria-labelledby="new-horizons-title">
       <div className="new-horizons-heading">
         <span className="eyebrow"><Sparkles size={15}/> FRESHLY FORGED · NOVEMBER 2026</span>
@@ -774,6 +783,11 @@ function App() {
           <p>{project.summary}</p>
           <div className="new-horizons-actions">
             {chapter && <button type="button" onClick={() => {openChapterFromDirectory(chapter);scrollToReader();}} aria-label={'Open '+chapter.title+' chapter in the Atlas'}><BookOpen size={14}/> Open chapter</button>}
+            {findDossier(encyclopedia.repositories,project.repo) && <a
+              href={'?dossier='+encodeURIComponent(project.repo)+'#living-encyclopedia'}
+              aria-label={'Open '+project.title+' source dossier in the Living Encyclopedia'}>
+              <LibraryBig size={14}/> Open dossier
+            </a>}
             <a href={project.sourceUrl} target="_blank" rel="noopener noreferrer" aria-label={'View '+project.title+' public GitHub repository'}><ExternalLink size={14}/> GitHub source</a>
           </div>
         </article>)}

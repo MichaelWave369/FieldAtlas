@@ -47,6 +47,30 @@ test('new games and creative tools have reviewed shelves, not vague-name fallbac
   assert.equal(inferProjectCategory('ReelCommons'),'Tools');
 });
 
+
+test('newly reviewed public project names land in their intended wings', () => {
+  const groups = {
+    Games: ['PhiBall369','RacetoOblivion'],
+    Intelligence: ['PhiTriBrain369'],
+    Systems: ['PhiMadaPrime','PhiOS-Mobile'],
+    Creative: ['ARCLight'],
+    Research: ['CompAware'],
+    Learning: ['RetroVerse'],
+    Music: ['PhianoSheets'],
+    Tools: ['GMED','OverStrings','PaperGhost'],
+  };
+  for (const [category, repos] of Object.entries(groups)) {
+    for (const repo of repos) {
+      assert.equal(inferProjectCategory(repo), category, repo);
+      const chapter = curateProject({
+        id: 'gh-test', repo, title: repo, category: 'Other',
+        url: 'https://michaelwave369.github.io/' + repo + '/',
+      });
+      assert.equal(chapter.category, category, repo);
+    }
+  }
+});
+
 test('After Hours incorporates new games without breaking old destinations', () => {
   const names=['BTM','SparkTheSubstrate','EchoesOfTheNine','TweedleVerse','LENZ','GiltHouse','PhiCade'];
   const catalog=names.map(repo=>({repo,id:repo,url:'https://example.org/'+repo}));

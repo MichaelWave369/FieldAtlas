@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import './encyclopedia.css';
 import { BookOpen, ExternalLink, GitMerge, LibraryBig, Search, Clock3, Network, Share2 } from 'lucide-react';
 import {
   readDossierQuery, findDossier, dossierConnections, dossierTimeline,

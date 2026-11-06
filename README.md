@@ -1,5 +1,14 @@
 # The Field Atlas ✦
 
+## November 5: Fix the live acceptance drift + open new shelves
+
+The October 29 web-preview change intentionally introduced an **opt-in gateway** instead of automatically launching third-party iframes. The deployed website remained accessible and the build/deployment stages succeeded, but the post-deploy Chromium check still demanded an iframe immediately. Eight live portal checks failed against the outdated assertion. The production tests now verify the actual visitor behavior: **no iframe before consent, full-tab link always present, one restricted iframe after an explicit preview click, and no iframe for archival Zenodo records**. These checks still do not assert that a third-party app can run inside the sandbox.
+
+The **New Horizons** source shelves now cover November public repositories: PhiBall369, GMED, PhiTriBrain369, PhiMadaPrime, ARCLight, Race to Oblivion, OverStrings, CompAware, RetroVerse, PhiOS Mobile, PhianoSheets and PaperGhost. These are verified **public GitHub source repositories**, not invented live Pages destinations. Reader chapters still require the independently verified published manifest or an existing locally curated chapter. Their reviewed editorial categories improve future discovery without changing IDs, URLs, bookmarks, passport stamps or user edits.
+
+The Atlas stays a book first: no forced third-party embeds, no new permissions or dependencies, no private repo scans, and **no DNS/CNAME/custom-domain changes**. The manual twelve-gate acceptance issue remains open and **NOT_APPROVED**. Green CI only demonstrates those automated checks; physical mobile, screen-reader, full-tab gameplay and domain-readiness must still be tested separately.
+
+
 ## October 29: Chapter link and preview resilience
 
 The Atlas distinguishes **verified live destination** from **embeddable/runnable in a sandbox**. The central book and fullscreen reader now start with an illustrated, accessible direct-website gateway. Visitors may explicitly **Try safe in-book preview**; the existing sandbox remains unchanged and never gains same-origin or device permissions to make a game appear playable. Direct full-tab links remain prominent. Directory previews remain opt-in with clearer sandbox explanations.

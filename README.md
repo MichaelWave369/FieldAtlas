@@ -1,5 +1,14 @@
 # The Field Atlas ✦
 
+## R7 · The Living Encyclopedia (source-dossier candidate)
+
+A collapsible **Living Encyclopedia** now sits beside the existing living book. Each public owner repository can have an automatically refreshed **source dossier**, including GitHub creation and latest-push observations, up to four actually **merged** PR milestones with evidence links, documented R4B relationships, and a numeric-ID locator into Field Constellation. Browse, search, and share via `?dossier=GMED#living-encyclopedia`. The **New Horizons** source cards link to their dossier when present.
+
+The GitHub Actions build/PR workflows generate `public/encyclopedia.json` from public-only repositories and bounded merged-PR lookups. A checked-in partial fallback avoids a blank feature when GitHub is temporarily unavailable. **Source dossier ≠ verified live website chapter**, and merge history ≠ deployment or independent functional proof. The live chapter action remains gated by the existing verified Pages manifest and accessible reader chapter. No private repo access, browser GitHub credentials, third-party embed, visitor-storage migration, or domain/DNS changes were introduced.
+
+See [R7 architecture and evidence boundaries](docs/R7_LIVING_ENCYCLOPEDIA.md). This is an automated-test candidate; issue #32's twelve manual release gates remain **NOT_APPROVED**.
+
+
 ## November 5: Fix the live acceptance drift + open new shelves
 
 The October 29 web-preview change intentionally introduced an **opt-in gateway** instead of automatically launching third-party iframes. The deployed website remained accessible and the build/deployment stages succeeded, but the post-deploy Chromium check still demanded an iframe immediately. Eight live portal checks failed against the outdated assertion. The production tests now verify the actual visitor behavior: **no iframe before consent, full-tab link always present, one restricted iframe after an explicit preview click, and no iframe for archival Zenodo records**. These checks still do not assert that a third-party app can run inside the sandbox.

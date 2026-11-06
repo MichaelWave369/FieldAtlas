@@ -41,14 +41,24 @@ for (const portal of portals) {
     await expect(action).toHaveAttribute('rel', /noreferrer/);
 
     const frame = page.locator('article.portal-page .iframe-shell iframe');
+    // A hosted app must never load before the visitor explicitly opts in.
+    await expect(frame).toHaveCount(0);
     if (portal.kind === 'research') {
-      await expect(frame).toHaveCount(0);
+      await expect(page.locator('article.portal-page .atlas-preview-gateway')).toHaveCount(0);
       await expect(action).toContainText('Open Zenodo record');
     } else {
+      const gateway = page.locator('article.portal-page .atlas-preview-gateway');
+      await expect(gateway).toBeVisible();
+      const direct = gateway.getByRole('link', { name: 'Open full website' });
+      await expect(direct).toHaveAttribute('href', portal.url);
+      await expect(direct).toHaveAttribute('target', '_blank');
+      await expect(direct).toHaveAttribute('rel', /noopener/);
+      await gateway.getByRole('button', { name: 'Try safe in-book preview' }).click();
       await expect(frame).toHaveCount(1);
       await expect(frame).toHaveAttribute('src', portal.url);
       await expect(frame).toHaveAttribute('sandbox', PREVIEW_SANDBOX);
       await expect(action).toContainText('Open this world');
+      await expect(action).toHaveAttribute('href', portal.url);
     }
   });
 }

@@ -1,0 +1,58 @@
+/* R7: a source-first folio beside the living book, not a second website reader. */
+.atlas-encyclopedia{position:relative;z-index:3;max-width:1240px;margin:0 auto 26px;border:1px solid rgba(235,195,133,.42);border-radius:20px;background:linear-gradient(125deg,rgba(49,32,29,.96),rgba(15,20,33,.96));box-shadow:0 24px 60px rgba(4,3,10,.36);color:#f4dfc2;overflow:hidden}
+.atlas-encyclopedia-toggle{list-style:none;cursor:pointer;display:flex;align-items:center;gap:17px;padding:21px 25px;min-height:92px}
+.atlas-encyclopedia-toggle::-webkit-details-marker{display:none}
+.atlas-encyclopedia-toggle:focus-visible,.atlas-encyclopedia button:focus-visible,.atlas-encyclopedia a:focus-visible,.atlas-encyclopedia input:focus-visible{outline:3px solid #e9c88d;outline-offset:3px}
+.atlas-encyclopedia-crest{display:grid;place-items:center;flex:0 0 60px;width:60px;height:60px;border-radius:18px;border:1px solid #cda66d;background:radial-gradient(circle at 35% 25%,#856145,#292434);color:#f2d9a8;font:40px Georgia,serif;box-shadow:0 0 25px rgba(212,168,102,.15)}
+.atlas-encyclopedia-heading{display:flex;flex-direction:column;gap:4px;flex:1;min-width:0}
+.atlas-encyclopedia-heading small,.atlas-encyclopedia-kicker{font:700 10px 'DM Sans',sans-serif;letter-spacing:.19em;color:#d9b17b}
+.atlas-encyclopedia-heading strong{font:600 clamp(26px,3vw,37px)/1 'Cormorant Garamond',Georgia,serif;color:#ffebc7}
+.atlas-encyclopedia-heading span{font-size:11px;color:#d3bdab}
+.atlas-encyclopedia-enter{font-size:12px;font-weight:700;color:#f3cd99;white-space:nowrap}
+.atlas-encyclopedia[open] .atlas-encyclopedia-toggle{border-bottom:1px solid rgba(232,197,146,.22)}
+.atlas-encyclopedia-content{padding:22px}
+.atlas-encyclopedia-intro{margin:0 0 8px;font-size:13px;line-height:1.65;color:#e8d2b4;max-width:1050px}
+.atlas-encyclopedia-status{font-size:11px;color:#bfae9d;margin:0 0 19px}
+.atlas-encyclopedia-layout{display:grid;grid-template-columns:minmax(220px,300px) minmax(0,1fr);gap:16px;align-items:start}
+.atlas-encyclopedia-directory,.atlas-encyclopedia-dossier{border:1px solid rgba(226,179,116,.23);border-radius:13px;background:rgba(8,11,21,.47)}
+.atlas-encyclopedia-directory{padding:15px;min-width:0}
+.atlas-encyclopedia-directory label{display:flex;align-items:center;gap:9px;color:#f0d7b2;font-weight:700;font-size:12px;margin-bottom:9px}
+.atlas-encyclopedia-directory input{display:block;width:100%;padding:11px 12px;border-radius:8px;border:1px solid #9a7654;background:#211d25;color:#fff2db;font:13px 'DM Sans',sans-serif}
+.atlas-encyclopedia-directory>small{display:block;font-size:10px;color:#cab49b;margin:9px 0}
+.atlas-encyclopedia-list{display:grid;gap:6px;max-height:465px;overflow-y:auto;scrollbar-color:#99744c transparent;padding:2px}
+.atlas-encyclopedia-list button{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;text-align:left;gap:5px 10px;width:100%;border:1px solid transparent;border-radius:8px;background:rgba(202,172,131,.07);color:#f3dfc5;padding:10px;cursor:pointer;word-break:break-word}
+.atlas-encyclopedia-list button span{font-size:12px;font-weight:700}
+.atlas-encyclopedia-list button small{font-size:10px;color:#b4a6a5}
+.atlas-encyclopedia-list button:hover,.atlas-encyclopedia-list button.atlas-dossier-selected{border-color:#dfb577;background:rgba(207,163,100,.22)}
+.atlas-encyclopedia-more{margin-top:10px;background:#443326;border:1px solid #98714b;border-radius:8px;padding:9px 12px;color:#f1d3a2;cursor:pointer;font-size:11px}
+.atlas-encyclopedia-disclaimer{line-height:1.5}
+.atlas-encyclopedia-dossier{padding:20px;min-height:335px}
+.atlas-encyclopedia-kicker{display:inline-flex;align-items:center;gap:9px}
+.atlas-encyclopedia-dossier h3{font:600 clamp(27px,3vw,41px)/1.05 'Cormorant Garamond',Georgia,serif;margin:9px 0;color:#ffe6bd;overflow-wrap:anywhere}
+.atlas-encyclopedia-dossier-head>p{font-size:13px;line-height:1.55;color:#dccabb;max-width:740px}
+.atlas-encyclopedia-metadata{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.atlas-encyclopedia-metadata span{font-size:10px;padding:5px 8px;border:1px solid rgba(222,189,145,.3);border-radius:100px;color:#dcc9ab}
+.atlas-encyclopedia-actions{display:flex;gap:8px;flex-wrap:wrap;margin:17px 0}
+.atlas-encyclopedia-actions a,.atlas-encyclopedia-actions button{display:inline-flex;align-items:center;gap:7px;border:1px solid #a88758;border-radius:8px;padding:9px 11px;background:rgba(137,96,54,.26);color:#ffe1af;font-size:11px;text-decoration:none;cursor:pointer}
+.atlas-encyclopedia-actions a:hover,.atlas-encyclopedia-actions button:hover{background:rgba(172,121,66,.42)}
+.atlas-encyclopedia-source-only,.atlas-encyclopedia-warning,.atlas-encyclopedia-history-note{font-size:11px;line-height:1.5;color:#edcaab;border-left:2px solid #cfaa78;padding:5px 10px}
+.atlas-encyclopedia-timeline,.atlas-encyclopedia-relations{border-top:1px solid rgba(211,184,137,.25);padding-top:15px;margin-top:18px}
+.atlas-encyclopedia-timeline h4,.atlas-encyclopedia-relations h4{display:flex;align-items:center;gap:8px;font:700 15px 'DM Sans',sans-serif;color:#e9c695;margin:0 0 12px}
+.atlas-encyclopedia-timeline ol{list-style:none;padding:0;margin:0;display:grid;gap:12px}
+.atlas-encyclopedia-timeline li{display:grid;grid-template-columns:122px minmax(0,1fr);gap:10px;border-left:2px solid rgba(203,160,106,.48);padding:0 0 0 13px}
+.atlas-encyclopedia-date{font-size:11px;color:#c4b1a3}
+.atlas-encyclopedia-timeline li strong{font-size:12px;color:#ffe7c6}
+.atlas-encyclopedia-timeline li p{font-size:12px;color:#d3c1b0;line-height:1.45;margin:4px 0}
+.atlas-encyclopedia-timeline li a,.atlas-encyclopedia-relations a{display:inline-flex;align-items:center;gap:5px;color:#e3b986;font-size:11px;text-underline-offset:3px}
+.atlas-encyclopedia-timeline li small{display:block;margin-top:5px;color:#ad9c9b;font-size:10px}
+.atlas-encyclopedia-relations article{display:flex;justify-content:space-between;gap:15px;padding:13px 0;border-bottom:1px solid rgba(245,216,166,.1)}
+.atlas-encyclopedia-relations article strong{font-size:12px}
+.atlas-encyclopedia-relations article p{font-size:12px;line-height:1.5;color:#d7c5b5}
+.atlas-encyclopedia-relations article small{font-size:10px;color:#b9a8a2}
+.atlas-encyclopedia-connection-actions{display:grid;align-content:center;justify-items:start;gap:7px;min-width:165px}
+.atlas-encyclopedia-connection-actions button{padding:7px;border:1px solid #b68e61;border-radius:8px;color:#f7d5a8;background:transparent;cursor:pointer;font-size:11px}
+.atlas-encyclopedia-empty{font-size:12px;line-height:1.5;color:#d9c8b6}
+.reader-focus-mode .atlas-encyclopedia{display:none}
+@media(max-width:800px){.atlas-encyclopedia-layout{grid-template-columns:1fr}.atlas-encyclopedia-list{max-height:245px}.atlas-encyclopedia-enter{display:none}.atlas-encyclopedia-content{padding:13px}.atlas-encyclopedia-dossier{padding:16px}}
+@media(max-width:500px){.atlas-encyclopedia-toggle{gap:9px;padding:15px}.atlas-encyclopedia-crest{flex-basis:42px;width:42px;height:42px;font-size:29px}.atlas-encyclopedia-heading strong{font-size:25px}.atlas-encyclopedia-timeline li{grid-template-columns:1fr;gap:4px}.atlas-encyclopedia-relations article{display:block}.atlas-encyclopedia-connection-actions{margin-top:12px;min-width:0}.atlas-encyclopedia-actions a,.atlas-encyclopedia-actions button{min-height:38px}}
+@media(prefers-reduced-motion:reduce){.atlas-encyclopedia *{scroll-behavior:auto!important;transition:none!important}}

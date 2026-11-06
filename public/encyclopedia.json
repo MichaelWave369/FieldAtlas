@@ -1,0 +1,177 @@
+{
+  "schema_version": 1,
+  "owner": "MichaelWave369",
+  "generated_at": null,
+  "complete": false,
+  "repository_count": 8,
+  "repositories": [
+    {
+      "id": 1411237134,
+      "repo": "FieldAtlas",
+      "description": "A cozy, interactive library of live GitHub Pages projects by MichaelWave369.",
+      "language": null,
+      "createdAt": "2026-10-09T03:34:56Z",
+      "pushedAt": "2026-11-06T02:19:51Z",
+      "archived": false,
+      "fork": false,
+      "isPublic": true,
+      "historyStatus": "checked",
+      "milestones": [
+        {
+          "kind": "merged-pr",
+          "number": 38,
+          "title": "Restore live Atlas acceptance and refresh November Field project shelves",
+          "date": "2026-11-06T02:19:52Z",
+          "commit": "1c437ef1c1625185996dc18cbbd03d31d330b977"
+        }
+      ]
+    },
+    {
+      "id": 1436160383,
+      "repo": "BTM",
+      "description": "Michael Wave & Ori: Break the Matrix",
+      "language": null,
+      "createdAt": "2026-10-27T19:01:49Z",
+      "pushedAt": "2026-11-06T02:17:10Z",
+      "archived": false,
+      "fork": false,
+      "isPublic": true,
+      "historyStatus": "checked",
+      "milestones": [
+        {
+          "kind": "merged-pr",
+          "number": 72,
+          "title": "Track BTM stabilization audit and Quest 3 field acceptance",
+          "date": "2026-11-06T02:17:10Z",
+          "commit": "c75c79d2136228a777f67606ee47e025d2d791b1"
+        }
+      ]
+    },
+    {
+      "id": 1447196881,
+      "repo": "PhiTriBrain369",
+      "description": "A local-first, model-independent knowledge store for the Phi369 ecosystem.",
+      "language": null,
+      "createdAt": "2026-11-05T15:49:09Z",
+      "pushedAt": "2026-11-06T01:54:38Z",
+      "archived": false,
+      "fork": false,
+      "isPublic": true,
+      "historyStatus": "checked",
+      "milestones": [
+        {
+          "kind": "merged-pr",
+          "number": 14,
+          "title": "Standard Definer Rung 2: Evidence Genesis with scoped WITNESS quote audits",
+          "date": "2026-11-06T01:54:39Z",
+          "commit": "4b0a3382219ef5916e50868b131d8cdcd1f066c8"
+        }
+      ]
+    },
+    {
+      "id": 1443845098,
+      "repo": "PhiMadaPrime",
+      "description": "An armada of Φ software. One living virtual office.",
+      "language": null,
+      "createdAt": "2026-11-03T05:19:12Z",
+      "pushedAt": "2026-11-06T02:27:23Z",
+      "archived": false,
+      "fork": false,
+      "isPublic": true,
+      "historyStatus": "checked",
+      "milestones": [
+        {
+          "kind": "merged-pr",
+          "number": 48,
+          "title": "R36 Mission Router: reconcile PR #41 with unified ThinkTank mainline",
+          "date": "2026-11-06T01:34:49Z",
+          "commit": "b3d079534ac37485a3826dba2d5729c7c2a87876"
+        }
+      ]
+    },
+    {
+      "id": 1447570777,
+      "repo": "GMED",
+      "description": "A local-first, MIT-licensed, read-only GitHub pull-request evidence checker.",
+      "language": null,
+      "createdAt": "2026-11-05T22:16:20Z",
+      "pushedAt": "2026-11-05T23:20:32Z",
+      "archived": false,
+      "fork": false,
+      "isPublic": true,
+      "historyStatus": "checked",
+      "milestones": [
+        {
+          "kind": "merged-pr",
+          "number": 2,
+          "title": "R2: Ouroboros Protocol — independent re-observation and circular-trust refusal",
+          "date": "2026-11-05T23:20:32Z",
+          "commit": "78faac7a410890d5fcffb043b6a7a30585a7df29"
+        }
+      ]
+    },
+    {
+      "id": 1446498503,
+      "repo": "ARCLight",
+      "description": "A story universe about family, freedom, identity, and the people who choose each other.",
+      "language": null,
+      "createdAt": "2026-11-05T03:46:42Z",
+      "pushedAt": "2026-11-05T07:07:32Z",
+      "archived": false,
+      "fork": false,
+      "isPublic": true,
+      "historyStatus": "checked",
+      "milestones": [
+        {
+          "kind": "merged-pr",
+          "number": 2,
+          "title": "Rung 2A: Cinematic prologue, Ori concept art, and ARCLight visual identity",
+          "date": "2026-11-05T07:07:32Z",
+          "commit": "d0267f7325521fabb4b7266bd652cded50265497"
+        }
+      ]
+    },
+    {
+      "id": 1443220237,
+      "repo": "CompAware",
+      "description": "A different substrate. A question of its own.",
+      "language": null,
+      "createdAt": "2026-11-02T16:41:03Z",
+      "pushedAt": "2026-11-04T21:19:24Z",
+      "archived": false,
+      "fork": false,
+      "isPublic": true,
+      "historyStatus": "checked",
+      "milestones": [
+        {
+          "kind": "merged-pr",
+          "number": 16,
+          "title": "R9 research proposal: test optical transport as an optional embodied data path",
+          "date": "2026-11-04T21:19:24Z",
+          "commit": "aa20ce1fab9e4636d3b09601c76b6e595894c70f"
+        }
+      ]
+    },
+    {
+      "id": 1428952721,
+      "repo": "FieldConstellation",
+      "description": "An interactive 3D atlas of MichaelWave369’s public GitHub repositories.",
+      "language": null,
+      "createdAt": "2026-10-21T21:32:29Z",
+      "pushedAt": "2026-11-05T18:42:55Z",
+      "archived": false,
+      "fork": false,
+      "isPublic": true,
+      "historyStatus": "checked",
+      "milestones": [
+        {
+          "kind": "merged-pr",
+          "number": 31,
+          "title": "Edition 31: connect four creator-owned Houses; preserve Quill and QEF pending",
+          "date": "2026-11-05T18:42:56Z",
+          "commit": "06f1d187d7c2c85f11d944fb13232aa8103252b9"
+        }
+      ]
+    }
+  ]
+}

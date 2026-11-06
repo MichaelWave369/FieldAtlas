@@ -26,6 +26,10 @@ jobs:
         run: npm run catalog:sync
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Refresh public repository histories (source-only, not Pages)
+        run: npm run encyclopedia:sync
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: npm run build
       - name: Static Grand Opening preflight (no DNS changes)
         run: npm run launch:preflight

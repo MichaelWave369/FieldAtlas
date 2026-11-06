@@ -6,7 +6,7 @@ import { inferProjectCategory, curateProject } from '../src/curation.js';
 import { availableJourneyStops } from '../src/journeys.js';
 
 test('only reviewed public source projects get spotlight cards', () => {
-  assert.equal(RECENT_FIELD_PROJECTS.length, 9);
+  assert.equal(RECENT_FIELD_PROJECTS.length, 21);
   assert.equal(new Set(RECENT_FIELD_PROJECTS.map(p=>p.repo.toLowerCase())).size, RECENT_FIELD_PROJECTS.length);
   for (const item of RECENT_FIELD_PROJECTS) {
     assert.equal(item.sourceUrl, 'https://github.com/MichaelWave369/'+item.repo);
@@ -16,11 +16,24 @@ test('only reviewed public source projects get spotlight cards', () => {
 
 test('a source-only card never guesses a live chapter or external site', () => {
   const choices=selectRecentFieldProjects([{id:'gh-4',repo:'BTM',title:'Break the Matrix',url:'https://michaelwave369.github.io/BTM/'}]);
-  assert.equal(choices.length, 9);
+  assert.equal(choices.length, 21);
   assert.equal(choices.find(v=>v.project.repo==='BTM').chapter.id,'gh-4');
   assert.equal(choices.find(v=>v.project.repo==='LENZ').chapter,null);
   assert.equal(selectRecentFieldProjects([{repo:'LENZ',url:'javascript:alert(1)'}]).find(v=>v.project.repo==='LENZ').chapter,null);
-  assert.equal(selectRecentFieldProjects(null).length,9);
+  assert.equal(selectRecentFieldProjects(null).length,21);
+});
+
+
+test('November 2026 spotlights distinguish public source from verified live chapters', () => {
+  const wanted = ['PhiBall369','GMED','PhiTriBrain369','PhiMadaPrime','ARCLight','RacetoOblivion','OverStrings','CompAware','RetroVerse','PhiOS-Mobile','PhianoSheets','PaperGhost'];
+  assert.deepEqual(RECENT_FIELD_PROJECTS.slice(0, wanted.length).map(p => p.repo), wanted);
+  const entries = selectRecentFieldProjects([
+    { id:'gh-369', repo:'PhiBall369', url:'https://michaelwave369.github.io/PhiBall369/' },
+    { id:'custom-1', repo:'GMED', url:'javascript:alert(1)' },
+  ]);
+  assert.equal(entries.find(e=>e.project.repo==='PhiBall369').chapter.id,'gh-369');
+  assert.equal(entries.find(e=>e.project.repo==='GMED').chapter,null);
+  assert.ok(entries.every(e => e.project.sourceUrl.startsWith('https://github.com/MichaelWave369/')));
 });
 
 test('new games and creative tools have reviewed shelves, not vague-name fallbacks', () => {
@@ -32,6 +45,30 @@ test('new games and creative tools have reviewed shelves, not vague-name fallbac
   assert.equal(inferProjectCategory('GenEWrist'),'Systems');
   assert.equal(inferProjectCategory('BackyardProductionCompany'),'Creative');
   assert.equal(inferProjectCategory('ReelCommons'),'Tools');
+});
+
+
+test('newly reviewed public project names land in their intended wings', () => {
+  const groups = {
+    Games: ['PhiBall369','RacetoOblivion'],
+    Intelligence: ['PhiTriBrain369'],
+    Systems: ['PhiMadaPrime','PhiOS-Mobile'],
+    Creative: ['ARCLight'],
+    Research: ['CompAware'],
+    Learning: ['RetroVerse'],
+    Music: ['PhianoSheets'],
+    Tools: ['GMED','OverStrings','PaperGhost'],
+  };
+  for (const [category, repos] of Object.entries(groups)) {
+    for (const repo of repos) {
+      assert.equal(inferProjectCategory(repo), category, repo);
+      const chapter = curateProject({
+        id: 'gh-test', repo, title: repo, category: 'Other',
+        url: 'https://michaelwave369.github.io/' + repo + '/',
+      });
+      assert.equal(chapter.category, category, repo);
+    }
+  }
 });
 
 test('After Hours incorporates new games without breaking old destinations', () => {

@@ -29,8 +29,9 @@ In each row prepend
 - Live Chromium desktop and emulated-mobile open each Atlas deep link
   and confirm chapter identity and correct full-tab `href`, `target`
   and `noopener noreferrer` properties.
-- For websites, tests confirm the reader uses a restricted sandbox and
-  always offers an obvious independent full-tab link.
+- For websites, tests first confirm **no third-party iframe loads automatically**,
+  then explicitly activate **Try safe in-book preview** and verify its unchanged
+  restricted sandbox, source URL, and independent full-tab fallback.
 - For a curated Zenodo record, tests confirm there is no untrusted iframe.
 - A targeted directory preview test confirms a user can stop an opt-in
   frame without losing the direct link.

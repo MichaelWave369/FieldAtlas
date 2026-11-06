@@ -7,6 +7,18 @@ import { censusCategoryForRepo } from './census-categories.js';
  * A descriptive fallback is used for new releases until reviewed.
  */
 export const projectOverrides = Object.freeze({
+  "PhiBall369": { title:"PhiBall369 · Pinball Workshop", category:"Games", desc:"A browser-first pinball engine and table-builder project in development; playable milestones will be linked only when verified." },
+  "GMED": { title:"GMED", category:"Tools", desc:"An evidence-first merge and CI verification workflow project for the Field ecosystem." },
+  "PhiTriBrain369": { title:"PhiTriBrain369", category:"Intelligence", desc:"Experiments with distinct AI roles for planning, memory, and verification." },
+  "PhiMadaPrime": { title:"PhiMadaPrime", category:"Systems", desc:"A developing virtual office for coordinating Field projects, operators, and assistant teams." },
+  "ARCLight": { title:"ARCLight", category:"Creative", desc:"An original science-fiction universe connecting stories, characters, and the ARCLight vessel." },
+  "RacetoOblivion": { title:"Race to Oblivion", category:"Games", desc:"An in-development narrative game exploring Elsewhen, the Interval, and Subject:369." },
+  "OverStrings": { title:"OverStrings", category:"Tools", desc:"An open hand-tracking toolkit for Quest and immersive interfaces." },
+  "CompAware": { title:"CompAware", category:"Research", desc:"An exploratory design and research repository for computational-awareness ideas and silicon embodiments." },
+  "RetroVerse": { title:"RetroVerse", category:"Learning", desc:"Browser-based retro-computing museum and preservation experiments." },
+  "PhiOS-Mobile": { title:"PhiOS Mobile", category:"Systems", desc:"A mobile platform initiative within the larger PhiOS project family." },
+  "PhianoSheets": { title:"PhianoSheets", category:"Music", desc:"A notation and musical experimentation workbench, including ideas about tuning and composition." },
+  "PaperGhost": { title:"PaperGhost", category:"Tools", desc:"A public-minded repository for a free library of practical digital essentials." },
   'BTM': { title:'Break the Matrix', category:'Games', desc:'A retro sci-fi raycasting shooter with a playable browser campaign and immersive Quest 3 WebXR mode.' },
   'SparkTheSubstrate': { title:'Spark: The Substrate', category:'Games', desc:'A free fantasy adventure with branching choices, elemental combat, and a browser-based immersive VR Descent.' },
   'EchoesOfTheNine': { title:'Echoes of the Nine', category:'Games', desc:'An original science-fantasy JRPG with choices, party combat and an experimental immersive battle view.' },

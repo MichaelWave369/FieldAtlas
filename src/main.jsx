@@ -763,9 +763,9 @@ function App() {
 
     <section className="new-horizons" aria-labelledby="new-horizons-title">
       <div className="new-horizons-heading">
-        <span className="eyebrow"><Sparkles size={15}/> FRESHLY FORGED · OCTOBER 2026</span>
+        <span className="eyebrow"><Sparkles size={15}/> FRESHLY FORGED · NOVEMBER 2026</span>
         <h2 id="new-horizons-title">New horizons in the Field</h2>
-        <p>Games, worlds, and creative tools that joined the collection recently. An <strong>Open chapter</strong> button appears only when that project is in your accessible Atlas; every card also links to its public source.</p>
+        <p>Recent projects across games, research, music, tools, and AI systems. These are public source spotlights, not claims of completed or playable websites. <strong>Open chapter</strong> appears only when your accessible Atlas already has a chapter; every card links to its public source.</p>
       </div>
       <div className="new-horizons-grid">
         {recentFieldProjects.map(({ project, chapter }) => <article className="new-horizons-card" key={project.repo}>
@@ -894,7 +894,7 @@ function App() {
       </section>
     </div>}
 
-    {showHelp && <div className="modal-cover" onMouseDown={()=>setShowHelp(false)}><section className="small-modal" data-atlas-modal="help" role="dialog" aria-modal="true" aria-labelledby="help-title" onMouseDown={e=>e.stopPropagation()}><button data-atlas-initial-focus className="modal-x" aria-label="Close" onClick={()=>setShowHelp(false)}><X/></button><span className="eyebrow">A NOTE FROM THE LIBRARY</span><h2 id="help-title">A book made of doorways.</h2><p>The Field Atlas is a real React app, wrapped in a warm study. Each chapter previews a GitHub Pages website in an iframe and offers a direct link. Some browsers and projects refuse embedded frames, so the direct link is always available.</p><p>Turn chapters with the arrows or keyboard, choose a library wing, bookmark favorites, or add sites by URL. A daily public-site manifest automatically adds verified live GitHub Pages to the shared book. Unverified suggestions remain in the private-to-this-browser approval inbox. Personal bookmarks and changes stay in this browser.</p><div className="modal-notice"><Star size={18}/> The book is a guide, never a permission grant. Embedded sites keep their own functionality and safety rules.</div></section></div>}
+    {showHelp && <div className="modal-cover" onMouseDown={()=>setShowHelp(false)}><section className="small-modal" data-atlas-modal="help" role="dialog" aria-modal="true" aria-labelledby="help-title" onMouseDown={e=>e.stopPropagation()}><button data-atlas-initial-focus className="modal-x" aria-label="Close" onClick={()=>setShowHelp(false)}><X/></button><span className="eyebrow">A NOTE FROM THE LIBRARY</span><h2 id="help-title">A book made of doorways.</h2><p>The Field Atlas is a real React app, wrapped in a warm study. Website chapters open a direct-link gateway first. An optional sandboxed preview is available on request, but games, storage, audio, and VR often need a full browser tab. Research records have no live embed.</p><p>Turn chapters with the arrows or keyboard, choose a library wing, bookmark favorites, or add sites by URL. A daily public-site manifest automatically adds verified live GitHub Pages to the shared book. Unverified suggestions remain in the private-to-this-browser approval inbox. Personal bookmarks and changes stay in this browser.</p><div className="modal-notice"><Star size={18}/> The book is a guide, never a permission grant. Embedded sites keep their own functionality and safety rules.</div></section></div>}
 
     {shelfOpen && <div className="modal-cover" onMouseDown={()=>setShelfOpen(false)}><section className="curate-modal" data-atlas-modal="shelf" role="dialog" aria-modal="true" aria-labelledby="curate-title" onMouseDown={e=>e.stopPropagation()}>
       <button type="button" data-atlas-initial-focus className="modal-x" aria-label="Close shelf editor" onClick={()=>setShelfOpen(false)}><X size={23}/></button>

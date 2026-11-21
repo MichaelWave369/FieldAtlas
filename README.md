@@ -1,5 +1,16 @@
 # The Field Atlas ✦
 
+## R9 · Experimental Wing (draft candidate)
+
+The new [Field Experiment Lab](./public/experiment-lab/index.html) is an opt-in, standalone
+research instrument reachable from a public R7 dossier. It offers a deterministic,
+fictional 12-node diffusion demo with click-to-play original audio, plus an evidence-only
+view of one public repository's recorded origin, latest push and bounded merged PRs.
+**Observation edges are not source dependencies or proven integrations.** No WebXR,
+physical structural simulation, private data access, deployment or release approval is
+claimed. The original book, Constellation bridge, passport and all existing gates remain
+unchanged. See [R9 candidate contract](docs/R9_EXPERIMENTAL_WING.md).
+
 ## R8 · The Field Chronicle (evidence-first timeline candidate)
 
 The **Field Chronicle** is a new, collapsible, responsive history lens below the Living Encyclopedia. It combines every dated event in the current **public R7 source snapshot** into one searchable, filterable timeline: GitHub repository creation, up to four recent **actually merged** PRs per source dossier, and the repository's last observed push. A month-by-month **Temporal Pulse** reveals recorded activity clusters without pretending to measure deploys or commits. Visitors can filter by repository, year, month, event kind or text, reverse chronological direction, inspect source links, and open R7 dossiers or numeric-ID Constellation locators. Shareable links like `?chronicle=GMED&chronicleKind=merged#field-chronicle` work without accounts.

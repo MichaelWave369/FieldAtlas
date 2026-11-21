@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { sourceMergedPrEvidence, expectSameEvidenceLinks } from './source-snapshot.js';
 
 test('R8 shareable Chronicle opens a real GMED timeline with public PR evidence', async ({ page }) => {
   await page.goto('/?chronicle=GMED&chronicleKind=merged#field-chronicle');
@@ -8,10 +9,10 @@ test('R8 shareable Chronicle opens a real GMED timeline with public PR evidence'
   await expect(chronicle.locator('.field-chronicle-titles')).toContainText('The Field Chronicle');
   await expect(chronicle.getByRole('combobox',{name:'Chronicle project'})).toHaveValue('GMED');
   await expect(chronicle.getByRole('button',{name:'Merged PRs'})).toHaveAttribute('aria-pressed','true');
-  const pr = chronicle.locator('.field-chronicle-event').filter({hasText:'Merged PR #2'}).first();
-  await expect(pr).toBeVisible();
-  await expect(pr.getByRole('link',{name:'Inspect merged PR'}))
-    .toHaveAttribute('href','https://github.com/MichaelWave369/GMED/pull/2');
+  const evidence = await sourceMergedPrEvidence(page,'GMED');
+  const displayed = chronicle.locator('.field-chronicle-event');
+  await expect(displayed).toHaveCount(evidence.numbers.length);
+  await expectSameEvidenceLinks(displayed.getByRole('link',{name:'Inspect merged PR'}), evidence.evidenceUrls);
   await expect(chronicle.getByRole('link',{name:'Share this view'}))
     .toHaveAttribute('href',/chronicle=GMED&chronicleKind=merged#field-chronicle$/);
   await expect(chronicle.getByRole('link',{name:'Open R7 dossier'}))
@@ -28,7 +29,10 @@ test('R8 filters source events, then restores the full timeline without losing t
   await expect(chronicle.locator('.field-chronicle-event')).toHaveCount(1);
   await expect(chronicle.locator('.field-chronicle-event').first()).toContainText('Repository created');
   await chronicle.getByRole('button',{name:'Merged PRs'}).click();
-  await expect(chronicle.locator('.field-chronicle-event').first()).toContainText('Merged PR #2');
+  const evidence = await sourceMergedPrEvidence(page,'GMED');
+  const merged = chronicle.locator('.field-chronicle-event');
+  await expect(merged).toHaveCount(evidence.numbers.length);
+  await expectSameEvidenceLinks(merged.getByRole('link',{name:'Inspect merged PR'}), evidence.evidenceUrls);
   await chronicle.getByRole('button',{name:'All recorded events'}).click();
   expect(await chronicle.locator('.field-chronicle-event').count()).toBeGreaterThan(1);
   await expect(page.locator('.atlas-book')).toBeAttached();

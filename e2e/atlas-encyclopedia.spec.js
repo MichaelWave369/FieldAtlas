@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { sourceMergedPrEvidence, expectSameEvidenceLinks } from './source-snapshot.js';
 
 test('living encyclopedia opens a shareable source dossier without replacing the living book',async ({page})=>{
   await page.goto('/?dossier=GMED#living-encyclopedia');
@@ -8,7 +9,10 @@ test('living encyclopedia opens a shareable source dossier without replacing the
   await expect(encyclopedia).toHaveAttribute('open','');
   await expect(encyclopedia.getByRole('heading',{name:'GMED',exact:true})).toBeVisible();
   await expect(encyclopedia.getByRole('heading',{name:'Public development history'})).toBeVisible();
-  await expect(encyclopedia.getByText('Merged PR #2')).toBeVisible();
+  const evidence = await sourceMergedPrEvidence(page,'GMED');
+  await expectSameEvidenceLinks(
+    encyclopedia.locator('.atlas-encyclopedia-timeline').getByRole('link',{name:'Review merged PR'}),
+    evidence.evidenceUrls);
   await expect(encyclopedia.getByRole('link',{name:'Open source'}))
     .toHaveAttribute('href','https://github.com/MichaelWave369/GMED');
   await expect(encyclopedia.getByRole('link',{name:'Locate in Constellation'}))
@@ -25,7 +29,10 @@ test('public source search navigates between dossiers without inventing live cha
   await encyclopedia.getByRole('searchbox',{name:'Find a project'}).fill('PhiTriBrain369');
   await encyclopedia.getByRole('button',{name:/PhiTriBrain369/}).click();
   await expect(encyclopedia.getByRole('heading',{name:'PhiTriBrain369'})).toBeVisible();
-  await expect(encyclopedia.getByText('Merged PR #14')).toBeVisible();
+  const evidence = await sourceMergedPrEvidence(page,'PhiTriBrain369');
+  await expectSameEvidenceLinks(
+    encyclopedia.locator('.atlas-encyclopedia-timeline').getByRole('link',{name:'Review merged PR'}),
+    evidence.evidenceUrls);
   const sources=encyclopedia.getByRole('link',{name:'Open source'});
   await expect(sources).toHaveAttribute('target','_blank');
   await expect(sources).toHaveAttribute('rel',/noopener/);

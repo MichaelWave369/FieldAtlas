@@ -1,12 +1,13 @@
 import React, { useMemo, useState } from 'react';
 import './encyclopedia.css';
-import { BookOpen, ExternalLink, GitMerge, LibraryBig, Search, Clock3, Network, Share2 } from 'lucide-react';
+import { BookOpen, ExternalLink, GitMerge, LibraryBig, Search, Clock3, Network, Share2, FlaskConical } from 'lucide-react';
 import {
   readDossierQuery, findDossier, dossierConnections, dossierTimeline,
   dossierConstellationUrl, dossierShareUrl,
 } from './encyclopedia-data.js';
 import { constellationProjectId } from './constellation-bridge.js';
 import { chronicleShareUrl } from './chronicle-data.js';
+import { experimentLabUrl } from './experiment-lab-link.js';
 
 const CHUNK_SIZE = 16;
 function dateLabel(value) {
@@ -100,6 +101,7 @@ export default function LivingEncyclopedia({
               <a href={selected.sourceUrl} target="_blank" rel="noopener noreferrer"><ExternalLink size={15}/> Open source</a>
               {chapter && <button type="button" onClick={() => onReadChapter(chapter)}><BookOpen size={15}/> Read live chapter</button>}
               {constellation && <a href={constellation} target="_blank" rel="noopener noreferrer"><Network size={15}/> Locate in Constellation</a>}
+              {typeof window !== 'undefined' && <a href={experimentLabUrl(window.location.href,selected.repo)} target="_blank" rel="noopener noreferrer"><FlaskConical size={15}/> Explore in Lab (experimental)</a>}
               {typeof window !== 'undefined' && <a href={chronicleShareUrl(window.location.href,{repo:selected.repo})}><GitMerge size={15}/> View in Chronicle</a>}
               {share && <a href={share}><Share2 size={15}/> Share dossier link</a>}
             </div>
